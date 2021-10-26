@@ -38,5 +38,24 @@ namespace ToDoApp.Services
         {
             return user.ToDoList.FirstOrDefault(t => t.Id == id);
         }
+
+        public bool DeleteTaskList(int id)
+        {
+            TaskList currentList = GetTaskList(UserService.CurrentUser, id);
+            if(currentList == null)
+            {
+                Console.WriteLine($"There isn't list with id {id}");
+
+                return false;
+            }
+            else
+            {
+                UserService.CurrentUser.ToDoList.Remove(currentList);
+                Console.WriteLine($"You deleted list {currentList.Title}");
+
+                return true;
+            }
+        }
     }
 }
+

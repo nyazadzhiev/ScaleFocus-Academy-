@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ToDoApp.Entities
 {
-    class Task : Entity
+    public class Task : Entity
     {
         public string Title { get; set; }
         public string Description { get; set; }

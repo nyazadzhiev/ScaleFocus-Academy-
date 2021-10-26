@@ -9,11 +9,7 @@ namespace ToDoApp.Services
 {
     class UserService
     {
-        private const string StoreFileName = "Users.json";
-        private readonly FileDatabase _storage;
-        private readonly List<User> _applicationUsers = new List<User>();
-        private static int userIdGenerator = 0;
-        public User CurrentUser { get; private set; }
+        public static User CurrentUser { get; private set; }
 
         public UserService()
         {
@@ -21,7 +17,7 @@ namespace ToDoApp.Services
             List<User> usersFromFile = _storage.Read<List<User>>(StoreFileName);
             if (usersFromFile == null)
             {
-                CreateUser("admin", "adminpassword", "Admin", "Admin", true);
+                CreateAdmin();
             }
             else
             {
@@ -29,9 +25,37 @@ namespace ToDoApp.Services
             }
         }
 
+        private const string StoreFileName = "Users.json";
+        private readonly FileDatabase _storage;
+        private readonly List<User> _applicationUsers = new List<User>();
+        private static int userIdGenerator = 0;
+
         private void SaveToFile()
         {
             _storage.Write(StoreFileName, _applicationUsers);
+        }
+
+        public bool CreateAdmin()
+        {
+            userIdGenerator++;
+
+            DateTime now = DateTime.Now;
+
+            _applicationUsers.Add(new User()
+            {
+                Username = "admin",
+                Password = "adminpassword",
+                FirstName = "Admin",
+                LastName = "Admin",
+                IsAdmin = true,
+                Id = userIdGenerator,
+                CreatedAt = now,
+                Creator = new User() { FirstName = "Admin", LastName = "Admin"}
+            });
+
+            SaveToFile();
+
+            return true;
         }
 
         public bool CreateUser(string username, string password, string firstName, string lastName, bool isAdmin)
@@ -53,7 +77,8 @@ namespace ToDoApp.Services
                 LastName = lastName,
                 IsAdmin = isAdmin,
                 Id = userIdGenerator,
-                CreatedAt = now
+                CreatedAt = now,
+                Creator = CurrentUser
             });
 
             SaveToFile();
@@ -71,14 +96,75 @@ namespace ToDoApp.Services
             CurrentUser = null;
         }
 
-        public User getUserById(int id)
+        public List<User> GetAllUsers()
+        {
+            return _applicationUsers;
+        }
+
+        public User GetUser(int id)
         {
             return _applicationUsers.FirstOrDefault(u => u.Id == id);
         }
 
-        public User getUserByUsername(string username)
+        public User GetUser(string username)
         {
             return _applicationUsers.FirstOrDefault(u => u.Username == username);
+        }
+
+        public bool EditUser(string username)
+        {
+            User user = GetUser(username);
+
+            if (user == null)
+            {
+                Console.WriteLine($"There isn't user with username {username}");
+
+                return false;
+            }
+            else
+            {
+                Console.WriteLine("Enter new username");
+                string newValues = Console.ReadLine();
+                user.Username = newValues;
+
+                Console.WriteLine("Enter new password");
+                newValues = Console.ReadLine();
+                user.Password = newValues;
+
+                Console.WriteLine("Enter new First Name");
+                newValues = Console.ReadLine();
+                user.FirstName = newValues;
+
+                Console.WriteLine("Enter new Last Name");
+                newValues = Console.ReadLine();
+                user.LastName = newValues;
+
+                Console.WriteLine("You successfully edited the user");
+
+                SaveToFile();
+
+                return true;
+            }
+        }
+
+        public bool DeleteUser(string username)
+        {
+            User user = GetUser(username);
+
+            if (user == null)
+            {
+                Console.WriteLine($"There isn't user with username {username}");
+
+                return false;
+            }
+            else
+            {
+                _applicationUsers.Remove(user);
+                Console.WriteLine($"You Deleted user {username}");
+                SaveToFile();
+
+                return true;
+            }
         }
     }
 }

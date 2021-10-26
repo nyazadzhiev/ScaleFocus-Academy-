@@ -8,7 +8,7 @@ using ToDoApp.Entities;
 namespace ToDoApp.Services
 {
     class TaskService
-    {       
+    {
         private int taskIDGenerator = 0;
 
         public Task GetTask(TaskList list, int id)
@@ -47,11 +47,11 @@ namespace ToDoApp.Services
             return false;
         }
 
-        public bool EditTask(TaskList list, int taskId, int newId, string newTitle, string newDesc, bool newIscomplete)
+        public bool EditTask(TaskList list, int taskId, string newTitle, string newDesc, bool newIscomplete)
         {
             Task currentTask = list.Tasks.FirstOrDefault(t => t.Id == taskId);
 
-            if(currentTask == null)
+            if (currentTask == null)
             {
                 Console.WriteLine($"There isn't a taks with id {taskId}");
 
@@ -59,7 +59,6 @@ namespace ToDoApp.Services
             }
             else
             {
-                currentTask.Id = newId;
                 currentTask.Title = newTitle;
                 currentTask.Description = newDesc;
                 currentTask.IsComplete = newIscomplete;
@@ -84,7 +83,8 @@ namespace ToDoApp.Services
 
                 return true;
             }
-            
+
         }
     }
 }
+
