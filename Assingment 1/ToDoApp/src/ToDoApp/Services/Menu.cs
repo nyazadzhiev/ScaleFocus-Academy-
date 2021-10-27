@@ -29,7 +29,6 @@ namespace ToDoApp.Services
                         userCommand.PromptLogOut();
                     }
                     break;
-
                 case "2":
                     bool isPrintSuccesfull = PrintUserManagementMenu(currentUser);
 
@@ -116,9 +115,20 @@ namespace ToDoApp.Services
         private static void ShowMenu(User currentUser)
         {
             LogMenu(currentUser);
-            Console.WriteLine("2. User Management Menu");
-            Console.WriteLine("3. Tasklist Management Menu");
-            Console.WriteLine("4. Task Management Menu");
+            if (currentUser != null)
+            {
+                if (currentUser.IsAdmin)
+                {
+                    Console.WriteLine("2. User Management Menu");
+                    Console.WriteLine("3. Tasklist Management Menu");
+                    Console.WriteLine("4. Task Management Menu");
+                }
+                else
+                {
+                    Console.WriteLine("3. Tasklist Management Menu");
+                    Console.WriteLine("4. Task Management Menu");
+                }
+            }
             Console.WriteLine("5. Exit");
         }
 
