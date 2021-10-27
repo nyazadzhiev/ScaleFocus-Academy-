@@ -227,7 +227,6 @@ namespace ToDoApp.Services
             }
 
             Console.WriteLine("Enter list id");
-            Console.WriteLine("Enter id");
             string _id = Console.ReadLine();
             int id;
             if (int.TryParse(_id, out id))
