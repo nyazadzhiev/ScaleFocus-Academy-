@@ -10,33 +10,14 @@ namespace ToDoAppServices
         UserService userService = new UserService();
         TaskListService listService = new TaskListService();
 
-        public bool PromptCreateTaskList()
+        public void PromptCreateTaskList()
         {
-            if (UserService.CurrentUser == null)
-            {
-                Console.WriteLine("Please log in");
-
-                return false;
-            }
-
             Console.WriteLine("Enter title");
             string title = Console.ReadLine();
 
             TaskList taskList = listService.CreateTaskList(UserService.CurrentUser, title);
 
-
-            if (taskList != null)
-            {
-                Console.WriteLine($"You created a tasklist {title}");
-
-                return true;
-            }
-            else
-            {
-                Console.WriteLine("There is no such a user");
-
-                return false;
-            }
+            Console.WriteLine($"You created a tasklist {title}");
         }
 
         public void PromptEditTaskList()
