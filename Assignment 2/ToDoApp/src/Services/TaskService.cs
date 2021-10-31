@@ -8,6 +8,8 @@ namespace ToDoAppServices
 {
     public class TaskService
     {
+        private static UserService userService = new UserService();
+        private static TaskListService listService = new TaskListService();
         private int taskIDGenerator = 0;
 
         public Task GetTask(TaskList list, int id)
@@ -28,6 +30,7 @@ namespace ToDoAppServices
                 ToDoList = list,
                 CreatedAt = DateTime.Now,
                 LastEdited = null,
+                Modifier = null,
                 Id = taskIDGenerator
             };
 
@@ -63,6 +66,7 @@ namespace ToDoAppServices
                 currentTask.Description = newDesc;
                 currentTask.IsComplete = newIscomplete;
                 currentTask.LastEdited = DateTime.Now;
+                currentTask.Modifier = UserService.CurrentUser;
 
                 return true;
             }
@@ -88,4 +92,3 @@ namespace ToDoAppServices
         }
     }
 }
-

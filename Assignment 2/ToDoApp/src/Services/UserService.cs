@@ -49,7 +49,7 @@ namespace ToDoAppServices
                 IsAdmin = true,
                 Id = userIdGenerator,
                 CreatedAt = now,
-                Creator = new User() { FirstName = "Admin", LastName = "Admin"}
+                Creator = new User() { FirstName = "Admin", LastName = "Admin" }
             });
 
             SaveToFile();
@@ -78,7 +78,8 @@ namespace ToDoAppServices
                 Id = userIdGenerator,
                 CreatedAt = now,
                 LastEdited = null,
-                Creator = CurrentUser
+                Creator = CurrentUser,
+                Modifier = null
             });
 
             SaveToFile();
@@ -140,6 +141,7 @@ namespace ToDoAppServices
                 user.LastName = newValues;
 
                 user.LastEdited = DateTime.Now;
+                user.Modifier = UserService.CurrentUser;
 
                 Console.WriteLine("You successfully edited the user");
 
@@ -170,3 +172,4 @@ namespace ToDoAppServices
         }
     }
 }
+

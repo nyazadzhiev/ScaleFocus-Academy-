@@ -15,7 +15,7 @@ namespace ToDoAppServices
             Console.WriteLine("Enter title");
             string title = Console.ReadLine();
 
-            TaskList taskList = listService.CreateTaskList(UserService.CurrentUser, title);
+            listService.CreateTaskList(UserService.CurrentUser, title);
 
             Console.WriteLine($"You created a tasklist {title}");
         }
@@ -112,7 +112,6 @@ namespace ToDoAppServices
             }
 
             Console.WriteLine("Enter list id to share");
-            Console.WriteLine("Enter id");
             string _id = Console.ReadLine();
             int id;
             if (int.TryParse(_id, out id))
