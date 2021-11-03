@@ -1,15 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using ToDoAppData;
 using ToDoAppEntities;
 
 namespace ToDoAppServices
 {
     public class Menu
     {
-        private static TaskCommand taskCommand = new TaskCommand();
-        private static TaskListCommand listCommand = new TaskListCommand();
-        private static UserCommand userCommand = new UserCommand();
+        private TaskCommand taskCommand;
+        private TaskListCommand listCommand;
+        private UserService userService;
+        private TaskListService listService;
+        private UserCommand userCommand;
+        private readonly Database _database;
+
+        public Menu(Database database)
+        {
+            _database = database;
+            userService = new UserService(_database);
+            listService = new TaskListService(_database);
+            userCommand = new UserCommand(userService);
+            listCommand = new TaskListCommand(userService, listService);
+            taskCommand = new TaskCommand(_database);
+        }
 
         public bool MainMenu(User currentUser)
         {

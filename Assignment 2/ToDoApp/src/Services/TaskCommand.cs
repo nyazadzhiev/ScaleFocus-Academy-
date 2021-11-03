@@ -1,15 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using ToDoAppData;
 using ToDoAppEntities;
 
 namespace ToDoAppServices
 {
     public class TaskCommand
     {
-        private static TaskService taskService = new TaskService();
-        private static TaskListService listService = new TaskListService();
-        private static UserService userService = new UserService();
+        private TaskService taskService;
+        private TaskListService listService;
+        private UserService userService;
+        private readonly Database _database;
+
+        public TaskCommand(Database database)
+        {
+            _database = database;
+            taskService = new TaskService(_database);
+            listService = new TaskListService(_database);
+            userService = new UserService(_database);
+        }
 
         public void PromptAddTask()
         {
@@ -32,7 +42,7 @@ namespace ToDoAppServices
                 return;
             }
 
-            TaskList list = listService.GetTaskList(UserService.CurrentUser, id);
+            TaskList list = listService.GetTaskList(id);
 
             if (list == null)
             {
@@ -58,7 +68,7 @@ namespace ToDoAppServices
                 isComplete = false;
             }
 
-            taskService.CreateTask(list, UserService.CurrentUser, title, description, isComplete);
+            taskService.CreateTask(UserService.CurrentUser, list, title, description, isComplete);
             Console.WriteLine($"You created task {title}");
         }
 
@@ -84,15 +94,27 @@ namespace ToDoAppServices
                 return;
             }
 
-            TaskList tasks = listService.GetTaskList(UserService.CurrentUser, id);
+            TaskList lists = listService.GetTaskList(id);
 
-            if (tasks == null)
+            if (lists == null)
             {
                 Console.WriteLine($"There isn't a list with id: {id}.");
                 return;
             }
 
-            foreach (Task task in tasks.Tasks)
+            List<Task> tasks = taskService.GetTasks(id);
+
+            foreach (Task task in tasks)
+            {
+                Console.WriteLine("--------------------------");
+                Console.WriteLine(task.ToString());
+            }
+
+            Console.WriteLine("Assigned Tasks");
+
+            List<Task> assignedTasks = taskService.GetTasks(id);
+
+            foreach (Task task in assignedTasks)
             {
                 Console.WriteLine("--------------------------");
                 Console.WriteLine(task.ToString());
@@ -119,7 +141,7 @@ namespace ToDoAppServices
 
                 return;
             }
-            TaskList list = listService.GetTaskList(UserService.CurrentUser, id);
+            TaskList list = listService.GetTaskList(id);
 
             if (list == null)
             {
@@ -139,7 +161,7 @@ namespace ToDoAppServices
                 return;
             }
 
-            Task currentTask = taskService.GetTask(list, id);
+            Task currentTask = taskService.GetTask(id);
 
             if (currentTask == null)
             {
@@ -167,7 +189,7 @@ namespace ToDoAppServices
                 isComplete = false;
             }
 
-            taskService.EditTask(list, currentTask.Id, newTitle, newDescription, isComplete);
+            taskService.EditTask(currentTask.Id, newTitle, newDescription, isComplete);
             Console.WriteLine("You successfully edited task");
         }
 
@@ -193,7 +215,7 @@ namespace ToDoAppServices
                 return;
             }
 
-            TaskList list = listService.GetTaskList(UserService.CurrentUser, id);
+            TaskList list = listService.GetTaskList(id);
 
             if (list == null)
             {
@@ -240,7 +262,7 @@ namespace ToDoAppServices
                 return;
             }
 
-            TaskList list = listService.GetTaskList(UserService.CurrentUser, id);
+            TaskList list = listService.GetTaskList(id);
 
             if (list == null)
             {
@@ -260,7 +282,7 @@ namespace ToDoAppServices
                 return;
             }
 
-            taskService.DeteleTask(list, id);
+            taskService.DeteleTask(id);
         }
 
         public void PromptAssignTask()
@@ -272,10 +294,10 @@ namespace ToDoAppServices
                 return;
             }
 
-            string username;
-
             Console.WriteLine("Enter list title");
             string listTitle = Console.ReadLine();
+            listService.CreateTaskList(UserService.CurrentUser, listTitle);
+            TaskList currentList = listService.GetTaskList(listTitle);
 
             Console.WriteLine("Enter task title");
             string title = Console.ReadLine();
@@ -295,6 +317,11 @@ namespace ToDoAppServices
                 isComplete = false;
             }
 
+            taskService.CreateTask(UserService.CurrentUser, currentList, title, description, isComplete);
+            Task currentTask = taskService.GetTask(title);
+
+            string username;
+
             do
             {
                 Console.WriteLine("Enter receiver's username or 1 to end");
@@ -309,9 +336,9 @@ namespace ToDoAppServices
                     return;
                 }
 
-                TaskList list = listService.CreateTaskList(receiver, listTitle);
-                receiver.ToDoList.Add(list);
-                taskService.CreateTask(list, UserService.CurrentUser, title, description, isComplete);
+
+
+                taskService.AssignTask(receiver, currentTask.Id);
 
                 Console.WriteLine($"You assigned task {title} to user {username}");
             } while (username != "1");

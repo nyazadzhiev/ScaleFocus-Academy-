@@ -1,13 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using ToDoAppData;
 using ToDoAppEntities;
 
 namespace ToDoAppServices
 {
     public class UserCommand
     {
-        private static UserService userService = new UserService();
+        private UserService _userService;
+
+        public UserCommand(UserService userService)
+        {
+            _userService = userService;
+        }
 
         public void PromptLogIn()
         {
@@ -16,7 +22,7 @@ namespace ToDoAppServices
 
             Console.WriteLine("Enter password:");
             string password = Console.ReadLine();
-            userService.Login(userName, password);
+            _userService.Login(userName, password);
             if (UserService.CurrentUser == null)
             {
                 Console.WriteLine("Login failed.");
@@ -29,7 +35,7 @@ namespace ToDoAppServices
 
         public void PromptLogOut()
         {
-            userService.LogOut();
+            _userService.LogOut();
         }
 
         public void PromptCreateUser()
@@ -66,7 +72,7 @@ namespace ToDoAppServices
                 isAdmin = false;
             }
 
-            bool isSuccess = userService.CreateUser(name, password, firstName, lastName, isAdmin);
+            bool isSuccess = _userService.CreateUser(name, password, firstName, lastName, isAdmin);
             if (isSuccess)
             {
                 Console.WriteLine($"User with name '{name}' added");
@@ -82,7 +88,7 @@ namespace ToDoAppServices
             Console.WriteLine("Enter username");
             string username = Console.ReadLine();
 
-            userService.EditUser(username);
+            _userService.EditUser(username);
         }
 
         public void PromptDeleteUser()
@@ -90,12 +96,12 @@ namespace ToDoAppServices
             Console.WriteLine("Enter username");
             string username = Console.ReadLine();
 
-            userService.DeleteUser(username);
+            _userService.DeleteUser(username);
         }
 
         public void PromptGetAllUsers()
         {
-            List<User> users = userService.GetAllUsers();
+            List<User> users = _userService.GetAllUsers();
 
             foreach (User user in users)
             {

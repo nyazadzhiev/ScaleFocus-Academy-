@@ -19,10 +19,8 @@ namespace ToDoAppEntities
         {
             return $"Name {this.FirstName} {this.LastName}\n" +
                 $"Role: {(this.IsAdmin ? "Admin" : "User")}\n" +
-                $"Creator {this.Creator.FirstName} {this.Creator.LastName}\n" +
                 $"Created at: {this.CreatedAt}\n" +
-                $"Modifier: {(this.Modifier == null ? "Not edited yet" : $"{this.Modifier.FirstName} {this.Modifier.LastName}")}\n" +
-                $"Last Edited: {(this.LastEdited == null ? "Not edited yet" : $"{this.LastEdited}")}\n";
+                $"Last Edited: {this.LastEdited}\n";
         }
     }
 }

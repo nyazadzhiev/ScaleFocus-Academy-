@@ -24,9 +24,10 @@ namespace ToDoAppServices
             {
                 Id = listIDGenerator,
                 Title = title,
-                Owner = user,
+                Creator = user,
                 CreatedAt = DateTime.Now,
-                LastEdited = null
+                LastEdited = null,
+                Modifier = null
             };
 
             user.ToDoList.Add(newTaskList);
@@ -54,6 +55,7 @@ namespace ToDoAppServices
             {
                 currentList.Title = newTitle;
                 currentList.LastEdited = DateTime.Now;
+                currentList.Modifier = UserService.CurrentUser;
                 Console.WriteLine("You succesfully edited TaskList");
 
                 return true;

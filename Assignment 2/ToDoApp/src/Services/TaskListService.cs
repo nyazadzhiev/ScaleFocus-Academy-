@@ -2,49 +2,60 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using ToDoAppData;
 using ToDoAppEntities;
 
 namespace ToDoAppServices
 {
     public class TaskListService
     {
+        private readonly Database _database;
         private List<TaskList> tasks = new List<TaskList>();
         private int listIDGenerator = 0;
 
-        public List<TaskList> GetAllTaskLists()
+        public TaskListService(Database database)
         {
-            return tasks;
+            _database = database;
         }
 
-        public TaskList CreateTaskList(User user, string title)
+        public List<TaskList> GetAllTaskLists(User user)
+        {
+            return _database.GetTaskLists(user.Id);
+        }
+
+        public List<TaskList> GetSharedLists()
+        {
+            return _database.GetSharedLists();
+        }
+
+        public bool CreateTaskList(User user, string title)
         {
             listIDGenerator++;
 
-            TaskList newTaskList = new TaskList()
+            return _database.CreateTaskList(new TaskList()
             {
                 Id = listIDGenerator,
                 Title = title,
-                Creator = user,
+                CreatorId = user.Id,
                 CreatedAt = DateTime.Now,
-                LastEdited = null,
-                Modifier = null
-            };
-
-            user.ToDoList.Add(newTaskList);
-            tasks.Add(newTaskList);
-
-            return newTaskList;
-
+                LastEdited = DateTime.Now,
+                ModifierId = user.Id
+            });
         }
 
-        public TaskList GetTaskList(User user, int id)
+        public TaskList GetTaskList(int id)
         {
-            return user.ToDoList.FirstOrDefault(t => t.Id == id);
+            return _database.GetTaskList(id);
+        }
+
+        public TaskList GetTaskList(string title)
+        {
+            return _database.GetTaskList(title);
         }
 
         public bool EditTaskList(int id, string newTitle)
         {
-            TaskList currentList = GetTaskList(UserService.CurrentUser, id);
+            TaskList currentList = GetTaskList(id);
             if (currentList == null)
             {
                 Console.WriteLine($"There isn't list with id {id}");
@@ -53,9 +64,7 @@ namespace ToDoAppServices
             }
             else
             {
-                currentList.Title = newTitle;
-                currentList.LastEdited = DateTime.Now;
-                currentList.Modifier = UserService.CurrentUser;
+                _database.EditTaskList(id, newTitle);
                 Console.WriteLine("You succesfully edited TaskList");
 
                 return true;
@@ -64,7 +73,7 @@ namespace ToDoAppServices
 
         public bool DeleteTaskList(int id)
         {
-            TaskList currentList = GetTaskList(UserService.CurrentUser, id);
+            TaskList currentList = GetTaskList(id);
             if (currentList == null)
             {
                 Console.WriteLine($"There isn't list with id {id}");
@@ -73,10 +82,22 @@ namespace ToDoAppServices
             }
             else
             {
-                UserService.CurrentUser.ToDoList.Remove(currentList);
+                _database.DeleteTaskList(id);
                 Console.WriteLine($"You deleted list {currentList.Title}");
 
                 return true;
+            }
+        }
+
+        public bool ShareTaskList(User user, int listId)
+        {
+            if(_database.ShareTaskList(user.Id, listId))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
     }
