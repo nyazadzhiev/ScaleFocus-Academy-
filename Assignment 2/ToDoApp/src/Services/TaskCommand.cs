@@ -11,14 +11,12 @@ namespace ToDoAppServices
         private TaskService taskService;
         private TaskListService listService;
         private UserService userService;
-        private readonly Database _database;
 
-        public TaskCommand(Database database)
+        public TaskCommand(TaskService _taskService, TaskListService _listService, UserService _userService)
         {
-            _database = database;
-            taskService = new TaskService(_database);
-            listService = new TaskListService(_database);
-            userService = new UserService(_database);
+            taskService = _taskService;
+            listService = _listService;
+            userService = _userService;
         }
 
         public void PromptAddTask()

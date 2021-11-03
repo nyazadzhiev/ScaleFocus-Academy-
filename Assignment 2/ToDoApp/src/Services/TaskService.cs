@@ -9,10 +9,10 @@ namespace ToDoAppServices
 {
     public class TaskService
     {
-        private readonly Database _database;
+        private readonly TaskDatabase _database;
         private int taskIDGenerator = 0;
 
-        public TaskService(Database database)
+        public TaskService(TaskDatabase database)
         {
             _database = database;
         }

@@ -12,17 +12,23 @@ namespace ToDoAppServices
         private TaskListCommand listCommand;
         private UserService userService;
         private TaskListService listService;
+        private TaskService taskService;
         private UserCommand userCommand;
-        private readonly Database _database;
+        private UserDatabase userDatabase;
+        private TaskListDatabase listDatabase;
+        private TaskDatabase taskDatabase;
 
         public Menu(Database database)
         {
-            _database = database;
-            userService = new UserService(_database);
-            listService = new TaskListService(_database);
+            userDatabase = new UserDatabase(database);
+            listDatabase = new TaskListDatabase(database);
+            taskDatabase = new TaskDatabase(database);
+            userService = new UserService(userDatabase);
+            listService = new TaskListService(listDatabase);
+            taskService = new TaskService(taskDatabase);
             userCommand = new UserCommand(userService);
             listCommand = new TaskListCommand(userService, listService);
-            taskCommand = new TaskCommand(_database);
+            taskCommand = new TaskCommand(taskService, listService, userService);
         }
 
         public bool MainMenu(User currentUser)
