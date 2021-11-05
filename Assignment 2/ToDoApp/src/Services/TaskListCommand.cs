@@ -27,6 +27,13 @@ namespace ToDoAppServices
                 return;
             }
 
+            if(_listService.GetTaskList(title) != null)
+            {
+                Console.WriteLine($"List with title {title} already exist");
+
+                return;
+            }
+
             _listService.CreateTaskList(UserService.CurrentUser, title);
 
             Console.WriteLine($"You created a tasklist {title}");

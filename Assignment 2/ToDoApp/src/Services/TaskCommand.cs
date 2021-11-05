@@ -57,6 +57,13 @@ namespace ToDoAppServices
                 return;
             }
 
+            if (taskService.GetTask(title) != null)
+            {
+                Console.WriteLine($"Task with title {title} already exist");
+
+                return;
+            }
+
             Console.WriteLine("Enter description");
             string description = Console.ReadLine();
             if (String.IsNullOrEmpty(description))
