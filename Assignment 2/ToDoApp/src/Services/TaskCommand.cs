@@ -328,26 +328,27 @@ namespace ToDoAppServices
             listService.CreateTaskList(UserService.CurrentUser, listTitle);
             TaskList currentList = listService.GetTaskList(listTitle);
 
-            Console.WriteLine("Enter task title");
-            string title = Console.ReadLine();
-
-            Console.WriteLine("Enter description");
-            string description = Console.ReadLine();
-
-            Console.WriteLine("Is complete? yes or no");
-            string answer = Console.ReadLine();
-            bool isComplete = true;
-            if (answer.ToLower() == "yes")
+            Console.WriteLine("Enter Task Id to assign");
+            string _taskId = Console.ReadLine();
+            int taskId;
+            if (int.TryParse(_taskId, out taskId))
             {
-                isComplete = true;
             }
-            else if (answer.ToLower() == "no")
+            else
             {
-                isComplete = false;
+                Console.WriteLine("Invalid input");
+
+                return;
             }
 
-            taskService.CreateTask(UserService.CurrentUser, currentList, title, description, isComplete);
-            Task currentTask = taskService.GetTask(title);
+            Task toAssign = taskService.GetTask(taskId);
+
+            if(toAssign == null)
+            {
+                Console.WriteLine($"The task with id {taskId} doesn't exist");
+
+                return;
+            }
 
             string username;
 
@@ -365,11 +366,9 @@ namespace ToDoAppServices
                     return;
                 }
 
+                taskService.AssignTask(receiver, toAssign.Id);
 
-
-                taskService.AssignTask(receiver, currentTask.Id);
-
-                Console.WriteLine($"You assigned task {title} to user {username}");
+                Console.WriteLine($"You assigned task {toAssign.Title} to user {username}");
             } while (username != "1");
         }
     }
