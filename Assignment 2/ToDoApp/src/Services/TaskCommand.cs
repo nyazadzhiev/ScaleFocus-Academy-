@@ -90,6 +90,12 @@ namespace ToDoAppServices
             {
                 isComplete = false;
             }
+            else
+            {
+                Console.WriteLine("Invalid input");
+
+                return;
+            }
 
             taskService.CreateTask(UserService.CurrentUser, list, title, description, isComplete);
             Console.WriteLine($"You created task {title}");
