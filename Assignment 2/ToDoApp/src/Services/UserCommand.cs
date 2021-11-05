@@ -48,19 +48,49 @@ namespace ToDoAppServices
 
             Console.WriteLine("User Name:");
             string name = Console.ReadLine();
+            if (String.IsNullOrEmpty(name))
+            {
+                Console.WriteLine("You can't enter empty values");
+
+                return;
+            }
 
             Console.WriteLine("Password:");
             string password = Console.ReadLine();
+            if (String.IsNullOrEmpty(password))
+            {
+                Console.WriteLine("You can't enter empty values");
+
+                return;
+            }
 
             Console.WriteLine("First Name:");
             string firstName = Console.ReadLine();
+            if (String.IsNullOrEmpty(firstName))
+            {
+                Console.WriteLine("You can't enter empty values");
+
+                return;
+            }
 
             Console.WriteLine("Last Name:");
             string lastName = Console.ReadLine();
+            if (String.IsNullOrEmpty(lastName))
+            {
+                Console.WriteLine("You can't enter empty values");
+
+                return;
+            }
 
             bool isAdmin;
             Console.WriteLine("Enter role (admin or user)");
             string answer = Console.ReadLine();
+            if (String.IsNullOrEmpty(answer))
+            {
+                Console.WriteLine("You can't enter empty values");
+
+                return;
+            }
 
 
             if (answer.ToLower() == "admin")

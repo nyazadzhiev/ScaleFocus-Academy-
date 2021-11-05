@@ -50,12 +50,30 @@ namespace ToDoAppServices
 
             Console.WriteLine("Enter title");
             string title = Console.ReadLine();
+            if (String.IsNullOrEmpty(title))
+            {
+                Console.WriteLine("You can't enter empty values");
+
+                return;
+            }
 
             Console.WriteLine("Enter description");
             string description = Console.ReadLine();
+            if (String.IsNullOrEmpty(description))
+            {
+                Console.WriteLine("You can't enter empty values");
+
+                return;
+            }
 
             Console.WriteLine("Is complete? yes or no");
             string answer = Console.ReadLine();
+            if (String.IsNullOrEmpty(answer))
+            {
+                Console.WriteLine("You can't enter empty values");
+
+                return;
+            }
             bool isComplete = true;
             if (answer.ToLower() == "yes")
             {

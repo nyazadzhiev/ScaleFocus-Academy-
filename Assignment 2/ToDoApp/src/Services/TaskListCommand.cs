@@ -20,6 +20,12 @@ namespace ToDoAppServices
         {
             Console.WriteLine("Enter title");
             string title = Console.ReadLine();
+            if (String.IsNullOrEmpty(title))
+            {
+                Console.WriteLine("You can't enter empty values");
+
+                return;
+            }
 
             _listService.CreateTaskList(UserService.CurrentUser, title);
 
