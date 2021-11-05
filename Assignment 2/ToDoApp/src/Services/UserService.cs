@@ -9,7 +9,6 @@ namespace ToDoAppServices
     public class UserService
     {
         private readonly UserDatabase _database;
-        private readonly List<User> _applicationUsers = new List<User>();
         private static int userIdGenerator = 0;
 
         public UserService(UserDatabase database)
@@ -19,10 +18,6 @@ namespace ToDoAppServices
             if(usersFromDB.Count == 0)
             {
                 CreateAdmin();
-            }
-            else
-            {
-                _applicationUsers = usersFromDB;
             }
         }
 
@@ -77,7 +72,7 @@ namespace ToDoAppServices
 
         public void Login(string userName, string password)
         {
-            CurrentUser = _applicationUsers.FirstOrDefault(u => u.Username == userName && u.Password == password);
+            CurrentUser = _database.GetUsers().FirstOrDefault(u => u.Username == userName && u.Password == password);
         }
 
         public void LogOut()
