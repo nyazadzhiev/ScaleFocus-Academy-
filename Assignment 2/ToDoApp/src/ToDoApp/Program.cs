@@ -10,14 +10,14 @@ namespace ToDoApp
     public class Program
     {
         private static Database database;
-        private static UserDatabase userDatabase;
+        private static UserRepository userDatabase;
         private static UserService userService;
         private static Menu menu;
 
         static void Main(string[] args)
         {
             database = InitializeApplication();
-            userDatabase = new UserDatabase(database);
+            userDatabase = new UserRepository(database);
             userService = new UserService(userDatabase);
             menu = new Menu(database);
 

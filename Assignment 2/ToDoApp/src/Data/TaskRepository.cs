@@ -7,11 +7,11 @@ using ToDoAppEntities;
 
 namespace ToDoAppData
 {
-    public class TaskDatabase
+    public class TaskRepository
     {
         private readonly Database database;
 
-        public TaskDatabase(Database _database)
+        public TaskRepository(Database _database)
         {
             database = _database;
         }

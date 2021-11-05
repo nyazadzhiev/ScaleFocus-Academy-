@@ -8,10 +8,10 @@ namespace ToDoAppServices
 {
     public class UserService
     {
-        private readonly UserDatabase _database;
+        private readonly UserRepository _database;
         private static int userIdGenerator = 0;
 
-        public UserService(UserDatabase database)
+        public UserService(UserRepository database)
         {
             _database = database;
             List<User> usersFromDB = database.GetUsers();
