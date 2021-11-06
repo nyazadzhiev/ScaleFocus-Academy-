@@ -58,6 +58,12 @@ namespace ToDoAppServices
 
                 return false;
             }
+            else if(currentList.CreatorId != UserService.CurrentUser.Id)
+            {
+                Console.WriteLine("You don't have permission to do this");
+
+                return false;
+            }
             else
             {
                 _database.EditTaskList(id, newTitle);
@@ -76,6 +82,12 @@ namespace ToDoAppServices
 
                 return false;
             }
+            else if (currentList.CreatorId != UserService.CurrentUser.Id)
+            {
+                Console.WriteLine("You don't have permission to do this");
+
+                return false;
+            }
             else
             {
                 _database.DeleteTaskList(id);
@@ -87,6 +99,15 @@ namespace ToDoAppServices
 
         public bool ShareTaskList(User user, int listId)
         {
+            TaskList toShare = _database.GetTaskList(listId);
+
+            if(toShare.CreatorId != UserService.CurrentUser.Id)
+            {
+                Console.WriteLine("You don't have permission to do this");
+
+                return false;
+            }
+
             if(_database.ShareTaskList(user.Id, listId))
             {
                 return true;
