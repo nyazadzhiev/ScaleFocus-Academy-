@@ -48,6 +48,13 @@ namespace ToDoAppServices
                 return;
             }
 
+            if(list.CreatorId != UserService.CurrentUser.Id)
+            {
+                Console.WriteLine("You don't have permission to do that");
+
+                return;
+            }
+
             Console.WriteLine("Enter title");
             string title = Console.ReadLine();
             if (String.IsNullOrEmpty(title))
