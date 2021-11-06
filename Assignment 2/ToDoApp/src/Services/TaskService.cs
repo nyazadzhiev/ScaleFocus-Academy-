@@ -10,7 +10,6 @@ namespace ToDoAppServices
     public class TaskService
     {
         private readonly TaskRepository _database;
-        private int taskIDGenerator = 0;
 
         public TaskService(TaskRepository database)
         {
@@ -51,8 +50,6 @@ namespace ToDoAppServices
 
         public bool CreateTask(User user, TaskList list, string title, string description, bool isComplete)
         {
-            taskIDGenerator++;
-
             return _database.CreateTask(new Task()
             {
                 Creator = user,
@@ -63,8 +60,7 @@ namespace ToDoAppServices
                 CreatedAt = DateTime.Now,
                 LastEdited = DateTime.Now,
                 ModifierId = user.Id,
-                CreatorId = user.Id,
-                Id = taskIDGenerator
+                CreatorId = user.Id
             });
         }
 

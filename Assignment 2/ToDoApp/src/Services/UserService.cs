@@ -9,7 +9,6 @@ namespace ToDoAppServices
     public class UserService
     {
         private readonly UserRepository _database;
-        private static int userIdGenerator = 0;
 
         public UserService(UserRepository database)
         {
@@ -25,7 +24,6 @@ namespace ToDoAppServices
 
         public bool CreateAdmin()
         {
-            userIdGenerator++;
 
             DateTime now = DateTime.Now;
 
@@ -36,11 +34,11 @@ namespace ToDoAppServices
                 FirstName = "Admin",
                 LastName = "Admin",
                 IsAdmin = true,
-                Id = userIdGenerator,
+                Id = 1,
                 CreatedAt = now,
                 LastEdited = now,
-                ModifierId = userIdGenerator,
-                CreatorId = userIdGenerator
+                ModifierId = 1,
+                CreatorId = 1
             });
         }
 
@@ -51,8 +49,6 @@ namespace ToDoAppServices
                 return false;
             }
 
-            userIdGenerator++;
-
             DateTime now = DateTime.Now;
 
             return _database.CreateUser(new User()
@@ -62,7 +58,6 @@ namespace ToDoAppServices
                 FirstName = firstName,
                 LastName = lastName,
                 IsAdmin = isAdmin,
-                Id = userIdGenerator,
                 CreatedAt = now,
                 LastEdited = now,
                 CreatorId = UserService.CurrentUser.Id,

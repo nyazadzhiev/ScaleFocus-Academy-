@@ -11,7 +11,6 @@ namespace ToDoAppServices
     {
         private readonly TaskListRepositoy _database;
         private List<TaskList> tasks = new List<TaskList>();
-        private int listIDGenerator = 0;
 
         public TaskListService(TaskListRepositoy database)
         {
@@ -30,11 +29,8 @@ namespace ToDoAppServices
 
         public bool CreateTaskList(User user, string title)
         {
-            listIDGenerator++;
-
             return _database.CreateTaskList(new TaskList()
             {
-                Id = listIDGenerator,
                 Title = title,
                 CreatorId = user.Id,
                 CreatedAt = DateTime.Now,
