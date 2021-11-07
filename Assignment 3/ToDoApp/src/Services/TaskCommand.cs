@@ -58,27 +58,8 @@ namespace ToDoAppServices
 
                 Console.WriteLine("Is complete? yes or no");
                 string answer = Console.ReadLine();
-                if (String.IsNullOrEmpty(answer))
-                {
-                    Console.WriteLine("You can't enter empty values");
 
-                    return;
-                }
-                bool isComplete = true;
-                if (answer.ToLower() == "yes")
-                {
-                    isComplete = true;
-                }
-                else if (answer.ToLower() == "no")
-                {
-                    isComplete = false;
-                }
-                else
-                {
-                    Console.WriteLine("Invalid input");
-
-                    return;
-                }
+                bool isComplete = userInput.EnterTaskCompleted();
 
                 taskService.CreateTask(UserService.CurrentUser, list, title, description, isComplete);
                 Console.WriteLine($"You created task {title}");
@@ -159,15 +140,7 @@ namespace ToDoAppServices
 
                 Console.WriteLine("Is completed? yes or no");
                 string answer = Console.ReadLine();
-                bool isComplete = false;
-                if (answer.ToLower() == "yes")
-                {
-                    isComplete = true;
-                }
-                else if (answer.ToLower() == "no")
-                {
-                    isComplete = false;
-                }
+                bool isComplete = userInput.EnterTaskCompleted();
 
                 taskService.EditTask(currentTask.Id, newTitle, newDescription, isComplete);
                 Console.WriteLine("You successfully edited task");

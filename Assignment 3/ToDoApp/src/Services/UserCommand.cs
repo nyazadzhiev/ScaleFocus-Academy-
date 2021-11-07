@@ -10,13 +10,11 @@ namespace ToDoAppServices
     {
         private UserService _userService;
         private UserInput userInput;
-        private Validations validations;
 
         public UserCommand(UserService userService)
         {
             _userService = userService;
             userInput = new UserInput();
-            validations = new Validations();
         }
 
         public void PromptLogIn()
@@ -50,12 +48,6 @@ namespace ToDoAppServices
 
         public void PromptCreateUser()
         {
-            if (UserService.CurrentUser == null || !UserService.CurrentUser.IsAdmin)
-            {
-                Console.WriteLine("You don't have permission to this operation");
-                return;
-            }
-
             try
             {
                 string name = userInput.EnterValue("username");
@@ -66,25 +58,7 @@ namespace ToDoAppServices
 
                 string lastName = userInput.EnterValue("Last Name");
 
-                bool isAdmin;
-                Console.WriteLine("Enter role (admin or user)");
-                string answer = Console.ReadLine();
-                if (String.IsNullOrEmpty(answer))
-                {
-                    Console.WriteLine("You can't enter empty values");
-
-                    return;
-                }
-
-
-                if (answer.ToLower() == "admin")
-                {
-                    isAdmin = true;
-                }
-                else
-                {
-                    isAdmin = false;
-                }
+                bool isAdmin = userInput.EnterRole();
 
                 bool isSuccess = _userService.CreateUser(name, password, firstName, lastName, isAdmin);
                 if (isSuccess)

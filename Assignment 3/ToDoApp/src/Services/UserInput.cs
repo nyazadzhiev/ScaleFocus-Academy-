@@ -37,5 +37,48 @@ namespace ToDoAppServices
                 throw new ArgumentNullException("Invalid input");
             }
         }
+
+        public bool EnterTaskCompleted()
+        {
+            Console.WriteLine("Is complete? yes or no");
+            string answer = Console.ReadLine();
+
+            bool isComplete = true;
+            if (answer.ToLower() == "yes")
+            {
+                isComplete = true;
+            }
+            else if (answer.ToLower() == "no")
+            {
+                isComplete = false;
+            }
+            else
+            {
+                Console.WriteLine("Invalid input");
+
+                return false;
+            }
+
+            return isComplete;
+        }
+
+        public bool EnterRole()
+        {
+            Console.WriteLine("Enter role (admin or user)");
+            string answer = Console.ReadLine();
+
+            bool isAdmin;
+
+            if (answer.ToLower() == "admin")
+            {
+                isAdmin = true;
+            }
+            else
+            {
+                isAdmin = false;
+            }
+
+            return isAdmin;
+        }
     }
 }
