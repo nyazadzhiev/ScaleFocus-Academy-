@@ -21,32 +21,25 @@ namespace ToDoAppServices
 
         public void PromptLogIn()
         {
-            string userName = userInput.EnterValue("username");
-
-            bool isEmpty = validations.CheckForEmptyInput(userName);
-
-            if (isEmpty)
+            try
             {
-                return;
+                string userName = userInput.EnterValue("username");
+
+                string password = userInput.EnterValue("password");
+
+                _userService.Login(userName, password);
+                if (UserService.CurrentUser == null)
+                {
+                    Console.WriteLine("Login failed.");
+                }
+                else
+                {
+                    Console.WriteLine("Login successful.");
+                }
             }
-
-            string password = userInput.EnterValue("password");
-
-            isEmpty = validations.CheckForEmptyInput(password);
-
-            if (isEmpty)
+            catch
             {
-                return;
-            }
-
-            _userService.Login(userName, password);
-            if (UserService.CurrentUser == null)
-            {
-                Console.WriteLine("Login failed.");
-            }
-            else
-            {
-                Console.WriteLine("Login successful.");
+                Console.WriteLine("Invalid input");
             }
         }
 
@@ -63,85 +56,78 @@ namespace ToDoAppServices
                 return;
             }
 
-            string name = userInput.EnterValue("username");
-
-            bool isEmpty = validations.CheckForEmptyInput(name);
-
-            if (isEmpty)
+            try
             {
-                return;
+                string name = userInput.EnterValue("username");
+
+                string password = userInput.EnterValue("password");
+
+                string firstName = userInput.EnterValue("First Name");
+
+                string lastName = userInput.EnterValue("Last Name");
+
+                bool isAdmin;
+                Console.WriteLine("Enter role (admin or user)");
+                string answer = Console.ReadLine();
+                if (String.IsNullOrEmpty(answer))
+                {
+                    Console.WriteLine("You can't enter empty values");
+
+                    return;
+                }
+
+
+                if (answer.ToLower() == "admin")
+                {
+                    isAdmin = true;
+                }
+                else
+                {
+                    isAdmin = false;
+                }
+
+                bool isSuccess = _userService.CreateUser(name, password, firstName, lastName, isAdmin);
+                if (isSuccess)
+                {
+                    Console.WriteLine($"User with name '{name}' added");
+                }
+                else
+                {
+                    Console.WriteLine($"User with name '{name}' already exists");
+                }
             }
-
-            string password = userInput.EnterValue("password");
-
-            isEmpty = validations.CheckForEmptyInput(password);
-
-            if (isEmpty)
+            catch
             {
-                return;
-            }
-
-            string firstName = userInput.EnterValue("First Name");
-
-            isEmpty = validations.CheckForEmptyInput(firstName);
-
-            if (isEmpty)
-            {
-                return;
-            }
-
-            string lastName = userInput.EnterValue("Last Name");
-
-            isEmpty = validations.CheckForEmptyInput(lastName);
-
-            if (isEmpty)
-            {
-                return;
-            }
-
-            bool isAdmin;
-            Console.WriteLine("Enter role (admin or user)");
-            string answer = Console.ReadLine();
-            if (String.IsNullOrEmpty(answer))
-            {
-                Console.WriteLine("You can't enter empty values");
-
-                return;
-            }
-
-
-            if (answer.ToLower() == "admin")
-            {
-                isAdmin = true;
-            }
-            else
-            {
-                isAdmin = false;
-            }
-
-            bool isSuccess = _userService.CreateUser(name, password, firstName, lastName, isAdmin);
-            if (isSuccess)
-            {
-                Console.WriteLine($"User with name '{name}' added");
-            }
-            else
-            {
-                Console.WriteLine($"User with name '{name}' already exists");
+                Console.WriteLine("Invalid input");
             }
         }
 
         public void PromptEditUser()
         {
-            string username = userInput.EnterValue("username");
+            try
+            {
+                string username = userInput.EnterValue("username");
 
-            _userService.EditUser(username);
+                _userService.EditUser(username);
+            }
+            catch
+            {
+                Console.WriteLine("Invalid input");
+            }
         }
 
         public void PromptDeleteUser()
         {
-            string username = userInput.EnterValue("username");
+            try
+            {
+                string username = userInput.EnterValue("username");
 
-            _userService.DeleteUser(username);
+                _userService.DeleteUser(username);
+            }
+            catch
+            {
+                Console.WriteLine("Invalid input");
+            }
         }
 
         public void PromptGetAllUsers()

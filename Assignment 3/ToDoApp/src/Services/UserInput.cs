@@ -6,10 +6,19 @@ namespace ToDoAppServices
 {
     public class UserInput
     {
+        private Validations validations = new Validations();
+
         public string EnterValue(string parameter)
         {
             Console.WriteLine($"Enter {parameter}");
             string value = Console.ReadLine();
+
+            bool isEmpty = validations.CheckForEmptyInput(value);
+
+            if (isEmpty)
+            {
+                throw new ArgumentNullException("Invalid input");
+            }
 
             return value;
         }
@@ -25,9 +34,7 @@ namespace ToDoAppServices
             }
             else
             {
-                Console.WriteLine("Invalid input");
-
-                return -1;
+                throw new ArgumentNullException("Invalid input");
             }
         }
     }

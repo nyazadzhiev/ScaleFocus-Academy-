@@ -25,8 +25,6 @@ namespace ToDoAppServices
         {
             if (String.IsNullOrEmpty(value))
             {
-                Console.WriteLine("You can't enter empty value");
-
                 return true;
             }
             else

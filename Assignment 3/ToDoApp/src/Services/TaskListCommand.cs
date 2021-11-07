@@ -22,91 +22,106 @@ namespace ToDoAppServices
 
         public void PromptCreateTaskList()
         {
-            string title = userInput.EnterValue("title");
-
-            bool isEmpty = validations.CheckForEmptyInput(title);
-
-            if (isEmpty)
+            try
             {
-                return;
-            }
+                string title = userInput.EnterValue("title");
 
-            if(_listService.GetTaskList(title) != null)
+                if (_listService.GetTaskList(title) != null)
+                {
+                    Console.WriteLine($"List with title {title} already exist");
+
+                    return;
+                }
+
+                _listService.CreateTaskList(UserService.CurrentUser, title);
+
+                Console.WriteLine($"You created a tasklist {title}");
+            }
+            catch
             {
-                Console.WriteLine($"List with title {title} already exist");
-
-                return;
+                Console.WriteLine("Invalid input");
             }
-
-            _listService.CreateTaskList(UserService.CurrentUser, title);
-
-            Console.WriteLine($"You created a tasklist {title}");
         }
 
         public void PromptEditTaskList()
         {
-            int id = userInput.EnterId("List Id");
-
-            TaskList list = _listService.GetTaskList(id);
-
-            bool isValidList = validations.EnsureListExist(list);
-            if (!isValidList)
+            try
             {
-                return;
+                int id = userInput.EnterId("List Id");
+
+                TaskList list = _listService.GetTaskList(id);
+
+                bool isValidList = validations.EnsureListExist(list);
+                if (!isValidList)
+                {
+                    return;
+                }
+
+                Console.WriteLine($"You want to edit list {list.Title}");
+
+
+                string newTitle = userInput.EnterValue("new title");
+
+                _listService.EditTaskList(id, newTitle);
             }
-
-            Console.WriteLine($"You want to edit list {list.Title}");
-
-            string newTitle = userInput.EnterValue("new title");
-
-            _listService.EditTaskList(id, newTitle);
+            catch
+            {
+                Console.WriteLine("Invalid input");
+            }
         }
 
         public void PromptDeleteTaskList()
         {
-            int id = userInput.EnterId("List Id");
+            try
+            {
+                int id = userInput.EnterId("List Id");
 
-            _listService.DeleteTaskList(id);
+                _listService.DeleteTaskList(id);
+            }
+            catch
+            {
+                Console.WriteLine("Invalid input");
+            }
         }
 
         public void PromptShareTaskList()
         {
-            string username = userInput.EnterValue("receiver username");
-
-            bool isEmpty = validations.CheckForEmptyInput(username);
-
-            if (isEmpty)
+            try
             {
-                return;
-            }
+                string username = userInput.EnterValue("receiver username");
 
-            if (username == UserService.CurrentUser.Username)
+                if (username == UserService.CurrentUser.Username)
+                {
+                    Console.WriteLine("You can't share with yourself");
+
+                    return;
+                }
+
+                User receiver = _userService.GetUser(username);
+
+                bool isValidUser = validations.EnsureUserExist(receiver);
+
+                if (!isValidUser)
+                {
+                    return;
+                }
+
+                int id = userInput.EnterId("List Id to share");
+
+                TaskList list = _listService.GetTaskList(id);
+                bool isValidList = validations.EnsureListExist(list);
+                if (!isValidList)
+                {
+                    return;
+                }
+
+                _listService.ShareTaskList(receiver, id);
+                Console.WriteLine($"You shared list {list.Title}");
+            }
+            catch
             {
-                Console.WriteLine("You can't share with yourself");
-
-                return;
+                Console.WriteLine("Invalid input");
             }
-
-            User receiver = _userService.GetUser(username);
-
-            bool isValidUser = validations.EnsureUserExist(receiver);
-
-            if (!isValidUser)
-            {
-                return;
-            }
-
-            int id = userInput.EnterId("List Id to share");
-
-            TaskList list = _listService.GetTaskList(id);
-            bool isValidList = validations.EnsureListExist(list);
-            if (!isValidList)
-            {
-                return;
-            }
-
-            _listService.ShareTaskList(receiver, id);
-            Console.WriteLine($"You shared list {list.Title}");
         }
 
         public void PromptShowTaskLists()
