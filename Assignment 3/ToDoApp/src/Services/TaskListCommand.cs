@@ -10,21 +10,24 @@ namespace ToDoAppServices
         UserService _userService;
         TaskListService _listService;
         UserInput userInput;
+        Validations validations;
 
         public TaskListCommand(UserService userService, TaskListService listService)
         {
             _userService = userService;
             _listService = listService;
             userInput = new UserInput();
+            validations = new Validations();
         }
 
         public void PromptCreateTaskList()
         {
             string title = userInput.EnterValue("title");
-            if (String.IsNullOrEmpty(title))
-            {
-                Console.WriteLine("You can't enter empty values");
 
+            bool isEmpty = validations.CheckForEmptyInput(title);
+
+            if (isEmpty)
+            {
                 return;
             }
 
@@ -42,20 +45,13 @@ namespace ToDoAppServices
 
         public void PromptEditTaskList()
         {
-            if (UserService.CurrentUser == null)
-            {
-                Console.WriteLine("Please log in");
-
-                return;
-            }
-
             int id = userInput.EnterId("List Id");
 
             TaskList list = _listService.GetTaskList(id);
 
-            if (list == null)
+            bool isValidList = validations.EnsureListExist(list);
+            if (!isValidList)
             {
-                Console.WriteLine($"There isn't a list with id: {id}.");
                 return;
             }
 
@@ -68,13 +64,6 @@ namespace ToDoAppServices
 
         public void PromptDeleteTaskList()
         {
-            if (UserService.CurrentUser == null)
-            {
-                Console.WriteLine("Please log in");
-
-                return;
-            }
-
             int id = userInput.EnterId("List Id");
 
             _listService.DeleteTaskList(id);
@@ -82,14 +71,14 @@ namespace ToDoAppServices
 
         public void PromptShareTaskList()
         {
-            if (UserService.CurrentUser == null)
-            {
-                Console.WriteLine("Please log in");
+            string username = userInput.EnterValue("receiver username");
 
+            bool isEmpty = validations.CheckForEmptyInput(username);
+
+            if (isEmpty)
+            {
                 return;
             }
-
-            string username = userInput.EnterValue("receiver username");
 
             if (username == UserService.CurrentUser.Username)
             {
@@ -100,19 +89,19 @@ namespace ToDoAppServices
 
             User receiver = _userService.GetUser(username);
 
-            if (receiver == null)
-            {
-                Console.WriteLine($"There isn't user with username {username}");
+            bool isValidUser = validations.EnsureUserExist(receiver);
 
+            if (!isValidUser)
+            {
                 return;
             }
 
             int id = userInput.EnterId("List Id to share");
 
             TaskList list = _listService.GetTaskList(id);
-            if (list == null)
+            bool isValidList = validations.EnsureListExist(list);
+            if (!isValidList)
             {
-                Console.WriteLine($"There isn't a list with id: {id}.");
                 return;
             }
 
@@ -122,13 +111,6 @@ namespace ToDoAppServices
 
         public void PromptShowTaskLists()
         {
-            if (UserService.CurrentUser == null)
-            {
-                Console.WriteLine("Please log in");
-
-                return;
-            }
-
             List<TaskList> lists = _listService.GetAllTaskLists(UserService.CurrentUser);
 
             foreach (TaskList list in lists)

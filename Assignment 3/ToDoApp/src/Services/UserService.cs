@@ -10,11 +10,13 @@ namespace ToDoAppServices
     {
         private readonly UserRepository _database;
         private UserInput userInput;
+        private Validations validations;
 
         public UserService(UserRepository database)
         {
             _database = database;
             userInput = new UserInput();
+            validations = new Validations();
             List<User> usersFromDB = database.GetUsers();
             if(usersFromDB.Count == 0)
             {
@@ -96,10 +98,10 @@ namespace ToDoAppServices
         {
             User user = GetUser(username);
 
-            if (user == null)
-            {
-                Console.WriteLine($"There isn't user with username {username}");
+            bool isValidUser = validations.EnsureUserExist(user);
 
+            if (!isValidUser)
+            {
                 return false;
             }
             else
@@ -126,10 +128,10 @@ namespace ToDoAppServices
         {
             User user = GetUser(username);
 
-            if (user == null)
-            {
-                Console.WriteLine($"There isn't user with username {username}");
+            bool isValidUser = validations.EnsureUserExist(user);
 
+            if (!isValidUser)
+            {
                 return false;
             }
             else

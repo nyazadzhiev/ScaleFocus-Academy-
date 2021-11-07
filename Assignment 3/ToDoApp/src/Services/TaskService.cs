@@ -10,10 +10,12 @@ namespace ToDoAppServices
     public class TaskService
     {
         private readonly TaskRepository _database;
+        private Validations validations;
 
         public TaskService(TaskRepository database)
         {
             _database = database;
+            validations = new Validations();
         }
 
         public Task GetTask(int id)
@@ -67,7 +69,8 @@ namespace ToDoAppServices
         public bool CompleteTask(TaskList list, int taskId)
         {
             Task currentTask = _database.GetTask(taskId);
-            if (currentTask != null)
+            bool isValidTask = validations.EnsureTaskExist(currentTask);
+            if (isValidTask)
             {
                 _database.CompleteTask(taskId);
 
@@ -81,10 +84,9 @@ namespace ToDoAppServices
         {
             Task currentTask = _database.GetTask(taskId);
 
-            if (currentTask == null)
+            bool isValidTask = validations.EnsureTaskExist(currentTask);
+            if (!isValidTask)
             {
-                Console.WriteLine($"There isn't a taks with id {taskId}");
-
                 return false;
             }
             else
@@ -98,10 +100,9 @@ namespace ToDoAppServices
         public bool DeteleTask(int taskId)
         {
             Task currentTask = _database.GetTask(taskId);
-            if (currentTask == null)
+            bool isValidTask = validations.EnsureTaskExist(currentTask);
+            if (!isValidTask)
             {
-                Console.WriteLine($"There isn't a taks with id {taskId}");
-
                 return false;
             }
             else

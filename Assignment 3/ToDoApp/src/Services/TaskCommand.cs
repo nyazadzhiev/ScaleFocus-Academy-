@@ -12,6 +12,7 @@ namespace ToDoAppServices
         private TaskListService listService;
         private UserService userService;
         private UserInput userInput;
+        private Validations validations;
 
         public TaskCommand(TaskService _taskService, TaskListService _listService, UserService _userService)
         {
@@ -19,27 +20,22 @@ namespace ToDoAppServices
             listService = _listService;
             userService = _userService;
             userInput = new UserInput();
+            validations = new Validations();
         }
 
         public void PromptAddTask()
         {
-            if (UserService.CurrentUser == null)
-            {
-                Console.WriteLine("Please log in");
-                return;
-            }
-
             int id = userInput.EnterId("List Id");
 
             TaskList list = listService.GetTaskList(id);
 
-            if (list == null)
+            bool isValidList = validations.EnsureListExist(list);
+            if (!isValidList)
             {
-                Console.WriteLine("The list does not exist");
                 return;
             }
 
-            if(list.CreatorId != UserService.CurrentUser.Id)
+            if (list.CreatorId != UserService.CurrentUser.Id)
             {
                 Console.WriteLine("You don't have permission to do that");
 
@@ -47,10 +43,11 @@ namespace ToDoAppServices
             }
 
             string title = userInput.EnterValue("title");
-            if (String.IsNullOrEmpty(title))
-            {
-                Console.WriteLine("You can't enter empty values");
 
+            bool isEmpty = validations.CheckForEmptyInput(title);
+
+            if (isEmpty)
+            {
                 return;
             }
 
@@ -62,10 +59,10 @@ namespace ToDoAppServices
             }
 
             string description = userInput.EnterValue("description");
-            if (String.IsNullOrEmpty(description))
-            {
-                Console.WriteLine("You can't enter empty values");
+            isEmpty = validations.CheckForEmptyInput(description);
 
+            if (isEmpty)
+            {
                 return;
             }
 
@@ -99,20 +96,13 @@ namespace ToDoAppServices
 
         public void PromptShowTasks()
         {
-            if (UserService.CurrentUser == null)
-            {
-                Console.WriteLine("Please log in");
-
-                return;
-            }
-
             int id = userInput.EnterId("List Id");
 
-            TaskList lists = listService.GetTaskList(id);
+            TaskList list = listService.GetTaskList(id);
 
-            if (lists == null)
+            bool isValidList = validations.EnsureListExist(list);
+            if (!isValidList)
             {
-                Console.WriteLine($"There isn't a list with id: {id}.");
                 return;
             }
 
@@ -137,18 +127,12 @@ namespace ToDoAppServices
 
         public void PromptEditTask()
         {
-            if (UserService.CurrentUser == null)
-            {
-                Console.WriteLine("Please Log in");
-                return;
-            }
-
             int id = userInput.EnterId("List Id");
             TaskList list = listService.GetTaskList(id);
 
-            if (list == null)
+            bool isValidList = validations.EnsureListExist(list);
+            if (!isValidList)
             {
-                Console.WriteLine($"There isn't a list with id: {id}.");
                 return;
             }
 
@@ -156,9 +140,9 @@ namespace ToDoAppServices
 
             Task currentTask = taskService.GetTask(id);
 
-            if (currentTask == null)
+            bool isValidTask = validations.EnsureTaskExist(currentTask);
+            if (!isValidTask)
             {
-                Console.WriteLine($"There isn't a task with id: {id}.");
                 return;
             }
 
@@ -167,6 +151,13 @@ namespace ToDoAppServices
             string newTitle = userInput.EnterValue("new title");
 
             string newDescription = userInput.EnterValue("new description");
+
+            bool isEmpty = validations.CheckForEmptyInput(newTitle) || validations.CheckForEmptyInput(newDescription);
+
+            if (isEmpty)
+            {
+                return;
+            }
 
             Console.WriteLine("Is completed? yes or no");
             string answer = Console.ReadLine();
@@ -186,20 +177,13 @@ namespace ToDoAppServices
 
         public void PromptCompleteTask()
         {
-            if (UserService.CurrentUser == null)
-            {
-                Console.WriteLine("Please log in");
-
-                return;
-            }
-
             int id = userInput.EnterId("List Id");
 
             TaskList list = listService.GetTaskList(id);
 
-            if (list == null)
+            bool isValidList = validations.EnsureListExist(list);
+            if (!isValidList)
             {
-                Console.WriteLine($"There isn't a list with id: {id}.");
                 return;
             }
 
@@ -212,20 +196,13 @@ namespace ToDoAppServices
 
         public void PromptDeleteTask()
         {
-            if (UserService.CurrentUser == null)
-            {
-                Console.WriteLine("Please log in");
-
-                return;
-            }
-
             int id = userInput.EnterId("List Id");
 
             TaskList list = listService.GetTaskList(id);
 
-            if (list == null)
+            bool isValidList = validations.EnsureListExist(list);
+            if (!isValidList)
             {
-                Console.WriteLine($"There isn't a list with id: {id}.");
                 return;
             }
 
@@ -236,14 +213,15 @@ namespace ToDoAppServices
 
         public void PromptAssignTask()
         {
-            if (UserService.CurrentUser == null)
-            {
-                Console.WriteLine("Please log in");
+            string listTitle = userInput.EnterValue("new title");
 
+            bool isEmpty = validations.CheckForEmptyInput(listTitle);
+
+            if (isEmpty)
+            {
                 return;
             }
 
-            string listTitle = userInput.EnterValue("new title");
             listService.CreateTaskList(UserService.CurrentUser, listTitle);
             TaskList currentList = listService.GetTaskList(listTitle);
 
@@ -251,10 +229,9 @@ namespace ToDoAppServices
 
             Task toAssign = taskService.GetTask(taskId);
 
-            if(toAssign == null)
+            bool isValidTask = validations.EnsureTaskExist(toAssign);
+            if (!isValidTask)
             {
-                Console.WriteLine($"The task with id {taskId} doesn't exist");
-
                 return;
             }
 
@@ -262,15 +239,20 @@ namespace ToDoAppServices
 
             do
             {
-                Console.WriteLine("Enter receiver's username or 1 to end");
-                username = Console.ReadLine();
+                username = userInput.EnterValue("receiver username or 1 to exit");
+
+                isEmpty = validations.CheckForEmptyInput(username);
+
+                if (isEmpty)
+                {
+                    return;
+                }
 
                 User receiver = userService.GetUser(username);
 
-                if (receiver == null)
+                bool isValidUser = validations.EnsureUserExist(receiver);
+                if (!isValidUser)
                 {
-                    Console.WriteLine($"User with username {username} doesn't exist");
-
                     return;
                 }
 

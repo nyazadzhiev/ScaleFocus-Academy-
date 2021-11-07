@@ -10,11 +10,13 @@ namespace ToDoAppServices
     {
         private UserService _userService;
         private UserInput userInput;
+        private Validations validations;
 
         public UserCommand(UserService userService)
         {
             _userService = userService;
             userInput = new UserInput();
+            validations = new Validations();
         }
 
         public void PromptLogIn()
@@ -22,6 +24,14 @@ namespace ToDoAppServices
             string userName = userInput.EnterValue("username");
 
             string password = userInput.EnterValue("password");
+
+            bool isEmpty = validations.CheckForEmptyInput(userName) || validations.CheckForEmptyInput(password);
+
+            if (isEmpty)
+            {
+                return;
+            }
+
             _userService.Login(userName, password);
             if (UserService.CurrentUser == null)
             {
@@ -47,34 +57,20 @@ namespace ToDoAppServices
             }
 
             string name = userInput.EnterValue("username");
-            if (String.IsNullOrEmpty(name))
-            {
-                Console.WriteLine("You can't enter empty values");
-
-                return;
-            }
 
             string password = userInput.EnterValue("password");
-            if (String.IsNullOrEmpty(password))
-            {
-                Console.WriteLine("You can't enter empty values");
-
-                return;
-            }
 
             string firstName = userInput.EnterValue("First Name");
-            if (String.IsNullOrEmpty(firstName))
-            {
-                Console.WriteLine("You can't enter empty values");
-
-                return;
-            }
 
             string lastName = userInput.EnterValue("Last Name");
-            if (String.IsNullOrEmpty(lastName))
-            {
-                Console.WriteLine("You can't enter empty values");
 
+            bool isEmpty = validations.CheckForEmptyInput(name) ||
+                validations.CheckForEmptyInput(password) ||
+                validations.CheckForEmptyInput(firstName) ||
+                validations.CheckForEmptyInput(lastName);
+
+            if (isEmpty)
+            {
                 return;
             }
 
