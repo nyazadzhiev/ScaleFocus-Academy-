@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Services;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using ToDoAppData;
@@ -11,12 +12,14 @@ namespace ToDoAppServices
         private TaskService taskService;
         private TaskListService listService;
         private UserService userService;
+        private UserInput userInput;
 
         public TaskCommand(TaskService _taskService, TaskListService _listService, UserService _userService)
         {
             taskService = _taskService;
             listService = _listService;
             userService = _userService;
+            userInput = new UserInput();
         }
 
         public void PromptAddTask()
@@ -27,18 +30,7 @@ namespace ToDoAppServices
                 return;
             }
 
-            Console.WriteLine("Enter List id:");
-            string _id = Console.ReadLine();
-            int id;
-            if (int.TryParse(_id, out id))
-            {
-            }
-            else
-            {
-                Console.WriteLine("Invalid input");
-
-                return;
-            }
+            int id = userInput.EnterId("List Id");
 
             TaskList list = listService.GetTaskList(id);
 
@@ -55,8 +47,7 @@ namespace ToDoAppServices
                 return;
             }
 
-            Console.WriteLine("Enter title");
-            string title = Console.ReadLine();
+            string title = userInput.EnterValue("title");
             if (String.IsNullOrEmpty(title))
             {
                 Console.WriteLine("You can't enter empty values");
@@ -71,8 +62,7 @@ namespace ToDoAppServices
                 return;
             }
 
-            Console.WriteLine("Enter description");
-            string description = Console.ReadLine();
+            string description = userInput.EnterValue("description");
             if (String.IsNullOrEmpty(description))
             {
                 Console.WriteLine("You can't enter empty values");
@@ -117,18 +107,7 @@ namespace ToDoAppServices
                 return;
             }
 
-            Console.WriteLine("Enter list id");
-            string _id = Console.ReadLine();
-            int id;
-            if (int.TryParse(_id, out id))
-            {
-            }
-            else
-            {
-                Console.WriteLine("Invalid input");
-
-                return;
-            }
+            int id = userInput.EnterId("List Id");
 
             TaskList lists = listService.GetTaskList(id);
 
@@ -165,18 +144,7 @@ namespace ToDoAppServices
                 return;
             }
 
-            Console.WriteLine("Enter list id");
-            string _id = Console.ReadLine();
-            int id;
-            if (int.TryParse(_id, out id))
-            {
-            }
-            else
-            {
-                Console.WriteLine("Invalid input");
-
-                return;
-            }
+            int id = userInput.EnterId("List Id");
             TaskList list = listService.GetTaskList(id);
 
             if (list == null)
@@ -185,17 +153,7 @@ namespace ToDoAppServices
                 return;
             }
 
-            Console.WriteLine("Enter task id");
-            _id = Console.ReadLine();
-            if (int.TryParse(_id, out id))
-            {
-            }
-            else
-            {
-                Console.WriteLine("Invalid input");
-
-                return;
-            }
+            id = userInput.EnterId("Task Id");
 
             Task currentTask = taskService.GetTask(id);
 
@@ -207,11 +165,9 @@ namespace ToDoAppServices
 
             Console.WriteLine($"You want to edit task {currentTask.Title}");
 
-            Console.WriteLine("Enter new title");
-            string newTitle = Console.ReadLine();
+            string newTitle = userInput.EnterValue("new title");
 
-            Console.WriteLine("Enter new description");
-            string newDescription = Console.ReadLine();
+            string newDescription = userInput.EnterValue("new description");
 
             Console.WriteLine("Is completed? yes or no");
             string answer = Console.ReadLine();
@@ -238,18 +194,7 @@ namespace ToDoAppServices
                 return;
             }
 
-            Console.WriteLine("Enter list id");
-            string _id = Console.ReadLine();
-            int id;
-            if (int.TryParse(_id, out id))
-            {
-            }
-            else
-            {
-                Console.WriteLine("Invalid input");
-
-                return;
-            }
+            int id = userInput.EnterId("List Id");
 
             TaskList list = listService.GetTaskList(id);
 
@@ -259,17 +204,7 @@ namespace ToDoAppServices
                 return;
             }
 
-            Console.WriteLine("Enter task id");
-            _id = Console.ReadLine();
-            if (int.TryParse(_id, out id))
-            {
-            }
-            else
-            {
-                Console.WriteLine("Invalid input");
-
-                return;
-            }
+            id = userInput.EnterId("Task Id");
 
             taskService.CompleteTask(list, id);
 
@@ -285,18 +220,7 @@ namespace ToDoAppServices
                 return;
             }
 
-            Console.WriteLine("Enter list id");
-            string _id = Console.ReadLine();
-            int id;
-            if (int.TryParse(_id, out id))
-            {
-            }
-            else
-            {
-                Console.WriteLine("Invalid input");
-
-                return;
-            }
+            int id = userInput.EnterId("List Id");
 
             TaskList list = listService.GetTaskList(id);
 
@@ -306,17 +230,7 @@ namespace ToDoAppServices
                 return;
             }
 
-            Console.WriteLine("Enter task id");
-            _id = Console.ReadLine();
-            if (int.TryParse(_id, out id))
-            {
-            }
-            else
-            {
-                Console.WriteLine("Invalid input");
-
-                return;
-            }
+            id = userInput.EnterId("Task Id");
 
             taskService.DeteleTask(id);
         }
@@ -330,23 +244,11 @@ namespace ToDoAppServices
                 return;
             }
 
-            Console.WriteLine("Enter list title");
-            string listTitle = Console.ReadLine();
+            string listTitle = userInput.EnterValue("new title");
             listService.CreateTaskList(UserService.CurrentUser, listTitle);
             TaskList currentList = listService.GetTaskList(listTitle);
 
-            Console.WriteLine("Enter Task Id to assign");
-            string _taskId = Console.ReadLine();
-            int taskId;
-            if (int.TryParse(_taskId, out taskId))
-            {
-            }
-            else
-            {
-                Console.WriteLine("Invalid input");
-
-                return;
-            }
+            int taskId = userInput.EnterId("Task Id");
 
             Task toAssign = taskService.GetTask(taskId);
 

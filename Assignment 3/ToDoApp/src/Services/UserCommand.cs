@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Services;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using ToDoAppData;
@@ -9,19 +10,19 @@ namespace ToDoAppServices
     public class UserCommand
     {
         private UserService _userService;
+        private UserInput userInput;
 
         public UserCommand(UserService userService)
         {
             _userService = userService;
+            userInput = new UserInput();
         }
 
         public void PromptLogIn()
         {
-            Console.WriteLine("Enter your user name:");
-            string userName = Console.ReadLine();
+            string userName = userInput.EnterValue("username");
 
-            Console.WriteLine("Enter password:");
-            string password = Console.ReadLine();
+            string password = userInput.EnterValue("password");
             _userService.Login(userName, password);
             if (UserService.CurrentUser == null)
             {
@@ -46,8 +47,7 @@ namespace ToDoAppServices
                 return;
             }
 
-            Console.WriteLine("User Name:");
-            string name = Console.ReadLine();
+            string name = userInput.EnterValue("username");
             if (String.IsNullOrEmpty(name))
             {
                 Console.WriteLine("You can't enter empty values");
@@ -55,8 +55,7 @@ namespace ToDoAppServices
                 return;
             }
 
-            Console.WriteLine("Password:");
-            string password = Console.ReadLine();
+            string password = userInput.EnterValue("password");
             if (String.IsNullOrEmpty(password))
             {
                 Console.WriteLine("You can't enter empty values");
@@ -64,8 +63,7 @@ namespace ToDoAppServices
                 return;
             }
 
-            Console.WriteLine("First Name:");
-            string firstName = Console.ReadLine();
+            string firstName = userInput.EnterValue("First Name");
             if (String.IsNullOrEmpty(firstName))
             {
                 Console.WriteLine("You can't enter empty values");
@@ -73,8 +71,7 @@ namespace ToDoAppServices
                 return;
             }
 
-            Console.WriteLine("Last Name:");
-            string lastName = Console.ReadLine();
+            string lastName = userInput.EnterValue("Last Name");
             if (String.IsNullOrEmpty(lastName))
             {
                 Console.WriteLine("You can't enter empty values");
@@ -115,16 +112,14 @@ namespace ToDoAppServices
 
         public void PromptEditUser()
         {
-            Console.WriteLine("Enter username");
-            string username = Console.ReadLine();
+            string username = userInput.EnterValue("username");
 
             _userService.EditUser(username);
         }
 
         public void PromptDeleteUser()
         {
-            Console.WriteLine("Enter username");
-            string username = Console.ReadLine();
+            string username = userInput.EnterValue("username");
 
             _userService.DeleteUser(username);
         }

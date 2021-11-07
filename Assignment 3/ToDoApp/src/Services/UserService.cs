@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Services;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using ToDoAppData;
@@ -9,10 +10,12 @@ namespace ToDoAppServices
     public class UserService
     {
         private readonly UserRepository _database;
+        private UserInput userInput;
 
         public UserService(UserRepository database)
         {
             _database = database;
+            userInput = new UserInput();
             List<User> usersFromDB = database.GetUsers();
             if(usersFromDB.Count == 0)
             {
@@ -102,17 +105,13 @@ namespace ToDoAppServices
             }
             else
             {
-                Console.WriteLine("Enter new username");
-                string newUsername = Console.ReadLine();
+                string newUsername = userInput.EnterValue("new username");
 
-                Console.WriteLine("Enter new password");
-                string newPassword = Console.ReadLine();
+                string newPassword = userInput.EnterValue("new password");
 
-                Console.WriteLine("Enter new First Name");
-                string newFirstName = Console.ReadLine();
+                string newFirstName = userInput.EnterValue("new First Name");
  
-                Console.WriteLine("Enter new Last Name");
-                string newLastName  = Console.ReadLine();
+                string newLastName  = userInput.EnterValue("new Last Name");
 
                 DateTime dateTime = DateTime.Now;
 
