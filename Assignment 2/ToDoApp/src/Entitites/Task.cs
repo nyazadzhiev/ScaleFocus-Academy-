@@ -9,6 +9,7 @@ namespace ToDoAppEntities
         public string Title { get; set; }
         public string Description { get; set; }
         public bool IsComplete { get; set; }
+        public int ListId { get; set; }
         public User Creator { get; set; }
         public TaskList ToDoList { get; set; }
 
@@ -18,9 +19,8 @@ namespace ToDoAppEntities
                 $"Title: {this.Title} \n" +
                 $"Description: {this.Description} \n" +
                 $"Is completed: {this.IsComplete} \n" +
-                $"User: {this.Creator.FirstName} {this.Creator.LastName}\n" +
                 $"Created at {this.CreatedAt}\n" +
-                $"Last Edited: {(this.LastEdited == null ? "Not edited yet" : $"{this.LastEdited}")}\n";
+                $"Last Edited: {this.LastEdited}\n";
         }
     }
 }

@@ -8,7 +8,6 @@ namespace ToDoAppEntities
     {
         public string Title { get; set; }
         public List<Task> Tasks { get; set; }
-        public User Owner { get; set; }
 
         public TaskList()
         {
@@ -19,7 +18,6 @@ namespace ToDoAppEntities
         {
             return $"ID: {this.Id}\n" +
                 $"Title: {this.Title}\n" +
-                $"Owner: {this.Owner.FirstName} {this.Owner.LastName}\n" +
                 $"Created at: {this.CreatedAt}\n" +
                 $"Last Edited: {(this.LastEdited == null ? "Not edited yet" : $"{this.LastEdited}")}\n"; ;
         }

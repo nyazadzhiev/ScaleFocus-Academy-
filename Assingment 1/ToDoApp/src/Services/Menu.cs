@@ -93,15 +93,18 @@ namespace ToDoAppServices
                                 taskCommand.PromptAddTask();
                                 break;
                             case "2":
-                                taskCommand.PromptShowTasks();
+                                taskCommand.PromptAssignTask();
                                 break;
                             case "3":
-                                taskCommand.PromptEditTask();
+                                taskCommand.PromptShowTasks();
                                 break;
                             case "4":
-                                taskCommand.PromptCompleteTask();
+                                taskCommand.PromptEditTask();
                                 break;
                             case "5":
+                                taskCommand.PromptCompleteTask();
+                                break;
+                            case "6":
                                 taskCommand.PromptDeleteTask();
                                 break;
                         }
@@ -213,11 +216,12 @@ namespace ToDoAppServices
             {
                 Console.WriteLine("---------- Task Management Menu ----------");
                 Console.WriteLine("1. Add Task");
-                Console.WriteLine("2. Show Tasks");
-                Console.WriteLine("3. Edit task");
-                Console.WriteLine("4. Complete task");
-                Console.WriteLine("5. Delete Task");
-                Console.WriteLine("6. Go back");
+                Console.WriteLine("2. Assign Task");
+                Console.WriteLine("3. Show Tasks");
+                Console.WriteLine("4. Edit task");
+                Console.WriteLine("5. Complete task");
+                Console.WriteLine("6. Delete Task");
+                Console.WriteLine("7. Go back");
 
                 return true;
             }

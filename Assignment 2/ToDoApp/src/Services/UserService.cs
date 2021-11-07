@@ -1,94 +1,73 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ToDoAppData;
 using ToDoAppEntities;
-using static ToDoAppData.FileStorage;
 
 namespace ToDoAppServices
 {
     public class UserService
     {
-        private const string StoreFileName = "Users.json";
-        private readonly FileDatabase _storage;
-        private readonly List<User> _applicationUsers = new List<User>();
-        private static int userIdGenerator = 0;
+        private readonly UserRepository _database;
 
-        public UserService()
+        public UserService(UserRepository database)
         {
-            _storage = new FileDatabase();
-            List<User> usersFromFile = _storage.Read<List<User>>(StoreFileName);
-            if (usersFromFile == null)
+            _database = database;
+            List<User> usersFromDB = database.GetUsers();
+            if(usersFromDB.Count == 0)
             {
                 CreateAdmin();
-            }
-            else
-            {
-                _applicationUsers = usersFromFile;
             }
         }
 
         public static User CurrentUser { get; private set; }
 
-        private void SaveToFile()
-        {
-            _storage.Write(StoreFileName, _applicationUsers);
-        }
-
         public bool CreateAdmin()
         {
-            userIdGenerator++;
 
             DateTime now = DateTime.Now;
 
-            _applicationUsers.Add(new User()
+            return _database.CreateUser(new User()
             {
                 Username = "admin",
                 Password = "adminpassword",
                 FirstName = "Admin",
                 LastName = "Admin",
                 IsAdmin = true,
-                Id = userIdGenerator,
+                Id = 1,
                 CreatedAt = now,
-                Creator = new User() { FirstName = "Admin", LastName = "Admin"}
+                LastEdited = now,
+                ModifierId = 1,
+                CreatorId = 1
             });
-
-            SaveToFile();
-
-            return true;
         }
 
         public bool CreateUser(string username, string password, string firstName, string lastName, bool isAdmin)
         {
-            if (_applicationUsers.Any(u => u.Username == username))
+            if (_database.GetUser(username) != null)
             {
                 return false;
             }
 
-            userIdGenerator++;
-
             DateTime now = DateTime.Now;
 
-            _applicationUsers.Add(new User()
+            return _database.CreateUser(new User()
             {
                 Username = username,
                 Password = password,
                 FirstName = firstName,
                 LastName = lastName,
                 IsAdmin = isAdmin,
-                Id = userIdGenerator,
                 CreatedAt = now,
-                LastEdited = null,
-                Creator = CurrentUser
-            });
-
-            SaveToFile();
-
-            return true;
+                LastEdited = now,
+                CreatorId = UserService.CurrentUser.Id,
+                ModifierId = UserService.CurrentUser.Id
+            }); 
         }
 
         public void Login(string userName, string password)
         {
-            CurrentUser = _applicationUsers.FirstOrDefault(u => u.Username == userName && u.Password == password);
+            CurrentUser = _database.GetUsers().FirstOrDefault(u => u.Username == userName && u.Password == password);
         }
 
         public void LogOut()
@@ -98,17 +77,17 @@ namespace ToDoAppServices
 
         public List<User> GetAllUsers()
         {
-            return _applicationUsers;
+            return _database.GetUsers();
         }
 
         public User GetUser(int id)
         {
-            return _applicationUsers.FirstOrDefault(u => u.Id == id);
+            return _database.GetUser(id);
         }
 
         public User GetUser(string username)
         {
-            return _applicationUsers.FirstOrDefault(u => u.Username == username);
+            return _database.GetUser(username);
         }
 
         public bool EditUser(string username)
@@ -124,26 +103,22 @@ namespace ToDoAppServices
             else
             {
                 Console.WriteLine("Enter new username");
-                string newValues = Console.ReadLine();
-                user.Username = newValues;
+                string newUsername = Console.ReadLine();
 
                 Console.WriteLine("Enter new password");
-                newValues = Console.ReadLine();
-                user.Password = newValues;
+                string newPassword = Console.ReadLine();
 
                 Console.WriteLine("Enter new First Name");
-                newValues = Console.ReadLine();
-                user.FirstName = newValues;
-
+                string newFirstName = Console.ReadLine();
+ 
                 Console.WriteLine("Enter new Last Name");
-                newValues = Console.ReadLine();
-                user.LastName = newValues;
+                string newLastName  = Console.ReadLine();
 
-                user.LastEdited = DateTime.Now;
+                DateTime dateTime = DateTime.Now;
 
                 Console.WriteLine("You successfully edited the user");
 
-                SaveToFile();
+                _database.EditUser(username, newUsername, newPassword, newFirstName, newLastName, dateTime);
 
                 return true;
             }
@@ -161,12 +136,12 @@ namespace ToDoAppServices
             }
             else
             {
-                _applicationUsers.Remove(user);
+                _database.DeleteUser(username);
                 Console.WriteLine($"You Deleted user {username}");
-                SaveToFile();
 
                 return true;
             }
         }
     }
 }
+

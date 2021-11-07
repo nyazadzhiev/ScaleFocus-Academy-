@@ -78,7 +78,8 @@ namespace ToDoAppServices
                 Id = userIdGenerator,
                 CreatedAt = now,
                 LastEdited = null,
-                Creator = CurrentUser
+                Creator = CurrentUser,
+                Modifier = null
             });
 
             SaveToFile();
@@ -140,6 +141,7 @@ namespace ToDoAppServices
                 user.LastName = newValues;
 
                 user.LastEdited = DateTime.Now;
+                user.Modifier = UserService.CurrentUser;
 
                 Console.WriteLine("You successfully edited the user");
 

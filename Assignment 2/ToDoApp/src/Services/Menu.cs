@@ -1,15 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using ToDoAppData;
 using ToDoAppEntities;
 
 namespace ToDoAppServices
 {
     public class Menu
     {
-        private static TaskCommand taskCommand = new TaskCommand();
-        private static TaskListCommand listCommand = new TaskListCommand();
-        private static UserCommand userCommand = new UserCommand();
+        private TaskCommand taskCommand;
+        private TaskListCommand listCommand;
+        private UserService userService;
+        private TaskListService listService;
+        private TaskService taskService;
+        private UserCommand userCommand;
+        private UserRepository userDatabase;
+        private TaskListRepositoy listDatabase;
+        private TaskRepository taskDatabase;
+
+        public Menu(Database database)
+        {
+            userDatabase = new UserRepository(database);
+            listDatabase = new TaskListRepositoy(database);
+            taskDatabase = new TaskRepository(database);
+            userService = new UserService(userDatabase);
+            listService = new TaskListService(listDatabase);
+            taskService = new TaskService(taskDatabase);
+            userCommand = new UserCommand(userService);
+            listCommand = new TaskListCommand(userService, listService);
+            taskCommand = new TaskCommand(taskService, listService, userService);
+        }
 
         public bool MainMenu(User currentUser)
         {
@@ -52,7 +72,7 @@ namespace ToDoAppServices
                         }
                     }
                     return false;
-                
+
                 case "3":
                     isPrintSuccesfull = PrintTaskListManagementMenu(currentUser);
 
@@ -93,15 +113,18 @@ namespace ToDoAppServices
                                 taskCommand.PromptAddTask();
                                 break;
                             case "2":
-                                taskCommand.PromptShowTasks();
+                                taskCommand.PromptAssignTask();
                                 break;
                             case "3":
-                                taskCommand.PromptEditTask();
+                                taskCommand.PromptShowTasks();
                                 break;
                             case "4":
-                                taskCommand.PromptCompleteTask();
+                                taskCommand.PromptEditTask();
                                 break;
                             case "5":
+                                taskCommand.PromptCompleteTask();
+                                break;
+                            case "6":
                                 taskCommand.PromptDeleteTask();
                                 break;
                         }
@@ -213,11 +236,12 @@ namespace ToDoAppServices
             {
                 Console.WriteLine("---------- Task Management Menu ----------");
                 Console.WriteLine("1. Add Task");
-                Console.WriteLine("2. Show Tasks");
-                Console.WriteLine("3. Edit task");
-                Console.WriteLine("4. Complete task");
-                Console.WriteLine("5. Delete Task");
-                Console.WriteLine("6. Go back");
+                Console.WriteLine("2. Assign Task");
+                Console.WriteLine("3. Show Tasks");
+                Console.WriteLine("4. Edit task");
+                Console.WriteLine("5. Complete task");
+                Console.WriteLine("6. Delete Task");
+                Console.WriteLine("7. Go back");
 
                 return true;
             }

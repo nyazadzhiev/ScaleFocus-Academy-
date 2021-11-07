@@ -1,17 +1,26 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using System;
 using System.Collections.Generic;
+using ToDoAppData;
 using ToDoAppEntities;
 using ToDoAppServices;
 
 namespace ToDoApp
 {
-    class Program
+    public class Program
     {
-        private static UserService userService = new UserService();
-        private static Menu menu = new Menu();
+        private static Database database;
+        private static UserRepository userDatabase;
+        private static UserService userService;
+        private static Menu menu;
 
         static void Main(string[] args)
         {
+            database = InitializeApplication();
+            userDatabase = new UserRepository(database);
+            userService = new UserService(userDatabase);
+            menu = new Menu(database);
+
             if (args.Length > 0)
             {
                 userService.CreateUser("admin", "adminpassword", "Admin", "Admin", true);
@@ -22,5 +31,21 @@ namespace ToDoApp
                 shouldExit = menu.MainMenu(UserService.CurrentUser);
             }
         }
+
+        static Database InitializeApplication()
+        {
+            // Read config file
+            var _configuration = ConfigInitializer.InitConfig();
+
+            string connectionString = _configuration.GetConnectionString("Default");
+
+            // Create new database and tables 
+            //DatabaseInitilizer.InitilizeDatabase(connectionString);
+
+            Database database = new Database(connectionString);
+
+            return database;
+        }
     }
 }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             

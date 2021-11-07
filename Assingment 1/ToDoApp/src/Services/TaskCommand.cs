@@ -9,6 +9,7 @@ namespace ToDoAppServices
     {
         private static TaskService taskService = new TaskService();
         private static TaskListService listService = new TaskListService();
+        private static UserService userService = new UserService();
 
         public void PromptAddTask()
         {
@@ -262,5 +263,58 @@ namespace ToDoAppServices
             taskService.DeteleTask(list, id);
         }
 
+        public void PromptAssignTask()
+        {
+            if(UserService.CurrentUser == null)
+            {
+                Console.WriteLine("Please log in");
+
+                return;
+            }
+
+            string username;
+
+            Console.WriteLine("Enter list title");
+            string listTitle = Console.ReadLine();
+
+            Console.WriteLine("Enter task title");
+            string title = Console.ReadLine();
+
+            Console.WriteLine("Enter description");
+            string description = Console.ReadLine();
+
+            Console.WriteLine("Is complete? yes or no");
+            string answer = Console.ReadLine();
+            bool isComplete = true;
+            if (answer.ToLower() == "yes")
+            {
+                isComplete = true;
+            }
+            else if (answer.ToLower() == "no")
+            {
+                isComplete = false;
+            }
+
+            do
+            {
+                Console.WriteLine("Enter receiver's username or 1 to end");
+                username = Console.ReadLine();
+
+                User receiver = userService.GetUser(username);
+
+                if (receiver == null)
+                {
+                    Console.WriteLine($"User with username {username} doesn't exist");
+
+                    return;
+                }
+
+                TaskList list = listService.CreateTaskList(receiver, listTitle);
+                receiver.ToDoList.Add(list);
+                taskService.CreateTask(list, UserService.CurrentUser, title, description, isComplete);
+
+                Console.WriteLine($"You assigned task {title} to user {username}");
+            } while (username != "1");
+        }
     }
 }

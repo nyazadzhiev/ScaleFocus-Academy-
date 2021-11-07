@@ -1,13 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using ToDoAppData;
 using ToDoAppEntities;
 
 namespace ToDoAppServices
 {
     public class UserCommand
     {
-        private static UserService userService = new UserService();
+        private UserService _userService;
+
+        public UserCommand(UserService userService)
+        {
+            _userService = userService;
+        }
 
         public void PromptLogIn()
         {
@@ -16,7 +22,7 @@ namespace ToDoAppServices
 
             Console.WriteLine("Enter password:");
             string password = Console.ReadLine();
-            userService.Login(userName, password);
+            _userService.Login(userName, password);
             if (UserService.CurrentUser == null)
             {
                 Console.WriteLine("Login failed.");
@@ -29,7 +35,7 @@ namespace ToDoAppServices
 
         public void PromptLogOut()
         {
-            userService.LogOut();
+            _userService.LogOut();
         }
 
         public void PromptCreateUser()
@@ -42,19 +48,49 @@ namespace ToDoAppServices
 
             Console.WriteLine("User Name:");
             string name = Console.ReadLine();
+            if (String.IsNullOrEmpty(name))
+            {
+                Console.WriteLine("You can't enter empty values");
+
+                return;
+            }
 
             Console.WriteLine("Password:");
             string password = Console.ReadLine();
+            if (String.IsNullOrEmpty(password))
+            {
+                Console.WriteLine("You can't enter empty values");
+
+                return;
+            }
 
             Console.WriteLine("First Name:");
             string firstName = Console.ReadLine();
+            if (String.IsNullOrEmpty(firstName))
+            {
+                Console.WriteLine("You can't enter empty values");
+
+                return;
+            }
 
             Console.WriteLine("Last Name:");
             string lastName = Console.ReadLine();
+            if (String.IsNullOrEmpty(lastName))
+            {
+                Console.WriteLine("You can't enter empty values");
+
+                return;
+            }
 
             bool isAdmin;
             Console.WriteLine("Enter role (admin or user)");
             string answer = Console.ReadLine();
+            if (String.IsNullOrEmpty(answer))
+            {
+                Console.WriteLine("You can't enter empty values");
+
+                return;
+            }
 
 
             if (answer.ToLower() == "admin")
@@ -66,7 +102,7 @@ namespace ToDoAppServices
                 isAdmin = false;
             }
 
-            bool isSuccess = userService.CreateUser(name, password, firstName, lastName, isAdmin);
+            bool isSuccess = _userService.CreateUser(name, password, firstName, lastName, isAdmin);
             if (isSuccess)
             {
                 Console.WriteLine($"User with name '{name}' added");
@@ -82,7 +118,7 @@ namespace ToDoAppServices
             Console.WriteLine("Enter username");
             string username = Console.ReadLine();
 
-            userService.EditUser(username);
+            _userService.EditUser(username);
         }
 
         public void PromptDeleteUser()
@@ -90,12 +126,12 @@ namespace ToDoAppServices
             Console.WriteLine("Enter username");
             string username = Console.ReadLine();
 
-            userService.DeleteUser(username);
+            _userService.DeleteUser(username);
         }
 
         public void PromptGetAllUsers()
         {
-            List<User> users = userService.GetAllUsers();
+            List<User> users = _userService.GetAllUsers();
 
             foreach (User user in users)
             {

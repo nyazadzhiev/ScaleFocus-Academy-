@@ -7,15 +7,34 @@ namespace ToDoAppServices
 {
     public class TaskListCommand
     {
-        UserService userService = new UserService();
-        TaskListService listService = new TaskListService();
+        UserService _userService;
+        TaskListService _listService;
+
+        public TaskListCommand(UserService userService, TaskListService listService)
+        {
+            _userService = userService;
+            _listService = listService;
+        }
 
         public void PromptCreateTaskList()
         {
             Console.WriteLine("Enter title");
             string title = Console.ReadLine();
+            if (String.IsNullOrEmpty(title))
+            {
+                Console.WriteLine("You can't enter empty values");
 
-            TaskList taskList = listService.CreateTaskList(UserService.CurrentUser, title);
+                return;
+            }
+
+            if(_listService.GetTaskList(title) != null)
+            {
+                Console.WriteLine($"List with title {title} already exist");
+
+                return;
+            }
+
+            _listService.CreateTaskList(UserService.CurrentUser, title);
 
             Console.WriteLine($"You created a tasklist {title}");
         }
@@ -42,7 +61,7 @@ namespace ToDoAppServices
                 return;
             }
 
-            TaskList list = listService.GetTaskList(UserService.CurrentUser, id);
+            TaskList list = _listService.GetTaskList(id);
 
             if (list == null)
             {
@@ -55,7 +74,7 @@ namespace ToDoAppServices
             Console.WriteLine("Enter new title");
             string newTitle = Console.ReadLine();
 
-            listService.EditTaskList(id, newTitle);
+            _listService.EditTaskList(id, newTitle);
         }
 
         public void PromptDeleteTaskList()
@@ -80,7 +99,7 @@ namespace ToDoAppServices
                 return;
             }
 
-            listService.DeleteTaskList(id);
+            _listService.DeleteTaskList(id);
         }
 
         public void PromptShareTaskList()
@@ -102,7 +121,7 @@ namespace ToDoAppServices
                 return;
             }
 
-            User receiver = userService.GetUser(username);
+            User receiver = _userService.GetUser(username);
 
             if (receiver == null)
             {
@@ -112,7 +131,6 @@ namespace ToDoAppServices
             }
 
             Console.WriteLine("Enter list id to share");
-            Console.WriteLine("Enter id");
             string _id = Console.ReadLine();
             int id;
             if (int.TryParse(_id, out id))
@@ -125,14 +143,14 @@ namespace ToDoAppServices
                 return;
             }
 
-            TaskList list = listService.GetTaskList(UserService.CurrentUser, id);
+            TaskList list = _listService.GetTaskList(id);
             if (list == null)
             {
                 Console.WriteLine($"There isn't a list with id: {id}.");
                 return;
             }
 
-            receiver.ToDoList.Add(list);
+            _listService.ShareTaskList(receiver, id);
             Console.WriteLine($"You shared list {list.Title}");
         }
 
@@ -145,7 +163,19 @@ namespace ToDoAppServices
                 return;
             }
 
-            foreach (TaskList list in UserService.CurrentUser.ToDoList)
+            List<TaskList> lists = _listService.GetAllTaskLists(UserService.CurrentUser);
+
+            foreach (TaskList list in lists)
+            {
+                Console.WriteLine("--------------------------");
+                Console.WriteLine(list.ToString());
+            }
+
+            List<TaskList> sharedLists = _listService.GetSharedLists();
+
+            Console.WriteLine("SharedLists");
+
+            foreach (TaskList list in sharedLists)
             {
                 Console.WriteLine("--------------------------");
                 Console.WriteLine(list.ToString());
