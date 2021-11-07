@@ -150,9 +150,16 @@ namespace ToDoAppServices
 
             string newTitle = userInput.EnterValue("new title");
 
+            bool isEmpty = validations.CheckForEmptyInput(newTitle);
+
+            if (isEmpty)
+            {
+                return;
+            }
+
             string newDescription = userInput.EnterValue("new description");
 
-            bool isEmpty = validations.CheckForEmptyInput(newTitle) || validations.CheckForEmptyInput(newDescription);
+            isEmpty = validations.CheckForEmptyInput(newDescription);
 
             if (isEmpty)
             {

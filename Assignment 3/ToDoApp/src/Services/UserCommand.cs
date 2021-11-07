@@ -23,9 +23,16 @@ namespace ToDoAppServices
         {
             string userName = userInput.EnterValue("username");
 
+            bool isEmpty = validations.CheckForEmptyInput(userName);
+
+            if (isEmpty)
+            {
+                return;
+            }
+
             string password = userInput.EnterValue("password");
 
-            bool isEmpty = validations.CheckForEmptyInput(userName) || validations.CheckForEmptyInput(password);
+            isEmpty = validations.CheckForEmptyInput(password);
 
             if (isEmpty)
             {
@@ -58,16 +65,34 @@ namespace ToDoAppServices
 
             string name = userInput.EnterValue("username");
 
+            bool isEmpty = validations.CheckForEmptyInput(name);
+
+            if (isEmpty)
+            {
+                return;
+            }
+
             string password = userInput.EnterValue("password");
+
+            isEmpty = validations.CheckForEmptyInput(password);
+
+            if (isEmpty)
+            {
+                return;
+            }
 
             string firstName = userInput.EnterValue("First Name");
 
+            isEmpty = validations.CheckForEmptyInput(firstName);
+
+            if (isEmpty)
+            {
+                return;
+            }
+
             string lastName = userInput.EnterValue("Last Name");
 
-            bool isEmpty = validations.CheckForEmptyInput(name) ||
-                validations.CheckForEmptyInput(password) ||
-                validations.CheckForEmptyInput(firstName) ||
-                validations.CheckForEmptyInput(lastName);
+            isEmpty = validations.CheckForEmptyInput(lastName);
 
             if (isEmpty)
             {
