@@ -7,12 +7,11 @@ namespace ToDoAppEntities
 {
     public class User : Person
     {
-        public List<TaskList> ToDoList { get; set; }
+        public int Id { get; set; }
         public bool IsAdmin { get; set; }
 
         public User()
         {
-            ToDoList = new List<TaskList>();
         }
 
         public override string ToString()

@@ -6,11 +6,11 @@ namespace ToDoAppEntities
 {
     public class Task : Entity
     {
+        public int Id { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
         public bool IsComplete { get; set; }
         public int ListId { get; set; }
-        public User Creator { get; set; }
         public TaskList ToDoList { get; set; }
 
         public override string ToString()

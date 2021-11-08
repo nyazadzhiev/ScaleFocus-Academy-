@@ -6,6 +6,7 @@ namespace ToDoAppEntities
 {
     public class TaskList : Entity
     {
+        public int Id { get; set; }
         public string Title { get; set; }
         public List<Task> Tasks { get; set; }
 
@@ -19,7 +20,7 @@ namespace ToDoAppEntities
             return $"ID: {this.Id}\n" +
                 $"Title: {this.Title}\n" +
                 $"Created at: {this.CreatedAt}\n" +
-                $"Last Edited: {(this.LastEdited == null ? "Not edited yet" : $"{this.LastEdited}")}\n"; ;
+                $"Last Edited: {(this.LastEdited == default(DateTime) ? "Not edited yet" : $"{this.LastEdited}")}\n"; ;
         }
     }
 }
