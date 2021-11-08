@@ -14,19 +14,13 @@ namespace ToDoAppServices
         private TaskListService listService;
         private TaskService taskService;
         private UserCommand userCommand;
-        private UserRepository userDatabase;
-        private TaskListRepositoy listDatabase;
-        private TaskRepository taskDatabase;
         private Validations validations;
 
-        public Menu(Database database)
+        public Menu(DatabaseContext database)
         {
-            userDatabase = new UserRepository(database);
-            listDatabase = new TaskListRepositoy(database);
-            taskDatabase = new TaskRepository(database);
-            userService = new UserService(userDatabase);
-            listService = new TaskListService(listDatabase);
-            taskService = new TaskService(taskDatabase);
+            userService = new UserService(database);
+            listService = new TaskListService(database);
+            taskService = new TaskService(database);
             userCommand = new UserCommand(userService);
             listCommand = new TaskListCommand(userService, listService);
             taskCommand = new TaskCommand(taskService, listService, userService);

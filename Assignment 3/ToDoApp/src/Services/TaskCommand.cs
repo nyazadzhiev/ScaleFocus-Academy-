@@ -64,9 +64,10 @@ namespace ToDoAppServices
                 taskService.CreateTask(UserService.CurrentUser, list, title, description, isComplete);
                 Console.WriteLine($"You created task {title}");
             }
-            catch
+            catch (ArgumentNullException e)
             {
                 Console.WriteLine("Invalid input");
+                Console.WriteLine(e.Message);
             }
         }
 
@@ -102,9 +103,10 @@ namespace ToDoAppServices
                     Console.WriteLine(task.ToString());
                 }
             }
-            catch
+            catch (ArgumentNullException e)
             {
                 Console.WriteLine("Invalid input");
+                Console.WriteLine(e.Message);
             }
         }
 
@@ -145,9 +147,10 @@ namespace ToDoAppServices
                 taskService.EditTask(currentTask.Id, newTitle, newDescription, isComplete);
                 Console.WriteLine("You successfully edited task");
             }
-            catch
+            catch (ArgumentNullException e)
             {
                 Console.WriteLine("Invalid input");
+                Console.WriteLine(e.Message);
             }
         }
 
@@ -171,9 +174,10 @@ namespace ToDoAppServices
 
                 Console.WriteLine("The task was completed");
             }
-            catch
+            catch (ArgumentNullException e)
             {
                 Console.WriteLine("Invalid input");
+                Console.WriteLine(e.Message);
             }
         }
 
@@ -195,9 +199,10 @@ namespace ToDoAppServices
 
                 taskService.DeteleTask(id);
             }
-            catch
+            catch (ArgumentNullException e)
             {
                 Console.WriteLine("Invalid input");
+                Console.WriteLine(e.Message);
             }
         }
 
@@ -239,9 +244,10 @@ namespace ToDoAppServices
 
                 } while (username != "1");
             }
-            catch
+            catch (ArgumentNullException e)
             {
                 Console.WriteLine("Invalid input");
+                Console.WriteLine(e.Message);
             }
         }
     }

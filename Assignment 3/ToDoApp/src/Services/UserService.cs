@@ -8,16 +8,16 @@ namespace ToDoAppServices
 {
     public class UserService
     {
-        private readonly UserRepository _database;
+        private readonly DatabaseContext _database;
         private UserInput userInput;
         private Validations validations;
 
-        public UserService(UserRepository database)
+        public UserService(DatabaseContext database)
         {
             _database = database;
             userInput = new UserInput();
             validations = new Validations();
-            List<User> usersFromDB = database.GetUsers();
+            List<User> usersFromDB = database.Users.ToList();
             if(usersFromDB.Count == 0)
             {
                 CreateAdmin();
@@ -31,7 +31,7 @@ namespace ToDoAppServices
 
             DateTime now = DateTime.Now;
 
-            return _database.CreateUser(new User()
+            User newAdmin = new User()
             {
                 Username = "admin",
                 Password = "adminpassword",
@@ -43,19 +43,25 @@ namespace ToDoAppServices
                 LastEdited = now,
                 ModifierId = 1,
                 CreatorId = 1
-            });
+            };
+
+            _database.Users.Add(newAdmin);
+
+            _database.SaveChanges();
+
+            return newAdmin.Id != 0;
         }
 
         public bool CreateUser(string username, string password, string firstName, string lastName, bool isAdmin)
         {
-            if (_database.GetUser(username) != null)
+            if (_database.Users.Where(u => u.Username == username) != null)
             {
                 return false;
             }
 
             DateTime now = DateTime.Now;
 
-            return _database.CreateUser(new User()
+            User newUser = new User()
             {
                 Username = username,
                 Password = password,
@@ -66,12 +72,18 @@ namespace ToDoAppServices
                 LastEdited = now,
                 CreatorId = UserService.CurrentUser.Id,
                 ModifierId = UserService.CurrentUser.Id
-            }); 
+            };
+
+            _database.Users.Add(newUser);
+
+            _database.SaveChanges();
+
+            return newUser.Id != 0;
         }
 
         public void Login(string userName, string password)
         {
-            CurrentUser = _database.GetUsers().FirstOrDefault(u => u.Username == userName && u.Password == password);
+            CurrentUser = _database.Users.FirstOrDefault(u => u.Username == userName && u.Password == password);
         }
 
         public void LogOut()
@@ -81,17 +93,17 @@ namespace ToDoAppServices
 
         public List<User> GetAllUsers()
         {
-            return _database.GetUsers();
+            return _database.Users.ToList();
         }
 
         public User GetUser(int id)
         {
-            return _database.GetUser(id);
+            return _database.Users.FirstOrDefault(u => u.Id == id);
         }
 
         public User GetUser(string username)
         {
-            return _database.GetUser(username);
+            return _database.Users.FirstOrDefault(u => u.Username == username);
         }
 
         public bool EditUser(string username)
@@ -118,7 +130,14 @@ namespace ToDoAppServices
 
                 Console.WriteLine("You successfully edited the user");
 
-                _database.EditUser(username, newUsername, newPassword, newFirstName, newLastName, dateTime);
+                user.Username = newUsername;
+                user.Password = newPassword;
+                user.FirstName = newFirstName;
+                user.LastName = newLastName;
+                user.LastEdited = DateTime.Now;
+                user.ModifierId = UserService.CurrentUser.Id;
+
+                _database.SaveChanges();
 
                 return true;
             }
@@ -136,7 +155,8 @@ namespace ToDoAppServices
             }
             else
             {
-                _database.DeleteUser(username);
+                _database.Users.Remove(user);
+                _database.SaveChanges();
                 Console.WriteLine($"You Deleted user {username}");
 
                 return true;

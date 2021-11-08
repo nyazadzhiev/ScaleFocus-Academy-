@@ -6,28 +6,26 @@ using System.Threading.Tasks;
 using System.Data.SqlClient;
 using System.IO;
 using System.Data.Common;
+using System.Data.Entity;
+using ToDoAppEntities;
 
 namespace ToDoAppData
 {
-    public class DatabaseInitilizer
+    public class DatabaseInitializer : DropCreateDatabaseIfModelChanges<DatabaseContext>
     {
-        public static void InitilizeDatabase(string connectionstring)
+        public override void InitializeDatabase(DatabaseContext context)
         {
-            try
-            {
-                using (SqlConnection connection = new SqlConnection(connectionstring))
-                {
-                    connection.Open();
-                    string script = File.ReadAllText("Scripts\\CreateDatabase.sql");
-                    DbCommand command = connection.CreateCommand();
-                    command.CommandText = script;
-                    command.ExecuteNonQuery();
-                }
-            }
-            catch(Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
+            base.InitializeDatabase(context);
+        }
+
+        protected override void Seed(DatabaseContext context)
+        {
+            context.Users.Add(new User() { Username = "admin", Password = "adminpassword", IsAdmin = true }); ;
+
+            context.SaveChanges();
+
+            base.Seed(context);
+
         }
     }
 }

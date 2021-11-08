@@ -9,10 +9,10 @@ namespace ToDoAppServices
 {
     public class TaskService
     {
-        private readonly TaskRepository _database;
+        private readonly DatabaseContext _database;
         private Validations validations;
 
-        public TaskService(TaskRepository database)
+        public TaskService(DatabaseContext database)
         {
             _database = database;
             validations = new Validations();
@@ -20,39 +20,34 @@ namespace ToDoAppServices
 
         public Task GetTask(int id)
         {
-            return _database.GetTask(id);
+            return _database.Tasks.FirstOrDefault(t => t.Id == id);
         }
 
         public Task GetTask(string title)
         {
-            return _database.GetTask(title);
+            return _database.Tasks.FirstOrDefault(t => t.Title == title);
         }
 
         public List<Task> GetTasks(int listId)
         {
-            return _database.GetTasks(listId);
+            return _database.Tasks.Where(t => t.ListId == listId).ToList();
         }
 
         public List<Task> GetAssignedTasks(int userId)
         {
-            return _database.GetAssignedTasks(userId);
+            List<Task> tasks = new List<Task>();
+
+            return tasks;
         }
 
         public bool AssignTask(User user, int taskId)
         {
-            if(_database.AssignTask(user.Id, taskId))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return false;
         }
 
         public bool CreateTask(User user, TaskList list, string title, string description, bool isComplete)
         {
-            return _database.CreateTask(new Task()
+            Task newTask = new Task()
             {
                 Creator = user,
                 Title = title,
@@ -63,16 +58,25 @@ namespace ToDoAppServices
                 LastEdited = DateTime.Now,
                 ModifierId = user.Id,
                 CreatorId = user.Id
-            });
+            };
+
+            _database.Tasks.Add(newTask);
+            _database.SaveChanges();
+
+            return newTask.Id != 0;
         }
 
         public bool CompleteTask(TaskList list, int taskId)
         {
-            Task currentTask = _database.GetTask(taskId);
+            Task currentTask = GetTask(taskId);
             bool isValidTask = validations.EnsureTaskExist(currentTask);
             if (isValidTask)
             {
-                _database.CompleteTask(taskId);
+                currentTask.IsComplete = true;
+                currentTask.LastEdited = DateTime.Now;
+                currentTask.ModifierId = UserService.CurrentUser.Id;
+
+                _database.SaveChanges();
 
                 return true;
             }
@@ -80,9 +84,9 @@ namespace ToDoAppServices
             return false;
         }
 
-        public bool EditTask(int taskId, string newTitle, string newDesc, bool newIscomplete)
+        public bool EditTask(int taskId, string newTitle, string newDesc, bool newIsComplete)
         {
-            Task currentTask = _database.GetTask(taskId);
+            Task currentTask = GetTask(taskId);
 
             bool isValidTask = validations.EnsureTaskExist(currentTask);
             if (!isValidTask)
@@ -91,7 +95,13 @@ namespace ToDoAppServices
             }
             else
             {
-                _database.EditTask(taskId, newTitle, newDesc, newIscomplete);
+                currentTask.Title = newTitle;
+                currentTask.Description = newDesc;
+                currentTask.IsComplete = newIsComplete;
+                currentTask.LastEdited = DateTime.Now;
+                currentTask.ModifierId = UserService.CurrentUser.Id;
+
+                _database.SaveChanges();
 
                 return true;
             }
@@ -99,7 +109,7 @@ namespace ToDoAppServices
 
         public bool DeteleTask(int taskId)
         {
-            Task currentTask = _database.GetTask(taskId);
+            Task currentTask = GetTask(taskId);
             bool isValidTask = validations.EnsureTaskExist(currentTask);
             if (!isValidTask)
             {
@@ -107,7 +117,7 @@ namespace ToDoAppServices
             }
             else
             {
-                _database.DeleteTask(taskId);
+                _database.Tasks.Remove(currentTask);
                 Console.WriteLine($"You deleted task {currentTask.Title}");
 
                 return true;

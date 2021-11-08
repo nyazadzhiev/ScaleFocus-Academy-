@@ -37,9 +37,10 @@ namespace ToDoAppServices
 
                 Console.WriteLine($"You created a tasklist {title}");
             }
-            catch
+            catch (ArgumentNullException e)
             {
                 Console.WriteLine("Invalid input");
+                Console.WriteLine(e.Message);
             }
         }
 
@@ -64,9 +65,10 @@ namespace ToDoAppServices
 
                 _listService.EditTaskList(id, newTitle);
             }
-            catch
+            catch (ArgumentNullException e)
             {
                 Console.WriteLine("Invalid input");
+                Console.WriteLine(e.Message);
             }
         }
 
@@ -78,9 +80,10 @@ namespace ToDoAppServices
 
                 _listService.DeleteTaskList(id);
             }
-            catch
+            catch (ArgumentNullException e)
             {
                 Console.WriteLine("Invalid input");
+                Console.WriteLine(e.Message);
             }
         }
 
@@ -118,9 +121,10 @@ namespace ToDoAppServices
                 _listService.ShareTaskList(receiver, id);
                 Console.WriteLine($"You shared list {list.Title}");
             }
-            catch
+            catch (ArgumentNullException e)
             {
                 Console.WriteLine("Invalid input");
+                Console.WriteLine(e.Message);
             }
         }
 

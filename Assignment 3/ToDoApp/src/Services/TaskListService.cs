@@ -9,10 +9,10 @@ namespace ToDoAppServices
 {
     public class TaskListService
     {
-        private readonly TaskListRepositoy _database;
+        private readonly DatabaseContext _database;
         private Validations validations;
 
-        public TaskListService(TaskListRepositoy database)
+        public TaskListService(DatabaseContext database)
         {
             _database = database;
             validations = new Validations();
@@ -20,34 +20,42 @@ namespace ToDoAppServices
 
         public List<TaskList> GetAllTaskLists(User user)
         {
-            return _database.GetTaskLists(user.Id);
+            return _database.Lists.Where(l => l.CreatorId == user.Id).ToList();
         }
 
         public List<TaskList> GetSharedLists()
         {
-            return _database.GetSharedLists();
+            List<TaskList> lists = new List<TaskList>();
+
+            return lists;
         }
 
         public bool CreateTaskList(User user, string title)
         {
-            return _database.CreateTaskList(new TaskList()
+            TaskList newList = new TaskList()
             {
                 Title = title,
                 CreatorId = user.Id,
                 CreatedAt = DateTime.Now,
                 LastEdited = DateTime.Now,
                 ModifierId = user.Id
-            });
+            };
+
+            _database.Lists.Add(newList);
+
+            _database.SaveChanges();
+
+            return newList.Id != 0;
         }
 
         public TaskList GetTaskList(int id)
         {
-            return _database.GetTaskList(id);
+            return _database.Lists.FirstOrDefault(l => l.Id == id);
         }
 
         public TaskList GetTaskList(string title)
         {
-            return _database.GetTaskList(title);
+            return _database.Lists.FirstOrDefault(l => l.Title == title);
         }
 
         public bool EditTaskList(int id, string newTitle)
@@ -66,7 +74,11 @@ namespace ToDoAppServices
             }
             else
             {
-                _database.EditTaskList(id, newTitle);
+                currentList.Title = newTitle;
+                currentList.LastEdited = DateTime.Now;
+                currentList.ModifierId = UserService.CurrentUser.Id;
+
+                _database.SaveChanges();
                 Console.WriteLine("You succesfully edited TaskList");
 
                 return true;
@@ -89,7 +101,7 @@ namespace ToDoAppServices
             }
             else
             {
-                _database.DeleteTaskList(id);
+                _database.Lists.Remove(currentList);
                 Console.WriteLine($"You deleted list {currentList.Title}");
 
                 return true;
@@ -98,7 +110,7 @@ namespace ToDoAppServices
 
         public bool ShareTaskList(User user, int listId)
         {
-            TaskList toShare = _database.GetTaskList(listId);
+            TaskList toShare = GetTaskList(listId);
 
             if(toShare.CreatorId != UserService.CurrentUser.Id)
             {
@@ -106,15 +118,7 @@ namespace ToDoAppServices
 
                 return false;
             }
-
-            if(_database.ShareTaskList(user.Id, listId))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return true;
         }
     }
 }
