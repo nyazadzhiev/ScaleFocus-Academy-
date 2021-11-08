@@ -17,44 +17,13 @@ namespace ToDoAppServices
             _database = database;
             userInput = new UserInput();
             validations = new Validations();
-            List<User> usersFromDB = database.Users.ToList();
-            if(usersFromDB.Count == 0)
-            {
-                CreateAdmin();
-            }
         }
 
         public static User CurrentUser { get; private set; }
 
-        public bool CreateAdmin()
-        {
-
-            DateTime now = DateTime.Now;
-
-            User newAdmin = new User()
-            {
-                Username = "admin",
-                Password = "adminpassword",
-                FirstName = "Admin",
-                LastName = "Admin",
-                IsAdmin = true,
-                Id = 1,
-                CreatedAt = now,
-                LastEdited = now,
-                ModifierId = 1,
-                CreatorId = 1
-            };
-
-            _database.Users.Add(newAdmin);
-
-            _database.SaveChanges();
-
-            return newAdmin.Id != 0;
-        }
-
         public bool CreateUser(string username, string password, string firstName, string lastName, bool isAdmin)
         {
-            if (_database.Users.Where(u => u.Username == username) != null)
+            if (_database.Users.Any(u => u.Username == username))
             {
                 return false;
             }

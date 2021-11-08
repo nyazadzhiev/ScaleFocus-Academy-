@@ -38,7 +38,7 @@ namespace ToDoApp
             string connectionString = _configuration.GetConnectionString("Default");
 
             // Create new database and tables 
-            //Database.SetInitializer(new DatabaseInitializer());
+            Database.SetInitializer(new DatabaseInitializer());
 
             DatabaseContext database = new DatabaseContext(connectionString);
 

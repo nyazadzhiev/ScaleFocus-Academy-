@@ -13,17 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Scripts\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Entitites\Entitites.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="Scripts\CreateDatabase.sql">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
 </Project>

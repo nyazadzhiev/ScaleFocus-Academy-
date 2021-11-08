@@ -20,7 +20,23 @@ namespace ToDoAppData
 
         protected override void Seed(DatabaseContext context)
         {
-            context.Users.Add(new User() { Username = "admin", Password = "adminpassword", IsAdmin = true }); ;
+            User defaultUser = new User()
+            {
+                Username = "admin",
+                Password = "adminpassword",
+                IsAdmin = true,
+                FirstName = "Admin",
+                LastName = "Admin",
+                CreatedAt = DateTime.Now,
+                LastEdited = DateTime.Now
+            };
+
+            context.Users.Add(defaultUser); 
+
+            context.SaveChanges();
+
+            defaultUser.Creator = defaultUser;
+            defaultUser.Modifier = defaultUser;
 
             context.SaveChanges();
 
