@@ -8,7 +8,7 @@ namespace ToDoAppEntities
     {
         public int Id { get; set; }
         public string Title { get; set; }
-        public List<Task> Tasks { get; set; }
+        public virtual List<Task> Tasks { get; set; }
 
         public TaskList()
         {

@@ -11,7 +11,7 @@ namespace ToDoAppEntities
         public string Description { get; set; }
         public bool IsComplete { get; set; }
         public int ListId { get; set; }
-        public TaskList ToDoList { get; set; }
+        public virtual TaskList ToDoList { get; set; }
 
         public override string ToString()
         {

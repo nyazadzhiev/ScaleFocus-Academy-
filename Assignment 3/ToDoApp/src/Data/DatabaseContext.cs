@@ -25,6 +25,11 @@ namespace ToDoAppData
         public IDbSet<TaskList> Lists { get; set; }
         public IDbSet<Task> Tasks { get; set; }
 
+        protected void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseLazyLoadingProxies();
+        }
+
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             SetupUserConfiguration(modelBuilder);
