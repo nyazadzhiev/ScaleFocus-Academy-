@@ -17,6 +17,7 @@ namespace ToDoAppServices
         private UserRepository userDatabase;
         private TaskListRepositoy listDatabase;
         private TaskRepository taskDatabase;
+        private Validations validations;
 
         public Menu(Database database)
         {
@@ -29,6 +30,7 @@ namespace ToDoAppServices
             userCommand = new UserCommand(userService);
             listCommand = new TaskListCommand(userService, listService);
             taskCommand = new TaskCommand(taskService, listService, userService);
+            validations = new Validations();
         }
 
         public bool MainMenu(User currentUser)
@@ -176,17 +178,15 @@ namespace ToDoAppServices
 
         private bool PrintUserManagementMenu(User user)
         {
-            if (user == null)
+            bool isLoggedIn = validations.CheckLog(user);
+            if (!isLoggedIn)
             {
-                Console.WriteLine("Please Log In");
-
                 return false;
             }
 
-            if (!user.IsAdmin)
+            bool isAdmin = validations.IsAdmin(user);
+            if (!isAdmin)
             {
-                Console.WriteLine("You don't have permission to enter this menu");
-
                 return false;
             }
             else
@@ -204,10 +204,9 @@ namespace ToDoAppServices
 
         private bool PrintTaskListManagementMenu(User user)
         {
-            if (user == null)
+            bool isLoggedIn = validations.CheckLog(user);
+            if (!isLoggedIn)
             {
-                Console.WriteLine("Please Log In");
-
                 return false;
             }
             else
@@ -226,10 +225,9 @@ namespace ToDoAppServices
 
         private bool PrintTaskManagementMenu(User user)
         {
-            if (user == null)
+            bool isLoggedIn = validations.CheckLog(user);
+            if (!isLoggedIn)
             {
-                Console.WriteLine("Please Log In");
-
                 return false;
             }
             else

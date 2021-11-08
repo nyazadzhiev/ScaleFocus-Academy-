@@ -10,11 +10,12 @@ namespace ToDoAppServices
     public class TaskListService
     {
         private readonly TaskListRepositoy _database;
-        private List<TaskList> tasks = new List<TaskList>();
+        private Validations validations;
 
         public TaskListService(TaskListRepositoy database)
         {
             _database = database;
+            validations = new Validations();
         }
 
         public List<TaskList> GetAllTaskLists(User user)
@@ -52,10 +53,9 @@ namespace ToDoAppServices
         public bool EditTaskList(int id, string newTitle)
         {
             TaskList currentList = GetTaskList(id);
-            if (currentList == null)
+            bool isValidList = validations.EnsureListExist(currentList);
+            if (!isValidList)
             {
-                Console.WriteLine($"There isn't list with id {id}");
-
                 return false;
             }
             else if(currentList.CreatorId != UserService.CurrentUser.Id)
@@ -76,10 +76,9 @@ namespace ToDoAppServices
         public bool DeleteTaskList(int id)
         {
             TaskList currentList = GetTaskList(id);
-            if (currentList == null)
+            bool isValidList = validations.EnsureListExist(currentList);
+            if (!isValidList)
             {
-                Console.WriteLine($"There isn't list with id {id}");
-
                 return false;
             }
             else if (currentList.CreatorId != UserService.CurrentUser.Id)

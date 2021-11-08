@@ -9,10 +9,14 @@ namespace ToDoAppServices
     public class UserService
     {
         private readonly UserRepository _database;
+        private UserInput userInput;
+        private Validations validations;
 
         public UserService(UserRepository database)
         {
             _database = database;
+            userInput = new UserInput();
+            validations = new Validations();
             List<User> usersFromDB = database.GetUsers();
             if(usersFromDB.Count == 0)
             {
@@ -94,25 +98,21 @@ namespace ToDoAppServices
         {
             User user = GetUser(username);
 
-            if (user == null)
-            {
-                Console.WriteLine($"There isn't user with username {username}");
+            bool isValidUser = validations.EnsureUserExist(user);
 
+            if (!isValidUser)
+            {
                 return false;
             }
             else
             {
-                Console.WriteLine("Enter new username");
-                string newUsername = Console.ReadLine();
+                string newUsername = userInput.EnterValue("new username");
 
-                Console.WriteLine("Enter new password");
-                string newPassword = Console.ReadLine();
+                string newPassword = userInput.EnterValue("new password");
 
-                Console.WriteLine("Enter new First Name");
-                string newFirstName = Console.ReadLine();
+                string newFirstName = userInput.EnterValue("new First Name");
  
-                Console.WriteLine("Enter new Last Name");
-                string newLastName  = Console.ReadLine();
+                string newLastName  = userInput.EnterValue("new Last Name");
 
                 DateTime dateTime = DateTime.Now;
 
@@ -128,10 +128,10 @@ namespace ToDoAppServices
         {
             User user = GetUser(username);
 
-            if (user == null)
-            {
-                Console.WriteLine($"There isn't user with username {username}");
+            bool isValidUser = validations.EnsureUserExist(user);
 
+            if (!isValidUser)
+            {
                 return false;
             }
             else

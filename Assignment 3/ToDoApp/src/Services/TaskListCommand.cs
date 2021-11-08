@@ -9,160 +9,123 @@ namespace ToDoAppServices
     {
         UserService _userService;
         TaskListService _listService;
+        UserInput userInput;
+        Validations validations;
 
         public TaskListCommand(UserService userService, TaskListService listService)
         {
             _userService = userService;
             _listService = listService;
+            userInput = new UserInput();
+            validations = new Validations();
         }
 
         public void PromptCreateTaskList()
         {
-            Console.WriteLine("Enter title");
-            string title = Console.ReadLine();
-            if (String.IsNullOrEmpty(title))
+            try
             {
-                Console.WriteLine("You can't enter empty values");
+                string title = userInput.EnterValue("title");
 
-                return;
+                if (_listService.GetTaskList(title) != null)
+                {
+                    Console.WriteLine($"List with title {title} already exist");
+
+                    return;
+                }
+
+                _listService.CreateTaskList(UserService.CurrentUser, title);
+
+                Console.WriteLine($"You created a tasklist {title}");
             }
-
-            if(_listService.GetTaskList(title) != null)
+            catch
             {
-                Console.WriteLine($"List with title {title} already exist");
-
-                return;
+                Console.WriteLine("Invalid input");
             }
-
-            _listService.CreateTaskList(UserService.CurrentUser, title);
-
-            Console.WriteLine($"You created a tasklist {title}");
         }
 
         public void PromptEditTaskList()
         {
-            if (UserService.CurrentUser == null)
+            try
             {
-                Console.WriteLine("Please log in");
+                int id = userInput.EnterId("List Id");
 
-                return;
-            }
+                TaskList list = _listService.GetTaskList(id);
 
-            Console.WriteLine("Enter id");
-            string _id = Console.ReadLine();
-            int id;
-            if (int.TryParse(_id, out id))
-            {
+                bool isValidList = validations.EnsureListExist(list);
+                if (!isValidList)
+                {
+                    return;
+                }
+
+                Console.WriteLine($"You want to edit list {list.Title}");
+
+
+                string newTitle = userInput.EnterValue("new title");
+
+                _listService.EditTaskList(id, newTitle);
             }
-            else
+            catch
             {
                 Console.WriteLine("Invalid input");
-
-                return;
             }
-
-            TaskList list = _listService.GetTaskList(id);
-
-            if (list == null)
-            {
-                Console.WriteLine($"There isn't a list with id: {id}.");
-                return;
-            }
-
-            Console.WriteLine($"You want to edit list {list.Title}");
-
-            Console.WriteLine("Enter new title");
-            string newTitle = Console.ReadLine();
-
-            _listService.EditTaskList(id, newTitle);
         }
 
         public void PromptDeleteTaskList()
         {
-            if (UserService.CurrentUser == null)
+            try
             {
-                Console.WriteLine("Please log in");
+                int id = userInput.EnterId("List Id");
 
-                return;
+                _listService.DeleteTaskList(id);
             }
-
-            Console.WriteLine("Enter id");
-            string _id = Console.ReadLine();
-            int id;
-            if (int.TryParse(_id, out id))
-            {
-            }
-            else
+            catch
             {
                 Console.WriteLine("Invalid input");
-
-                return;
             }
-
-            _listService.DeleteTaskList(id);
         }
 
         public void PromptShareTaskList()
         {
-            if (UserService.CurrentUser == null)
+            try
             {
-                Console.WriteLine("Please log in");
+                string username = userInput.EnterValue("receiver username");
 
-                return;
+                if (username == UserService.CurrentUser.Username)
+                {
+                    Console.WriteLine("You can't share with yourself");
+
+                    return;
+                }
+
+                User receiver = _userService.GetUser(username);
+
+                bool isValidUser = validations.EnsureUserExist(receiver);
+
+                if (!isValidUser)
+                {
+                    return;
+                }
+
+                int id = userInput.EnterId("List Id to share");
+
+                TaskList list = _listService.GetTaskList(id);
+                bool isValidList = validations.EnsureListExist(list);
+                if (!isValidList)
+                {
+                    return;
+                }
+
+                _listService.ShareTaskList(receiver, id);
+                Console.WriteLine($"You shared list {list.Title}");
             }
-
-            Console.WriteLine("Enter receiver username");
-            string username = Console.ReadLine();
-
-            if (username == UserService.CurrentUser.Username)
-            {
-                Console.WriteLine("You can't share with yourself");
-
-                return;
-            }
-
-            User receiver = _userService.GetUser(username);
-
-            if (receiver == null)
-            {
-                Console.WriteLine($"There isn't user with username {username}");
-
-                return;
-            }
-
-            Console.WriteLine("Enter list id to share");
-            string _id = Console.ReadLine();
-            int id;
-            if (int.TryParse(_id, out id))
-            {
-            }
-            else
+            catch
             {
                 Console.WriteLine("Invalid input");
-
-                return;
             }
-
-            TaskList list = _listService.GetTaskList(id);
-            if (list == null)
-            {
-                Console.WriteLine($"There isn't a list with id: {id}.");
-                return;
-            }
-
-            _listService.ShareTaskList(receiver, id);
-            Console.WriteLine($"You shared list {list.Title}");
         }
 
         public void PromptShowTaskLists()
         {
-            if (UserService.CurrentUser == null)
-            {
-                Console.WriteLine("Please log in");
-
-                return;
-            }
-
             List<TaskList> lists = _listService.GetAllTaskLists(UserService.CurrentUser);
 
             foreach (TaskList list in lists)

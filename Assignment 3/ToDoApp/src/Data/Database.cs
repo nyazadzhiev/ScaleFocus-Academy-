@@ -33,11 +33,5 @@ namespace ToDoAppData
         {
             command.Parameters.Add(parameterName, parameterType).Value = parameterValue;
         }
-
-
-
-        
-
-
     }
 }
