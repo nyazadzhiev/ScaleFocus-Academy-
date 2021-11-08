@@ -56,9 +56,6 @@ namespace ToDoAppServices
 
                 string description = userInput.EnterValue("description");
 
-                Console.WriteLine("Is complete? yes or no");
-                string answer = Console.ReadLine();
-
                 bool isComplete = userInput.EnterTaskCompleted();
 
                 taskService.CreateTask(UserService.CurrentUser, list, title, description, isComplete);

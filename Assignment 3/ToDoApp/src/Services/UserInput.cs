@@ -40,15 +40,15 @@ namespace ToDoAppServices
 
         public bool EnterTaskCompleted()
         {
-            Console.WriteLine("Is complete? yes or no");
+            Console.WriteLine("Is complete? 1. yes or 2. no");
             string answer = Console.ReadLine();
 
             bool isComplete = true;
-            if (answer.ToLower() == "yes")
+            if (answer.ToLower() == "1")
             {
                 isComplete = true;
             }
-            else if (answer.ToLower() == "no")
+            else if (answer.ToLower() == "2")
             {
                 isComplete = false;
             }
@@ -64,18 +64,24 @@ namespace ToDoAppServices
 
         public bool EnterRole()
         {
-            Console.WriteLine("Enter role (admin or user)");
+            Console.WriteLine("Enter role: 1. admin or 2. user)");
             string answer = Console.ReadLine();
 
             bool isAdmin;
 
-            if (answer.ToLower() == "admin")
+            if (answer.ToLower() == "1")
             {
                 isAdmin = true;
             }
-            else
+            else if(answer.ToLower() == "2")
             {
                 isAdmin = false;
+            }
+            else
+            {
+                Console.WriteLine("Invalid input");
+
+                return false;
             }
 
             return isAdmin;
