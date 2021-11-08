@@ -35,10 +35,9 @@ namespace ToDoAppServices
                     Console.WriteLine("Login successful.");
                 }
             }
-            catch (ArgumentNullException e)
+            catch (ArgumentNullException)
             {
                 Console.WriteLine("Invalid input");
-                Console.WriteLine(e.Message);
             }
         }
 
@@ -71,10 +70,9 @@ namespace ToDoAppServices
                     Console.WriteLine($"User with name '{name}' already exists");
                 }
             }
-            catch (ArgumentNullException e)
+            catch (ArgumentNullException)
             {
                 Console.WriteLine("Invalid input");
-                Console.WriteLine(e.Message);
             }
         }
 
@@ -86,10 +84,9 @@ namespace ToDoAppServices
 
                 _userService.EditUser(username);
             }
-            catch (ArgumentNullException e)
+            catch (ArgumentNullException)
             {
                 Console.WriteLine("Invalid input");
-                Console.WriteLine(e.Message);
             }
         }
 
@@ -101,10 +98,9 @@ namespace ToDoAppServices
 
                 _userService.DeleteUser(username);
             }
-            catch (ArgumentNullException e)
+            catch (ArgumentNullException)
             {
                 Console.WriteLine("Invalid input");
-                Console.WriteLine(e.Message);
             }
         }
 

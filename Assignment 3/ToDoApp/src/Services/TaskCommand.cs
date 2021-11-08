@@ -61,10 +61,9 @@ namespace ToDoAppServices
                 taskService.CreateTask(UserService.CurrentUser, list, title, description, isComplete);
                 Console.WriteLine($"You created task {title}");
             }
-            catch (ArgumentNullException e)
+            catch (ArgumentNullException)
             {
                 Console.WriteLine("Invalid input");
-                Console.WriteLine(e.Message);
             }
         }
 
@@ -100,10 +99,9 @@ namespace ToDoAppServices
                     Console.WriteLine(task.ToString());
                 }
             }
-            catch (ArgumentNullException e)
+            catch (ArgumentNullException)
             {
                 Console.WriteLine("Invalid input");
-                Console.WriteLine(e.Message);
             }
         }
 
@@ -144,10 +142,9 @@ namespace ToDoAppServices
                 taskService.EditTask(currentTask.Id, newTitle, newDescription, isComplete);
                 Console.WriteLine("You successfully edited task");
             }
-            catch (ArgumentNullException e)
+            catch (ArgumentNullException)
             {
                 Console.WriteLine("Invalid input");
-                Console.WriteLine(e.Message);
             }
         }
 
@@ -171,10 +168,9 @@ namespace ToDoAppServices
 
                 Console.WriteLine("The task was completed");
             }
-            catch (ArgumentNullException e)
+            catch (ArgumentNullException)
             {
                 Console.WriteLine("Invalid input");
-                Console.WriteLine(e.Message);
             }
         }
 
@@ -196,10 +192,9 @@ namespace ToDoAppServices
 
                 taskService.DeteleTask(id);
             }
-            catch (ArgumentNullException e)
+            catch (ArgumentNullException)
             {
                 Console.WriteLine("Invalid input");
-                Console.WriteLine(e.Message);
             }
         }
 
@@ -241,10 +236,9 @@ namespace ToDoAppServices
 
                 } while (username != "1");
             }
-            catch (ArgumentNullException e)
+            catch (ArgumentNullException)
             {
                 Console.WriteLine("Invalid input");
-                Console.WriteLine(e.Message);
             }
         }
     }
