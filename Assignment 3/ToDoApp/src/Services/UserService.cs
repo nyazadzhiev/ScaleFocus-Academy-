@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using ToDoAppData;
 using ToDoAppEntities;
 
@@ -21,7 +23,7 @@ namespace ToDoAppServices
 
         public static User CurrentUser { get; private set; }
 
-        public bool CreateUser(string username, string password, string firstName, string lastName, bool isAdmin)
+        public async Task<bool> CreateUser(string username, string password, string firstName, string lastName, bool isAdmin)
         {
             if (_database.Users.Any(u => u.Username == username))
             {
@@ -45,7 +47,7 @@ namespace ToDoAppServices
 
             _database.Users.Add(newUser);
 
-            _database.SaveChanges();
+            await _database.SaveChangesAsync();
 
             return newUser.Id != 0;
         }
@@ -75,7 +77,7 @@ namespace ToDoAppServices
             return _database.Users.FirstOrDefault(u => u.Username == username);
         }
 
-        public bool EditUser(string username)
+        public async Task<bool> EditUser(string username)
         {
             User user = GetUser(username);
 
@@ -95,8 +97,6 @@ namespace ToDoAppServices
  
                 string newLastName  = userInput.EnterValue("new Last Name");
 
-                DateTime dateTime = DateTime.Now;
-
                 Console.WriteLine("You successfully edited the user");
 
                 user.Username = newUsername;
@@ -106,13 +106,13 @@ namespace ToDoAppServices
                 user.LastEdited = DateTime.Now;
                 user.ModifierId = UserService.CurrentUser.Id;
 
-                _database.SaveChanges();
+                await _database.SaveChangesAsync();
 
                 return true;
             }
         }
 
-        public bool DeleteUser(string username)
+        public async Task<bool> DeleteUser(string username)
         {
             User user = GetUser(username);
 
@@ -125,7 +125,7 @@ namespace ToDoAppServices
             else
             {
                 _database.Users.Remove(user);
-                _database.SaveChanges();
+                await _database.SaveChangesAsync();
                 Console.WriteLine($"You Deleted user {username}");
 
                 return true;

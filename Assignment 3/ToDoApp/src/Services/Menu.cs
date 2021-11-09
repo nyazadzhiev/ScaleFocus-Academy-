@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using ToDoAppData;
 using ToDoAppEntities;
 
@@ -27,7 +28,7 @@ namespace ToDoAppServices
             validations = new Validations();
         }
 
-        public bool MainMenu(User currentUser)
+        public async Task<bool> MainMenu(User currentUser)
         {
             ShowMenu(currentUser);
 
@@ -54,16 +55,16 @@ namespace ToDoAppServices
                         switch (innerChoice)
                         {
                             case "1":
-                                userCommand.PromptCreateUser();
+                                await userCommand.PromptCreateUser();
                                 break;
                             case "2":
                                 userCommand.PromptGetAllUsers();
                                 break;
                             case "3":
-                                userCommand.PromptEditUser();
+                                await userCommand.PromptEditUser();
                                 break;
                             case "4":
-                                userCommand.PromptDeleteUser();
+                                await userCommand.PromptDeleteUser();
                                 break;
                         }
                     }
@@ -79,19 +80,19 @@ namespace ToDoAppServices
                         switch (innerChoice)
                         {
                             case "1":
-                                listCommand.PromptCreateTaskList();
+                                await listCommand.PromptCreateTaskList();
                                 break;
                             case "2":
-                                listCommand.PromptShowTaskLists();
+                                listCommand .PromptShowTaskLists();
                                 break;
                             case "3":
-                                listCommand.PromptEditTaskList();
+                                await listCommand.PromptEditTaskList();
                                 break;
                             case "4":
-                                listCommand.PromptDeleteTaskList();
+                                await listCommand.PromptDeleteTaskList();
                                 break;
                             case "5":
-                                listCommand.PromptShareTaskList();
+                                await listCommand .PromptShareTaskList();
                                 break;
                         }
                     }
@@ -106,22 +107,22 @@ namespace ToDoAppServices
                         switch (innerChoice)
                         {
                             case "1":
-                                taskCommand.PromptAddTask();
+                                await taskCommand.PromptAddTask();
                                 break;
                             case "2":
-                                taskCommand.PromptAssignTask();
+                                await taskCommand.PromptAssignTask();
                                 break;
                             case "3":
-                                taskCommand.PromptShowTasks();
+                                await taskCommand.PromptShowTasks();
                                 break;
                             case "4":
-                                taskCommand.PromptEditTask();
+                                await taskCommand.PromptEditTask();
                                 break;
                             case "5":
-                                taskCommand.PromptCompleteTask();
+                                await taskCommand.PromptCompleteTask();
                                 break;
                             case "6":
-                                taskCommand.PromptDeleteTask();
+                                await taskCommand .PromptDeleteTask();
                                 break;
                         }
                     }

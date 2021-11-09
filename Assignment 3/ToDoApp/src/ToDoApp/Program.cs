@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Threading.Tasks;
 using ToDoAppData;
 using ToDoAppEntities;
 using ToDoAppServices;
@@ -11,22 +12,17 @@ namespace ToDoApp
     public class Program
     {
         private static DatabaseContext database;
-        private static UserService userService;
         private static Menu menu;
 
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             database = InitializeApplication();
             menu = new Menu(database);
 
-            if (args.Length > 0)
-            {
-                userService.CreateUser("admin", "adminpassword", "Admin", "Admin", true);
-            }
             bool shouldExit = false;
             while (!shouldExit)
             {
-                shouldExit = menu.MainMenu(UserService.CurrentUser);
+                shouldExit = await menu.MainMenu(UserService.CurrentUser);
             }
         }
 

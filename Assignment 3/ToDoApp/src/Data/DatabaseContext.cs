@@ -9,7 +9,7 @@ using System.Text.Json;
 using System.Data.SqlClient;
 using System.Data.Entity;
 using ToDoAppEntities;
-using Task = ToDoAppEntities.Task;
+using ToDoTask = ToDoAppEntities.ToDoTask;
 using Microsoft.EntityFrameworkCore;
 
 namespace ToDoAppData
@@ -23,7 +23,7 @@ namespace ToDoAppData
 
         public IDbSet<User> Users { get; set; }
         public IDbSet<TaskList> Lists { get; set; }
-        public IDbSet<Task> Tasks { get; set; }
+        public IDbSet<ToDoTask> Tasks { get; set; }
         public IDbSet<SharedList> SharedLists { get; set; }
         public IDbSet<AssignedTask> AssignedTasks { get; set; }
 
@@ -45,12 +45,12 @@ namespace ToDoAppData
 
         private static void SetupTaskConfiguration(DbModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Task>().HasKey(t => t.Id);
-            modelBuilder.Entity<Task>().Property(t => t.Title).IsRequired().HasMaxLength(20);
-            modelBuilder.Entity<Task>().Property(t => t.Description).IsRequired().HasMaxLength(300);
-            modelBuilder.Entity<Task>().HasRequired(t => t.ToDoList).WithMany(l => l.Tasks).HasForeignKey(t => t.ListId).WillCascadeOnDelete(false);
-            modelBuilder.Entity<Task>().HasRequired(t => t.Creator).WithMany().HasForeignKey(u => u.CreatorId).WillCascadeOnDelete(false);
-            modelBuilder.Entity<Task>().HasRequired(t => t.Modifier).WithMany().HasForeignKey(u => u.ModifierId).WillCascadeOnDelete(false);
+            modelBuilder.Entity<ToDoTask>().HasKey(t => t.Id);
+            modelBuilder.Entity<ToDoTask>().Property(t => t.Title).IsRequired().HasMaxLength(20);
+            modelBuilder.Entity<ToDoTask>().Property(t => t.Description).IsRequired().HasMaxLength(300);
+            modelBuilder.Entity<ToDoTask>().HasRequired(t => t.ToDoList).WithMany(l => l.Tasks).HasForeignKey(t => t.ListId).WillCascadeOnDelete(false);
+            modelBuilder.Entity<ToDoTask>().HasRequired(t => t.Creator).WithMany().HasForeignKey(u => u.CreatorId).WillCascadeOnDelete(false);
+            modelBuilder.Entity<ToDoTask>().HasRequired(t => t.Modifier).WithMany().HasForeignKey(u => u.ModifierId).WillCascadeOnDelete(false);
         }
 
         private static void SetupTaskListConfiguration(DbModelBuilder modelBuilder)

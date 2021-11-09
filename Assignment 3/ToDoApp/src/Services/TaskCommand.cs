@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using ToDoAppData;
 using ToDoAppEntities;
 
@@ -23,13 +24,13 @@ namespace ToDoAppServices
             validations = new Validations();
         }
 
-        public void PromptAddTask()
+        public async Task PromptAddTask()
         {
             try
             {
                 int id = userInput.EnterId("List Id");
 
-                TaskList list = listService.GetTaskList(id);
+                TaskList list = listService .GetTaskList(id);
 
                 bool isValidList = validations.EnsureListExist(list);
                 if (!isValidList)
@@ -58,7 +59,7 @@ namespace ToDoAppServices
 
                 bool isComplete = userInput.EnterTaskCompleted();
 
-                taskService.CreateTask(UserService.CurrentUser, list, title, description, isComplete);
+                await taskService.CreateTask(UserService.CurrentUser, list, title, description, isComplete);
                 Console.WriteLine($"You created task {title}");
             }
             catch (ArgumentNullException)
@@ -67,13 +68,13 @@ namespace ToDoAppServices
             }
         }
 
-        public void PromptShowTasks()
+        public async Task PromptShowTasks()
         {
             try
             {
                 int id = userInput.EnterId("List Id");
 
-                TaskList list = listService.GetTaskList(id);
+                TaskList list = listService .GetTaskList(id);
 
                 bool isValidList = validations.EnsureListExist(list);
                 if (!isValidList)
@@ -81,9 +82,9 @@ namespace ToDoAppServices
                     return;
                 }
 
-                List<Task> tasks = taskService.GetTasks(id);
+                List<ToDoTask> tasks = taskService.GetTasks(id);
 
-                foreach (Task task in tasks)
+                foreach (ToDoTask task in tasks)
                 {
                     Console.WriteLine("--------------------------");
                     Console.WriteLine(task.ToString());
@@ -91,9 +92,9 @@ namespace ToDoAppServices
 
                 Console.WriteLine("Assigned Tasks");
 
-                List<Task> assignedTasks = taskService.GetAssignedTasks();
+                List<ToDoTask> assignedTasks = taskService.GetAssignedTasks();
 
-                foreach (Task task in assignedTasks)
+                foreach (ToDoTask task in assignedTasks)
                 {
                     Console.WriteLine("--------------------------");
                     Console.WriteLine(task.ToString());
@@ -105,12 +106,12 @@ namespace ToDoAppServices
             }
         }
 
-        public void PromptEditTask()
+        public async Task PromptEditTask()
         {
             try
             {
                 int id = userInput.EnterId("List Id");
-                TaskList list = listService.GetTaskList(id);
+                TaskList list = listService .GetTaskList(id);
 
                 bool isValidList = validations.EnsureListExist(list);
                 if (!isValidList)
@@ -120,7 +121,7 @@ namespace ToDoAppServices
 
                 id = userInput.EnterId("Task Id");
 
-                Task currentTask = taskService.GetTask(id);
+                ToDoTask currentTask = taskService.GetTask(id);
 
                 bool isValidTask = validations.EnsureTaskExist(currentTask);
                 if (!isValidTask)
@@ -135,11 +136,9 @@ namespace ToDoAppServices
 
                 string newDescription = userInput.EnterValue("new description");
 
-                Console.WriteLine("Is completed? yes or no");
-                string answer = Console.ReadLine();
                 bool isComplete = userInput.EnterTaskCompleted();
 
-                taskService.EditTask(currentTask.Id, newTitle, newDescription, isComplete);
+                await taskService.EditTask(currentTask.Id, newTitle, newDescription, isComplete);
                 Console.WriteLine("You successfully edited task");
             }
             catch (ArgumentNullException)
@@ -148,13 +147,13 @@ namespace ToDoAppServices
             }
         }
 
-        public void PromptCompleteTask()
+        public async Task PromptCompleteTask()
         {
             try
             {
                 int id = userInput.EnterId("List Id");
 
-                TaskList list = listService.GetTaskList(id);
+                TaskList list = listService .GetTaskList(id);
 
                 bool isValidList = validations.EnsureListExist(list);
                 if (!isValidList)
@@ -164,7 +163,7 @@ namespace ToDoAppServices
 
                 id = userInput.EnterId("Task Id");
 
-                taskService.CompleteTask(list, id);
+                await taskService .CompleteTask(list, id);
 
                 Console.WriteLine("The task was completed");
             }
@@ -174,13 +173,13 @@ namespace ToDoAppServices
             }
         }
 
-        public void PromptDeleteTask()
+        public async Task PromptDeleteTask()
         {
             try
             {
                 int id = userInput.EnterId("List Id");
 
-                TaskList list = listService.GetTaskList(id);
+                TaskList list = listService .GetTaskList(id);
 
                 bool isValidList = validations.EnsureListExist(list);
                 if (!isValidList)
@@ -190,7 +189,7 @@ namespace ToDoAppServices
 
                 id = userInput.EnterId("Task Id");
 
-                taskService.DeteleTask(id);
+                await taskService.DeteleTask(id);
             }
             catch (ArgumentNullException)
             {
@@ -198,18 +197,18 @@ namespace ToDoAppServices
             }
         }
 
-        public void PromptAssignTask()
+        public async Task PromptAssignTask()
         {
             try
             {
                 string listTitle = userInput.EnterValue("new title");
 
-                listService.CreateTaskList(UserService.CurrentUser, listTitle);
+                await listService .CreateTaskList(UserService.CurrentUser, listTitle);
                 TaskList currentList = listService.GetTaskList(listTitle);
 
                 int taskId = userInput.EnterId("Task Id");
 
-                Task toAssign = taskService.GetTask(taskId);
+                ToDoTask toAssign = taskService.GetTask(taskId);
 
                 bool isValidTask = validations.EnsureTaskExist(toAssign);
                 if (!isValidTask)
@@ -223,7 +222,7 @@ namespace ToDoAppServices
                 {
                     username = userInput.EnterValue("receiver username or 1 to exit");
 
-                    User receiver = userService.GetUser(username);
+                    User receiver = userService .GetUser(username);
 
                     bool isValidUser = validations.EnsureUserExist(receiver);
                     if (!isValidUser)
@@ -231,7 +230,7 @@ namespace ToDoAppServices
                         return;
                     }
 
-                    taskService.AssignTask(receiver, toAssign.Id);
+                    await taskService .AssignTask(receiver, toAssign.Id);
                     Console.WriteLine($"You assigned task {toAssign.Title} to user {username}");
 
                 } while (username != "1");

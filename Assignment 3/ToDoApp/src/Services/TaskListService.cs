@@ -1,7 +1,9 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using ToDoAppData;
 using ToDoAppEntities;
 
@@ -39,7 +41,7 @@ namespace ToDoAppServices
             return lists;
         }
 
-        public bool CreateTaskList(User user, string title)
+        public async Task<bool> CreateTaskList(User user, string title)
         {
             TaskList newList = new TaskList()
             {
@@ -52,7 +54,7 @@ namespace ToDoAppServices
 
             _database.Lists.Add(newList);
 
-            _database.SaveChanges();
+            await _database.SaveChangesAsync();
 
             return newList.Id != 0;
         }
@@ -67,9 +69,9 @@ namespace ToDoAppServices
             return _database.Lists.FirstOrDefault(l => l.Title == title);
         }
 
-        public bool EditTaskList(int id, string newTitle)
+        public async Task<bool> EditTaskList(int id, string newTitle)
         {
-            TaskList currentList = GetTaskList(id);
+            TaskList currentList = GetTaskList (id);
             bool isValidList = validations.EnsureListExist(currentList);
             if (!isValidList)
             {
@@ -87,14 +89,14 @@ namespace ToDoAppServices
                 currentList.LastEdited = DateTime.Now;
                 currentList.ModifierId = UserService.CurrentUser.Id;
 
-                _database.SaveChanges();
+                await _database.SaveChangesAsync();
                 Console.WriteLine("You succesfully edited TaskList");
 
                 return true;
             }
         }
 
-        public bool DeleteTaskList(int id)
+        public async Task<bool> DeleteTaskList(int id)
         {
             TaskList currentList = GetTaskList(id);
             bool isValidList = validations.EnsureListExist(currentList);
@@ -111,13 +113,14 @@ namespace ToDoAppServices
             else
             {
                 _database.Lists.Remove(currentList);
+                await _database.SaveChangesAsync();
                 Console.WriteLine($"You deleted list {currentList.Title}");
 
                 return true;
             }
         }
 
-        public bool ShareTaskList(User user, int listId)
+        public async Task<bool> ShareTaskList(User user, int listId)
         {
             TaskList toShare = GetTaskList(listId);
 
@@ -135,7 +138,7 @@ namespace ToDoAppServices
             };
 
             _database.SharedLists.Add(shared);
-            _database.SaveChanges();
+            await _database.SaveChangesAsync();
 
             return true;
         }

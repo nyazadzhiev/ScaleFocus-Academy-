@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using ToDoAppEntities;
 
 namespace ToDoAppServices
@@ -20,7 +21,7 @@ namespace ToDoAppServices
             validations = new Validations();
         }
 
-        public void PromptCreateTaskList()
+        public async Task PromptCreateTaskList()
         {
             try
             {
@@ -33,7 +34,7 @@ namespace ToDoAppServices
                     return;
                 }
 
-                _listService.CreateTaskList(UserService.CurrentUser, title);
+                await _listService.CreateTaskList(UserService.CurrentUser, title);
 
                 Console.WriteLine($"You created a tasklist {title}");
             }
@@ -43,7 +44,7 @@ namespace ToDoAppServices
             }
         }
 
-        public void PromptEditTaskList()
+        public async Task PromptEditTaskList()
         {
             try
             {
@@ -62,7 +63,7 @@ namespace ToDoAppServices
 
                 string newTitle = userInput.EnterValue("new title");
 
-                _listService.EditTaskList(id, newTitle);
+                await _listService.EditTaskList(id, newTitle);
             }
             catch (ArgumentNullException)
             {
@@ -70,13 +71,13 @@ namespace ToDoAppServices
             }
         }
 
-        public void PromptDeleteTaskList()
+        public async Task PromptDeleteTaskList()
         {
             try
             {
                 int id = userInput.EnterId("List Id");
 
-                _listService.DeleteTaskList(id);
+                await _listService.DeleteTaskList(id);
             }
             catch (ArgumentNullException e)
             {
@@ -85,7 +86,7 @@ namespace ToDoAppServices
             }
         }
 
-        public void PromptShareTaskList()
+        public async Task PromptShareTaskList()
         {
             try
             {
@@ -116,7 +117,7 @@ namespace ToDoAppServices
                     return;
                 }
 
-                _listService.ShareTaskList(receiver, id);
+                await _listService.ShareTaskList(receiver, id);
                 Console.WriteLine($"You shared list {list.Title}");
             }
             catch (ArgumentNullException)

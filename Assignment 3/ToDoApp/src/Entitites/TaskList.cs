@@ -8,11 +8,11 @@ namespace ToDoAppEntities
     {
         public int Id { get; set; }
         public string Title { get; set; }
-        public virtual List<Task> Tasks { get; set; }
+        public virtual List<ToDoTask> Tasks { get; set; }
 
         public TaskList()
         {
-            Tasks = new List<Task>();
+            Tasks = new List<ToDoTask>();
         }
 
         public override string ToString()

@@ -75,7 +75,7 @@ namespace ToDoAppServices
             }
         }
 
-        public bool EnsureTaskExist(Task task)
+        public bool EnsureTaskExist(ToDoTask task)
         {
             if (task == null)
             {
