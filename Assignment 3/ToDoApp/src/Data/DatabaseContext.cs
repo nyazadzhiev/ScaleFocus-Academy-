@@ -24,6 +24,8 @@ namespace ToDoAppData
         public IDbSet<User> Users { get; set; }
         public IDbSet<TaskList> Lists { get; set; }
         public IDbSet<Task> Tasks { get; set; }
+        public IDbSet<SharedList> SharedLists { get; set; }
+        public IDbSet<AssignedTask> AssignedTasks { get; set; }
 
         protected void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -35,6 +37,8 @@ namespace ToDoAppData
             SetupUserConfiguration(modelBuilder);
             SetupTaskListConfiguration(modelBuilder);
             SetupTaskConfiguration(modelBuilder);
+            SetupSharedListConfiguretion(modelBuilder);
+            SetupAssignedTaskConfiguretion(modelBuilder);
 
             base.OnModelCreating(modelBuilder);
         }
@@ -66,6 +70,20 @@ namespace ToDoAppData
             modelBuilder.Entity<User>().Property(u => u.LastName).IsRequired().HasMaxLength(50);
             modelBuilder.Entity<User>().HasOptional(u => u.Creator).WithMany().HasForeignKey(u => u.CreatorId).WillCascadeOnDelete(false);
             modelBuilder.Entity<User>().HasOptional(u => u.Modifier).WithMany().HasForeignKey(u => u.ModifierId).WillCascadeOnDelete(false);
+        }
+
+        private static void SetupSharedListConfiguretion(DbModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<SharedList>().HasKey(l => l.Id);
+            modelBuilder.Entity<SharedList>().HasRequired(l => l.User).WithMany().HasForeignKey(s => s.UserId).WillCascadeOnDelete(false);
+            modelBuilder.Entity<SharedList>().HasRequired(l => l.List).WithMany().HasForeignKey(s => s.ListId).WillCascadeOnDelete(false);
+        }
+
+        private static void SetupAssignedTaskConfiguretion(DbModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<AssignedTask>().HasKey(t => t.Id);
+            modelBuilder.Entity<AssignedTask>().HasRequired(t => t.User).WithMany().HasForeignKey(t => t.UserId).WillCascadeOnDelete(false);
+            modelBuilder.Entity<AssignedTask>().HasRequired(t => t.Task).WithMany().HasForeignKey(t => t.TaskId).WillCascadeOnDelete(false);
         }
     }
 }
