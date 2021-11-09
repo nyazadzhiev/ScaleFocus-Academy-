@@ -33,16 +33,43 @@ namespace ToDoAppServices
             return _database.Tasks.Where(t => t.ListId == listId).ToList();
         }
 
-        public List<Task> GetAssignedTasks(int userId)
+        public List<Task> GetAssignedTasks()
         {
             List<Task> tasks = new List<Task>();
+
+            List<AssignedTask> assignedTasks = _database.AssignedTasks.Where(t => t.UserId == UserService.CurrentUser.Id).ToList();
+
+            foreach(AssignedTask assignedTask in assignedTasks)
+            {
+                Task task = GetTask(assignedTask.TaskId);
+
+                tasks.Add(task);
+            }
 
             return tasks;
         }
 
         public bool AssignTask(User user, int taskId)
         {
-            return false;
+            Task toAssign = GetTask(taskId);
+
+            if (toAssign.CreatorId != UserService.CurrentUser.Id)
+            {
+                Console.WriteLine("You don't have permission to do this");
+
+                return false;
+            }
+
+            AssignedTask assignedTask = new AssignedTask()
+            {
+                UserId = user.Id,
+                TaskId = taskId
+            };
+
+            _database.AssignedTasks.Add(assignedTask);
+            _database.SaveChanges();
+
+            return true;
         }
 
         public bool CreateTask(User user, TaskList list, string title, string description, bool isComplete)

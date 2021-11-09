@@ -91,7 +91,7 @@ namespace ToDoAppServices
 
                 Console.WriteLine("Assigned Tasks");
 
-                List<Task> assignedTasks = taskService.GetTasks(id);
+                List<Task> assignedTasks = taskService.GetAssignedTasks();
 
                 foreach (Task task in assignedTasks)
                 {
