@@ -124,6 +124,10 @@ namespace ToDoAppServices
             {
                 Console.WriteLine("Invalid input");
             }
+            catch (NotSupportedException)
+            {
+                Console.WriteLine("You don't have permission to do this");
+            }
         }
 
         public void PromptShowTaskLists()

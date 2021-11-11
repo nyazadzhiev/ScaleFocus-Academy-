@@ -126,9 +126,7 @@ namespace ToDoAppServices
 
             if(toShare.CreatorId != UserService.CurrentUser.Id)
             {
-                Console.WriteLine("You don't have permission to do this");
-
-                return false;
+                throw new NotSupportedException();
             }
 
             SharedList shared = new SharedList()
