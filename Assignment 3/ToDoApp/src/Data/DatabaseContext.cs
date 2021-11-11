@@ -75,8 +75,8 @@ namespace ToDoAppData
         private static void SetupSharedListConfiguretion(DbModelBuilder modelBuilder)
         {
             modelBuilder.Entity<SharedList>().HasKey(l => l.Id);
-            modelBuilder.Entity<SharedList>().HasRequired(l => l.User).WithMany().HasForeignKey(s => s.UserId).WillCascadeOnDelete(false);
-            modelBuilder.Entity<SharedList>().HasRequired(l => l.List).WithMany().HasForeignKey(s => s.ListId).WillCascadeOnDelete(false);
+            modelBuilder.Entity<SharedList>().HasRequired(l => l.User).WithMany().HasForeignKey(s => s.UserId).WillCascadeOnDelete(true);
+            modelBuilder.Entity<SharedList>().HasRequired(l => l.List).WithMany().HasForeignKey(s => s.ListId).WillCascadeOnDelete(true);
         }
 
         private static void SetupAssignedTaskConfiguretion(DbModelBuilder modelBuilder)
