@@ -11,6 +11,7 @@ namespace ToDoAppServices
     {
         private UserService _userService;
         private UserInput userInput;
+        private Validations validations = new Validations();
 
         public UserCommand(UserService userService)
         {
@@ -82,12 +83,15 @@ namespace ToDoAppServices
             try
             {
                 string username = userInput.EnterValue("username");
-
                 await _userService.EditUser(username);
             }
             catch (ArgumentNullException)
             {
                 Console.WriteLine("Invalid input");
+            }
+            catch (ArgumentException)
+            {
+                Console.WriteLine($"Username is taken");
             }
         }
 

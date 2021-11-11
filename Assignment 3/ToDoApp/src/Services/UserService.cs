@@ -91,6 +91,15 @@ namespace ToDoAppServices
             {
                 string newUsername = userInput.EnterValue("new username");
 
+                User newUser = GetUser(newUsername);
+
+                isValidUser = validations.EnsureUserExist(newUser);
+
+                if (isValidUser)
+                {
+                    throw new ArgumentException();
+                }
+
                 string newPassword = userInput.EnterValue("new password");
 
                 string newFirstName = userInput.EnterValue("new First Name");
