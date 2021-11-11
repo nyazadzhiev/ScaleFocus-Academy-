@@ -19,8 +19,10 @@ namespace ToDoAppEntities
         {
             return $"ID: {this.Id}\n" +
                 $"Title: {this.Title}\n" +
+               $"Creator: {this.Creator.FirstName} {this.Creator.LastName}\n" +
                 $"Created at: {this.CreatedAt}\n" +
-                $"Last Edited: {(this.LastEdited == default(DateTime) ? "Not edited yet" : $"{this.LastEdited}")}\n"; ;
+                $"Modifier: {this.Modifier.FirstName} {this.Modifier.LastName}\n" +
+                $"Last Edited: {this.LastEdited}\n";
         }
     }
 }

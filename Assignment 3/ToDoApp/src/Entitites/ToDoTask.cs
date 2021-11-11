@@ -19,7 +19,9 @@ namespace ToDoAppEntities
                 $"Title: {this.Title} \n" +
                 $"Description: {this.Description} \n" +
                 $"Is completed: {this.IsComplete} \n" +
-                $"Created at {this.CreatedAt}\n" +
+                $"Creator: {this.Creator.FirstName} {this.Creator.LastName}\n" +
+                $"Created at: {this.CreatedAt}\n" +
+                $"Modifier: {this.Modifier.FirstName} {this.Modifier.LastName}\n" +
                 $"Last Edited: {this.LastEdited}\n";
         }
     }
