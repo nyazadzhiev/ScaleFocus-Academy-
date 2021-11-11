@@ -145,6 +145,10 @@ namespace ToDoAppServices
             {
                 Console.WriteLine("Invalid input");
             }
+            catch (NotSupportedException)
+            {
+                Console.WriteLine("You don't have permission to do this");
+            }
         }
 
         public async Task PromptCompleteTask()
@@ -171,6 +175,10 @@ namespace ToDoAppServices
             {
                 Console.WriteLine("Invalid input");
             }
+            catch (NotSupportedException)
+            {
+                Console.WriteLine("You don't have permission to do this");
+            }
         }
 
         public async Task PromptDeleteTask()
@@ -194,6 +202,10 @@ namespace ToDoAppServices
             catch (ArgumentNullException)
             {
                 Console.WriteLine("Invalid input");
+            }
+            catch (NotSupportedException)
+            {
+                Console.WriteLine("You don't have permission to do this");
             }
         }
 
@@ -238,6 +250,10 @@ namespace ToDoAppServices
             catch (ArgumentNullException)
             {
                 Console.WriteLine("Invalid input");
+            }
+            catch (NotSupportedException)
+            {
+                Console.WriteLine("You don't have permission to do this");
             }
         }
     }

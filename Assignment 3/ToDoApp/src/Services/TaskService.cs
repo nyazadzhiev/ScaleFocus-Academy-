@@ -57,9 +57,7 @@ namespace ToDoAppServices
 
             if (toAssign.CreatorId != UserService.CurrentUser.Id)
             {
-                Console.WriteLine("You don't have permission to do this");
-
-                return false;
+                throw new NotSupportedException();
             }
 
             AssignedTask assignedTask = new AssignedTask()
@@ -99,6 +97,12 @@ namespace ToDoAppServices
         {
             ToDoTask currentTask = GetTask (taskId);
             bool isValidTask = validations.EnsureTaskExist(currentTask);
+
+            if (currentTask.CreatorId != UserService.CurrentUser.Id)
+            {
+                throw new NotSupportedException();
+            }
+
             if (isValidTask)
             {
                 currentTask.IsComplete = true;
@@ -118,6 +122,12 @@ namespace ToDoAppServices
             ToDoTask currentTask = GetTask (taskId);
 
             bool isValidTask = validations.EnsureTaskExist(currentTask);
+
+            if (currentTask.CreatorId != UserService.CurrentUser.Id)
+            {
+                throw new NotSupportedException();
+            }
+
             if (!isValidTask)
             {
                 return false;
@@ -140,6 +150,12 @@ namespace ToDoAppServices
         {
             ToDoTask currentTask = GetTask (taskId);
             bool isValidTask = validations.EnsureTaskExist(currentTask);
+
+            if (currentTask.CreatorId != UserService.CurrentUser.Id)
+            {
+                throw new NotSupportedException();
+            }
+
             if (!isValidTask)
             {
                 return false;
