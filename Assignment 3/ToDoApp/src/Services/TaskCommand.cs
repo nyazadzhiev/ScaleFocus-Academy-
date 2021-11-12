@@ -168,7 +168,7 @@ namespace ToDoAppServices
 
                 id = userInput.EnterId("Task Id");
 
-                await taskService .CompleteTask(list, id);
+                await taskService.CompleteTask(list, id);
 
                 Console.WriteLine("The task was completed");
             }

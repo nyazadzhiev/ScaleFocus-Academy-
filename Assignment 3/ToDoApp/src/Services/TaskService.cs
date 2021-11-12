@@ -81,7 +81,7 @@ namespace ToDoAppServices
             ToDoTask currentTask = GetTask (taskId);
             bool isValidTask = validations.EnsureTaskExist(currentTask);
 
-            if (currentTask.CreatorId != UserService.CurrentUser.Id)
+            if (currentTask.CreatorId != UserService.CurrentUser.Id && !currentTask.SharedUsers.Any(u => u.Id == UserService.CurrentUser.Id))
             {
                 throw new NotSupportedException();
             }
