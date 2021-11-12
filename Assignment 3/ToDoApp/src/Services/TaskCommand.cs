@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ToDoAppData;
@@ -38,7 +39,7 @@ namespace ToDoAppServices
                     return;
                 }
 
-                if (list.CreatorId != UserService.CurrentUser.Id)
+                if (list.CreatorId != UserService.CurrentUser.Id && !list.SharedUsers.Any(u => u.Id == UserService.CurrentUser.Id))
                 {
                     Console.WriteLine("You don't have permission to do that");
 
