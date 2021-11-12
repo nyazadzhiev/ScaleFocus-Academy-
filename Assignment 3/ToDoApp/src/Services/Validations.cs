@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using ToDoAppEntities;
 
@@ -82,6 +83,18 @@ namespace ToDoAppServices
                 Console.WriteLine($"The task doesn't exist");
 
                 return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        public bool CheckAccessToTask(ToDoTask task)
+        {
+            if (task.CreatorId != UserService.CurrentUser.Id && !task.SharedUsers.Any(u => u.Id == UserService.CurrentUser.Id))
+            {
+                throw new NotSupportedException();
             }
             else
             {

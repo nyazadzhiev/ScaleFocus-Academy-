@@ -81,10 +81,7 @@ namespace ToDoAppServices
             ToDoTask currentTask = GetTask (taskId);
             bool isValidTask = validations.EnsureTaskExist(currentTask);
 
-            if (currentTask.CreatorId != UserService.CurrentUser.Id && !currentTask.SharedUsers.Any(u => u.Id == UserService.CurrentUser.Id))
-            {
-                throw new NotSupportedException();
-            }
+            validations.CheckAccessToTask(currentTask);
 
             if (isValidTask)
             {
@@ -106,10 +103,7 @@ namespace ToDoAppServices
 
             bool isValidTask = validations.EnsureTaskExist(currentTask);
 
-            if (currentTask.CreatorId != UserService.CurrentUser.Id && !currentTask.SharedUsers.Any(u => u.Id == UserService.CurrentUser.Id))
-            {
-                throw new NotSupportedException();
-            }
+            validations.CheckAccessToTask(currentTask);
 
             if (!isValidTask)
             {
@@ -134,10 +128,7 @@ namespace ToDoAppServices
             ToDoTask currentTask = GetTask (taskId);
             bool isValidTask = validations.EnsureTaskExist(currentTask);
 
-            if (currentTask.CreatorId != UserService.CurrentUser.Id)
-            {
-                throw new NotSupportedException();
-            }
+            validations.CheckAccessToTask(currentTask);
 
             if (!isValidTask)
             {
