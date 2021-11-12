@@ -24,8 +24,6 @@ namespace ToDoAppData
         public IDbSet<User> Users { get; set; }
         public IDbSet<TaskList> Lists { get; set; }
         public IDbSet<ToDoTask> Tasks { get; set; }
-        public IDbSet<SharedList> SharedLists { get; set; }
-        public IDbSet<AssignedTask> AssignedTasks { get; set; }
 
         protected void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -74,16 +72,28 @@ namespace ToDoAppData
 
         private static void SetupSharedListConfiguretion(DbModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<SharedList>().HasKey(l => l.Id);
-            modelBuilder.Entity<SharedList>().HasRequired(l => l.User).WithMany().HasForeignKey(s => s.UserId).WillCascadeOnDelete(true);
-            modelBuilder.Entity<SharedList>().HasRequired(l => l.List).WithMany().HasForeignKey(s => s.ListId).WillCascadeOnDelete(true);
+            modelBuilder.Entity<User>()
+                        .HasMany<TaskList>(u => u.SharedLists)
+                        .WithMany(l => l.SharedUsers)
+                        .Map(ul =>
+                        {
+                            ul.MapLeftKey("UserId");
+                            ul.MapRightKey("ListId");
+                            ul.ToTable("SharedLists");
+                        });
         }
 
         private static void SetupAssignedTaskConfiguretion(DbModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<AssignedTask>().HasKey(t => t.Id);
-            modelBuilder.Entity<AssignedTask>().HasRequired(t => t.User).WithMany().HasForeignKey(t => t.UserId).WillCascadeOnDelete(false);
-            modelBuilder.Entity<AssignedTask>().HasRequired(t => t.Task).WithMany().HasForeignKey(t => t.TaskId).WillCascadeOnDelete(false);
+            modelBuilder.Entity<User>()
+            .HasMany<ToDoTask>(u => u.AssignedTasks)
+            .WithMany(t => t.SharedUsers)
+            .Map(ut =>
+            {
+                ut.MapLeftKey("UserId");
+                ut.MapRightKey("TaskId");
+                ut.ToTable("AssignedLists");
+            });
         }
     }
 }

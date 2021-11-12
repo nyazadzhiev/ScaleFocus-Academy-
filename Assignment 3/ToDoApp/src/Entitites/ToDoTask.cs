@@ -12,6 +12,12 @@ namespace ToDoAppEntities
         public bool IsComplete { get; set; }
         public int ListId { get; set; }
         public virtual TaskList ToDoList { get; set; }
+        public virtual List<User> SharedUsers { get; set; }
+
+        public ToDoTask()
+        {
+            this.SharedUsers = new List<User>();
+        }
 
         public override string ToString()
         {

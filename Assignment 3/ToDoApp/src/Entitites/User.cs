@@ -10,8 +10,13 @@ namespace ToDoAppEntities
         public int Id { get; set; }
         public bool IsAdmin { get; set; }
 
+        public virtual List<TaskList> SharedLists { get; set;  }
+        public virtual List<ToDoTask> AssignedTasks { get; set; }
+
         public User()
         {
+            this.SharedLists = new List<TaskList>();
+            this.AssignedTasks = new List<ToDoTask>();
         }
 
         public override string ToString()

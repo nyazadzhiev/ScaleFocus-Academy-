@@ -9,10 +9,12 @@ namespace ToDoAppEntities
         public int Id { get; set; }
         public string Title { get; set; }
         public virtual List<ToDoTask> Tasks { get; set; }
+        public virtual List<User> SharedUsers { get; set; }
 
         public TaskList()
         {
-            Tasks = new List<ToDoTask>();
+            this.Tasks = new List<ToDoTask>();
+            this.SharedUsers = new List<User>();
         }
 
         public override string ToString()
