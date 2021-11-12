@@ -19,7 +19,7 @@ namespace ToDoAppServices
             userInput = new UserInput();
         }
 
-        public async Task PromptLogIn()
+        public void PromptLogIn()
         {
             try
             {

@@ -39,7 +39,7 @@ namespace ToDoAppServices
                 case "1":
                     if (currentUser == null)
                     {
-                        await userCommand.PromptLogIn();
+                        userCommand.PromptLogIn();
                     }
                     else
                     {
