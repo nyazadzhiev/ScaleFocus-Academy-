@@ -66,7 +66,7 @@ namespace ToDoAppServices
             {
                 return false;
             }
-            else if(currentList.CreatorId != UserService.CurrentUser.Id)
+            else if(currentList.CreatorId != UserService.CurrentUser.Id || !currentList.SharedUsers.Any(u => u.Id == UserService.CurrentUser.Id))
             {
                 Console.WriteLine("You don't have permission to do this");
 
