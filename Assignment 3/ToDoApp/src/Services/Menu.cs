@@ -39,7 +39,7 @@ namespace ToDoAppServices
                 case "1":
                     if (currentUser == null)
                     {
-                        userCommand.PromptLogIn();
+                        await userCommand.PromptLogIn();
                     }
                     else
                     {
@@ -83,7 +83,7 @@ namespace ToDoAppServices
                                 await listCommand.PromptCreateTaskList();
                                 break;
                             case "2":
-                                listCommand .PromptShowTaskLists();
+                                listCommand.PromptShowTaskLists();
                                 break;
                             case "3":
                                 await listCommand.PromptEditTaskList();
@@ -113,7 +113,7 @@ namespace ToDoAppServices
                                 await taskCommand.PromptAssignTask();
                                 break;
                             case "3":
-                                await taskCommand.PromptShowTasks();
+                                taskCommand.PromptShowTasks();
                                 break;
                             case "4":
                                 await taskCommand.PromptEditTask();

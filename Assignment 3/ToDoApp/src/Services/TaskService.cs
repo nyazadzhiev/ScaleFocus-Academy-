@@ -37,18 +37,7 @@ namespace ToDoAppServices
 
         public List<ToDoTask> GetAssignedTasks()
         {
-            List<ToDoTask> tasks = new List<ToDoTask>();
-
-            List<AssignedTask> assignedTasks = _database.AssignedTasks.Where(t => t.UserId == UserService.CurrentUser.Id).ToList();
-
-            foreach(AssignedTask assignedTask in assignedTasks)
-            {
-                ToDoTask task = GetTask(assignedTask.TaskId);
-
-                tasks.Add(task);
-            }
-
-            return tasks;
+            return UserService.CurrentUser.AssignedTasks;
         }
 
         public async Task<bool> AssignTask(User user, int taskId)
@@ -60,13 +49,7 @@ namespace ToDoAppServices
                 throw new NotSupportedException();
             }
 
-            AssignedTask assignedTask = new AssignedTask()
-            {
-                UserId = user.Id,
-                TaskId = taskId
-            };
-
-            _database.AssignedTasks.Add(assignedTask);
+            user.AssignedTasks.Add(toAssign);
             await _database.SaveChangesAsync();
 
             return true;

@@ -68,7 +68,7 @@ namespace ToDoAppServices
             }
         }
 
-        public async Task PromptShowTasks()
+        public void PromptShowTasks()
         {
             try
             {
@@ -215,7 +215,7 @@ namespace ToDoAppServices
             {
                 string listTitle = userInput.EnterValue("new title");
 
-                await listService .CreateTaskList(UserService.CurrentUser, listTitle);
+                await listService.CreateTaskList(UserService.CurrentUser, listTitle);
                 TaskList currentList = listService.GetTaskList(listTitle);
 
                 int taskId = userInput.EnterId("Task Id");
@@ -234,7 +234,7 @@ namespace ToDoAppServices
                 {
                     username = userInput.EnterValue("receiver username or 1 to exit");
 
-                    User receiver = userService .GetUser(username);
+                    User receiver = userService.GetUser(username);
 
                     bool isValidUser = validations.EnsureUserExist(receiver);
                     if (!isValidUser)
@@ -242,7 +242,8 @@ namespace ToDoAppServices
                         return;
                     }
 
-                    await taskService .AssignTask(receiver, toAssign.Id);
+                    await listService.ShareTaskList(receiver, currentList.Id);
+                    await taskService.AssignTask(receiver, toAssign.Id);
                     Console.WriteLine($"You assigned task {toAssign.Title} to user {username}");
 
                 } while (username != "1");

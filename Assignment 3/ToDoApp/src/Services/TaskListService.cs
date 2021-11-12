@@ -27,18 +27,7 @@ namespace ToDoAppServices
 
         public List<TaskList> GetSharedLists()
         {
-            List<TaskList> lists = new List<TaskList>();
-
-            List<SharedList> sharedLists = _database.SharedLists.Where(l => l.UserId == UserService.CurrentUser.Id).ToList();
-
-            foreach(SharedList sharedList in sharedLists)
-            {
-                TaskList list = GetTaskList(sharedList.ListId);
-
-                lists.Add(list);
-            }
-
-            return lists;
+            return UserService.CurrentUser.SharedLists;
         }
 
         public async Task<bool> CreateTaskList(User user, string title)
@@ -129,13 +118,7 @@ namespace ToDoAppServices
                 throw new NotSupportedException();
             }
 
-            SharedList shared = new SharedList()
-            {
-                UserId = user.Id,
-                ListId = listId
-            };
-
-            _database.SharedLists.Add(shared);
+            user.SharedLists.Add(toShare);
             await _database.SaveChangesAsync();
 
             return true;
