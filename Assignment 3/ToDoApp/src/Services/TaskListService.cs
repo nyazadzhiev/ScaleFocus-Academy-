@@ -1,7 +1,9 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using ToDoAppData;
 using ToDoAppEntities;
 
@@ -9,10 +11,10 @@ namespace ToDoAppServices
 {
     public class TaskListService
     {
-        private readonly TaskListRepositoy _database;
+        private readonly DatabaseContext _database;
         private Validations validations;
 
-        public TaskListService(TaskListRepositoy database)
+        public TaskListService(DatabaseContext database)
         {
             _database = database;
             validations = new Validations();
@@ -20,45 +22,51 @@ namespace ToDoAppServices
 
         public List<TaskList> GetAllTaskLists(User user)
         {
-            return _database.GetTaskLists(user.Id);
+            return _database.Lists.Where(l => l.CreatorId == user.Id).ToList();
         }
 
         public List<TaskList> GetSharedLists()
         {
-            return _database.GetSharedLists();
+            return UserService.CurrentUser.SharedLists;
         }
 
-        public bool CreateTaskList(User user, string title)
+        public async Task<bool> CreateTaskList(User user, string title)
         {
-            return _database.CreateTaskList(new TaskList()
+            TaskList newList = new TaskList()
             {
                 Title = title,
                 CreatorId = user.Id,
                 CreatedAt = DateTime.Now,
                 LastEdited = DateTime.Now,
                 ModifierId = user.Id
-            });
+            };
+
+            _database.Lists.Add(newList);
+
+            await _database.SaveChangesAsync();
+
+            return newList.Id != 0;
         }
 
         public TaskList GetTaskList(int id)
         {
-            return _database.GetTaskList(id);
+            return _database.Lists.FirstOrDefault(l => l.Id == id);
         }
 
         public TaskList GetTaskList(string title)
         {
-            return _database.GetTaskList(title);
+            return _database.Lists.FirstOrDefault(l => l.Title == title);
         }
 
-        public bool EditTaskList(int id, string newTitle)
+        public async Task<bool> EditTaskList(int id, string newTitle)
         {
-            TaskList currentList = GetTaskList(id);
+            TaskList currentList = GetTaskList (id);
             bool isValidList = validations.EnsureListExist(currentList);
             if (!isValidList)
             {
                 return false;
             }
-            else if(currentList.CreatorId != UserService.CurrentUser.Id)
+            else if(currentList.CreatorId != UserService.CurrentUser.Id || !currentList.SharedUsers.Any(u => u.Id == UserService.CurrentUser.Id))
             {
                 Console.WriteLine("You don't have permission to do this");
 
@@ -66,14 +74,18 @@ namespace ToDoAppServices
             }
             else
             {
-                _database.EditTaskList(id, newTitle);
+                currentList.Title = newTitle;
+                currentList.LastEdited = DateTime.Now;
+                currentList.ModifierId = UserService.CurrentUser.Id;
+
+                await _database.SaveChangesAsync();
                 Console.WriteLine("You succesfully edited TaskList");
 
                 return true;
             }
         }
 
-        public bool DeleteTaskList(int id)
+        public async Task<bool> DeleteTaskList(int id)
         {
             TaskList currentList = GetTaskList(id);
             bool isValidList = validations.EnsureListExist(currentList);
@@ -81,7 +93,7 @@ namespace ToDoAppServices
             {
                 return false;
             }
-            else if (currentList.CreatorId != UserService.CurrentUser.Id)
+            else if (currentList.CreatorId != UserService.CurrentUser.Id && !currentList.SharedUsers.Any(u => u.Id == UserService.CurrentUser.Id))
             {
                 Console.WriteLine("You don't have permission to do this");
 
@@ -89,32 +101,27 @@ namespace ToDoAppServices
             }
             else
             {
-                _database.DeleteTaskList(id);
+                _database.Lists.Remove(currentList);
+                await _database.SaveChangesAsync();
                 Console.WriteLine($"You deleted list {currentList.Title}");
 
                 return true;
             }
         }
 
-        public bool ShareTaskList(User user, int listId)
+        public async Task<bool> ShareTaskList(User user, int listId)
         {
-            TaskList toShare = _database.GetTaskList(listId);
+            TaskList toShare = GetTaskList(listId);
 
             if(toShare.CreatorId != UserService.CurrentUser.Id)
             {
-                Console.WriteLine("You don't have permission to do this");
-
-                return false;
+                throw new NotSupportedException();
             }
 
-            if(_database.ShareTaskList(user.Id, listId))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            user.SharedLists.Add(toShare);
+            await _database.SaveChangesAsync();
+
+            return true;
         }
     }
 }

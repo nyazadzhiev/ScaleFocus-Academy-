@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using ToDoAppData;
 using ToDoAppEntities;
+using System.Threading.Tasks;
 
 namespace ToDoAppServices
 {
@@ -10,6 +11,7 @@ namespace ToDoAppServices
     {
         private UserService _userService;
         private UserInput userInput;
+        private Validations validations = new Validations();
 
         public UserCommand(UserService userService)
         {
@@ -35,7 +37,7 @@ namespace ToDoAppServices
                     Console.WriteLine("Login successful.");
                 }
             }
-            catch
+            catch (ArgumentNullException)
             {
                 Console.WriteLine("Invalid input");
             }
@@ -46,7 +48,7 @@ namespace ToDoAppServices
             _userService.LogOut();
         }
 
-        public void PromptCreateUser()
+        public async Task PromptCreateUser()
         {
             try
             {
@@ -60,7 +62,7 @@ namespace ToDoAppServices
 
                 bool isAdmin = userInput.EnterRole();
 
-                bool isSuccess = _userService.CreateUser(name, password, firstName, lastName, isAdmin);
+                bool isSuccess = await _userService.CreateUser(name, password, firstName, lastName, isAdmin);
                 if (isSuccess)
                 {
                     Console.WriteLine($"User with name '{name}' added");
@@ -70,35 +72,38 @@ namespace ToDoAppServices
                     Console.WriteLine($"User with name '{name}' already exists");
                 }
             }
-            catch
+            catch (ArgumentNullException)
             {
                 Console.WriteLine("Invalid input");
             }
         }
 
-        public void PromptEditUser()
+        public async Task PromptEditUser()
         {
             try
             {
                 string username = userInput.EnterValue("username");
-
-                _userService.EditUser(username);
+                await _userService.EditUser(username);
             }
-            catch
+            catch (ArgumentNullException)
             {
                 Console.WriteLine("Invalid input");
             }
+            catch (ArgumentException)
+            {
+                Console.WriteLine($"Username is taken");
+            }
         }
 
-        public void PromptDeleteUser()
+        public async Task PromptDeleteUser()
         {
             try
             {
                 string username = userInput.EnterValue("username");
 
-                _userService.DeleteUser(username);
+                await _userService.DeleteUser(username);
             }
-            catch
+            catch (ArgumentNullException)
             {
                 Console.WriteLine("Invalid input");
             }

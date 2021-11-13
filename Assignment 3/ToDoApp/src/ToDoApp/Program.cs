@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
+using System.Threading.Tasks;
 using ToDoAppData;
 using ToDoAppEntities;
 using ToDoAppServices;
@@ -9,30 +11,22 @@ namespace ToDoApp
 {
     public class Program
     {
-        private static Database database;
-        private static UserRepository userDatabase;
-        private static UserService userService;
+        private static DatabaseContext database;
         private static Menu menu;
 
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             database = InitializeApplication();
-            userDatabase = new UserRepository(database);
-            userService = new UserService(userDatabase);
             menu = new Menu(database);
 
-            if (args.Length > 0)
-            {
-                userService.CreateUser("admin", "adminpassword", "Admin", "Admin", true);
-            }
             bool shouldExit = false;
             while (!shouldExit)
             {
-                shouldExit = menu.MainMenu(UserService.CurrentUser);
+                shouldExit = await menu.MainMenu(UserService.CurrentUser);
             }
         }
 
-        static Database InitializeApplication()
+        static DatabaseContext InitializeApplication()
         {
             // Read config file
             var _configuration = ConfigInitializer.InitConfig();
@@ -40,9 +34,9 @@ namespace ToDoApp
             string connectionString = _configuration.GetConnectionString("Default");
 
             // Create new database and tables 
-            //DatabaseInitilizer.InitilizeDatabase(connectionString);
+            Database.SetInitializer(new DatabaseInitializer());
 
-            Database database = new Database(connectionString);
+            DatabaseContext database = new DatabaseContext(connectionString);
 
             return database;
         }
