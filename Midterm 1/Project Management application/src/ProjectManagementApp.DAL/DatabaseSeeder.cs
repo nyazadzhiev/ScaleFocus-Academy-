@@ -8,11 +8,11 @@ namespace ProjectManagementApp.DAL
 {
     public class DatabaseSeeder
     {
-        public static async Task Seed(DatabaseContext database)
+        public static void Seed(DatabaseContext database)
         {
-            if (await database.Database.EnsureCreatedAsync())
+            if (database.Database.EnsureCreated())
             {
-                await database.Users.AddAsync(new User()
+                database.Users.Add(new User()
                 {
                     Username = "admin",
                     Password = "adminpassword",
@@ -21,7 +21,7 @@ namespace ProjectManagementApp.DAL
                     IsAdmin = true
                 });
 
-                await database.SaveChangesAsync();
+                database.SaveChanges();
             }
         }
     }
