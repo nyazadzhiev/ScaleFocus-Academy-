@@ -8,5 +8,13 @@
     <Folder Include="Controllers\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ProjectManagementApp.DAL\ProjectManagementApp.DAL.csproj" />
+  </ItemGroup>
+
 
 </Project>
