@@ -20,6 +20,7 @@ namespace ProjectManagementApp.DAL
         public DbSet<Team> Teams { get; set; }
         public DbSet<Project> Projects { get; set; }
         public DbSet<ToDoTask> ToDoTasks { get; set; }
+        public DbSet<WorkLog> WorkLogs { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -33,6 +34,7 @@ namespace ProjectManagementApp.DAL
             SetupTeamConfiguration(modelBuilder);
             SetupProjectConfiguration(modelBuilder);
             SetupTaskConfiguration(modelBuilder);
+            SetupWorkLogConfiguration(modelBuilder);
 
             base.OnModelCreating(modelBuilder);
         }
@@ -44,7 +46,7 @@ namespace ProjectManagementApp.DAL
             modelBuilder.Entity<User>().Property(u => u.Password).IsRequired().HasMaxLength(50);
             modelBuilder.Entity<User>().Property(u => u.FirstName).IsRequired().HasMaxLength(50);
             modelBuilder.Entity<User>().Property(u => u.LastName).IsRequired().HasMaxLength(50);
-            modelBuilder.Entity<User>().HasOne<Team>(u => u.Team).WithMany(t => t.Users).HasForeignKey(u => u.TeamId).OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<User>().HasMany<Team>(u => u.Teams).WithMany(t => t.Users);
             modelBuilder.Entity<User>().HasMany<ToDoTask>(u => u.ToDoTasks).WithOne(t => t.Asignee);
         }
 
@@ -52,7 +54,7 @@ namespace ProjectManagementApp.DAL
         {
             modelBuilder.Entity<Team>().HasKey(t => t.Id);
             modelBuilder.Entity<Team>().Property(t => t.Name).IsRequired().HasMaxLength(20);
-            modelBuilder.Entity<Team>().HasMany<User>(t => t.Users).WithOne(u => u.Team).HasForeignKey(u => u.TeamId).OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Team>().HasMany<User>(t => t.Users).WithMany(u => u.Teams);
         }
 
         private static void SetupProjectConfiguration(ModelBuilder modelBuilder)
@@ -70,6 +72,13 @@ namespace ProjectManagementApp.DAL
             modelBuilder.Entity<ToDoTask>().Property(t => t.Description).IsRequired().HasMaxLength(300);
             modelBuilder.Entity<ToDoTask>().HasOne(t => t.Asignee).WithMany().HasForeignKey(t => t.AsigneeId).OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<ToDoTask>().HasOne(t => t.Project).WithMany().HasForeignKey(t => t.ProjectId).OnDelete(DeleteBehavior.Cascade);
+        }
+
+        private static void SetupWorkLogConfiguration(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<WorkLog>().HasKey(w => w.Id);
+            modelBuilder.Entity<WorkLog>().HasOne(w => w.User).WithMany().HasForeignKey(w => w.UserId).OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<WorkLog>().HasOne(w => w.ToDoTask).WithMany().HasForeignKey(w => w.ToDoTaskId).OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
