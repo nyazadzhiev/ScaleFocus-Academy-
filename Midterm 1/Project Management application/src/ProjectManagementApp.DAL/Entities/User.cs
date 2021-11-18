@@ -14,5 +14,11 @@ namespace ProjectManagementApp.DAL.Entities
         public bool IsAdmin { get; set; }
         public List<Team> Teams { get; set; }
         public List<ToDoTask> Tasks { get; set; }
+
+        public User()
+        {
+            this.Teams = new List<Team>();
+            this.Tasks = new List<ToDoTask>();
+        }
     }
 }
