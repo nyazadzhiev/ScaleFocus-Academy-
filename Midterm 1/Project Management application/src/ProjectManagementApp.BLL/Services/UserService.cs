@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ProjectManagementApp.BLL.Exceptions;
 
 namespace ProjectManagementApp.BLL.Services
 {
@@ -93,7 +94,7 @@ namespace ProjectManagementApp.BLL.Services
 
             if (isValid)
             {
-                throw new BadImageFormatException();
+                throw new UserExistException();
             }
 
 

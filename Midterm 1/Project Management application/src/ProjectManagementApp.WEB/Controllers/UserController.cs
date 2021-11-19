@@ -12,6 +12,7 @@ using ProjectManagementApp.WEB.Auth;
 using Common;
 using ProjectManagementApp.DAL.Models.Responses;
 using ProjectManagementApp.BLL.Validations;
+using ProjectManagementApp.BLL.Exceptions;
 
 namespace ProjectManagementApp.WEB.Controllers
 {
@@ -53,11 +54,11 @@ namespace ProjectManagementApp.WEB.Controllers
 
                 return Ok(users);
             }
-            catch (ArgumentNullException)
+            catch (UserNotFoundException)
             {
                 return NotFound(Constants.UserNotFound);
             }
-            catch (ArgumentOutOfRangeException)
+            catch (UnauthorizedUserException)
             {
                 return Unauthorized(Constants.Unauthorized);
             }
@@ -86,11 +87,11 @@ namespace ProjectManagementApp.WEB.Controllers
                     Id = userFromDB.Id
                 };
             }
-            catch (ArgumentNullException)
+            catch (UserNotFoundException)
             {
                 return NotFound(Constants.UserNotFound);
             }
-            catch (ArgumentOutOfRangeException)
+            catch (UnauthorizedUserException)
             {
                 return Unauthorized(Constants.Unauthorized);
             }
@@ -121,11 +122,11 @@ namespace ProjectManagementApp.WEB.Controllers
                     return BadRequest(Constants.FailedOperation);
                 }
             }
-            catch (ArgumentNullException)
+            catch (UserNotFoundException)
             {
                 return NotFound(Constants.UserNotFound);
             }
-            catch (ArgumentOutOfRangeException)
+            catch (UnauthorizedUserException)
             {
                 return Unauthorized(Constants.Unauthorized);
             }
@@ -163,15 +164,15 @@ namespace ProjectManagementApp.WEB.Controllers
                 }
 
             }
-            catch (ArgumentNullException)
+            catch (UserNotFoundException)
             {
                 return NotFound(Constants.UserNotFound);
             }
-            catch (ArgumentOutOfRangeException)
+            catch (UnauthorizedUserException)
             {
                 return Unauthorized(Constants.Unauthorized);
             }
-            catch (BadImageFormatException)
+            catch (UserExistException)
             {
                 return BadRequest(Constants.UserExist);
             }
@@ -201,11 +202,11 @@ namespace ProjectManagementApp.WEB.Controllers
                     return BadRequest(Constants.FailedOperation);
                 }
             }
-            catch (ArgumentNullException)
+            catch (UserNotFoundException)
             {
                 return NotFound(Constants.UserNotFound);
             }
-            catch (ArgumentOutOfRangeException)
+            catch (UnauthorizedUserException)
             {
                 return Unauthorized(Constants.Unauthorized);
             }

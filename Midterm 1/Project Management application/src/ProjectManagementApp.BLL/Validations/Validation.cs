@@ -1,4 +1,5 @@
-﻿using ProjectManagementApp.DAL;
+﻿using ProjectManagementApp.BLL.Exceptions;
+using ProjectManagementApp.DAL;
 using ProjectManagementApp.DAL.Entities;
 using System;
 using System.Collections.Generic;
@@ -20,7 +21,7 @@ namespace ProjectManagementApp.BLL.Validations
         {
             if (user == null)
             {
-                throw new ArgumentNullException();
+                throw new UserNotFoundException();
             }
             else
             {
@@ -32,7 +33,7 @@ namespace ProjectManagementApp.BLL.Validations
         {
             if (!user.IsAdmin)
             {
-                throw new ArgumentOutOfRangeException();
+                throw new UnauthorizedUserException();
             }
             else
             {
