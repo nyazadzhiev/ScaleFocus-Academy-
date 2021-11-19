@@ -81,7 +81,6 @@ namespace ProjectManagementApp.BLL.Services
 
                 return true;
             }
-
         }
 
         public async Task<bool> EditUser(int id, string newUsername, string newPassword, string newFirstName, string newLastName)
@@ -107,7 +106,6 @@ namespace ProjectManagementApp.BLL.Services
             await database.SaveChangesAsync();
 
             return true;
-
         }
     }
 }
