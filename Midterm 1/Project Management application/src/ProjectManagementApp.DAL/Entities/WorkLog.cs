@@ -8,9 +8,9 @@ namespace ProjectManagementApp.DAL.Entities
     {
         public int Id { get; set; }
         public int UserId { get; set; }
-        public User User { get; set; }
+        public virtual User User { get; set; }
         public int ToDoTaskId { get; set; }
-        public ToDoTask ToDoTask { get; set; }
+        public virtual ToDoTask ToDoTask { get; set; }
 
         public int WorkedTime { get; set; }
     }

@@ -77,7 +77,7 @@ namespace ProjectManagementApp.DAL
         private static void SetupWorkLogConfiguration(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<WorkLog>().HasKey(w => w.Id);
-            modelBuilder.Entity<WorkLog>().HasOne(w => w.User).WithMany().HasForeignKey(w => w.UserId).OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<WorkLog>().HasOne(w => w.User).WithMany(u => u.WorkLogs).HasForeignKey(w => w.UserId).OnDelete(DeleteBehavior.Restrict);
             modelBuilder.Entity<WorkLog>().HasOne(w => w.ToDoTask).WithMany().HasForeignKey(w => w.ToDoTaskId).OnDelete(DeleteBehavior.Cascade);
         }
     }

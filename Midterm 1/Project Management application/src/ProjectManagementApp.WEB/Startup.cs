@@ -25,12 +25,12 @@ namespace ProjectManagementApp.WEB
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public async Task ConfigureServices(IServiceCollection services)
+        public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<DatabaseContext>();
 
             var database = new DatabaseContext(Configuration);
-            await DatabaseSeeder.Seed(database);
+            DatabaseSeeder.Seed(database);
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
@@ -48,7 +48,7 @@ namespace ProjectManagementApp.WEB
                 database.Database.EnsureCreated();
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ToDoApp.WEB v1"));
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ProjectManagementApp.WEB v1"));
 
             }
 

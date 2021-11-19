@@ -12,8 +12,9 @@ namespace ProjectManagementApp.DAL.Entities
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public bool IsAdmin { get; set; }
-        public List<Team> Teams { get; set; }
-        public List<ToDoTask> ToDoTasks { get; set; }
+        public virtual List<Team> Teams { get; set; }
+        public virtual List<ToDoTask> ToDoTasks { get; set; }
+        public virtual List<WorkLog> WorkLogs { get; set; }
 
         public User()
         {
