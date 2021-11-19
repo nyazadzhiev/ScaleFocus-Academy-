@@ -217,7 +217,7 @@ namespace ProjectManagementApp.WEB.Controllers
             }
         }
 
-        [HttpPost("{teamId}/{userId}")]
+        [HttpPost("{teamId}/User/{userId}")]
         public async Task<ActionResult> AddUser(int teamId, int userId)
         {
             try
@@ -254,7 +254,7 @@ namespace ProjectManagementApp.WEB.Controllers
             }
         }
 
-        [HttpDelete("{teamId}/{userId}")]
+        [HttpDelete("{teamId}/User/{userId}")]
         public async Task<ActionResult> RemoveUser(int teamId, int userId)
         {
             try
