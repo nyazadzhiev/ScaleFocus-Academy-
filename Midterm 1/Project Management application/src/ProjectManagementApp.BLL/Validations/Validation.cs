@@ -29,11 +29,24 @@ namespace ProjectManagementApp.BLL.Validations
             }
         }
 
-        public bool CheckRole(User user)
+        public void CheckRole(User user)
         {
             if (!user.IsAdmin)
             {
                 throw new UnauthorizedUserException();
+            }
+        }
+
+        public bool CheckUsername(string username)
+        {
+            return database.Users.Any(u => u.Username == username);
+        }
+
+        public bool EnsureTeamExist(Team team)
+        {
+            if (team == null)
+            {
+                throw new TeamNotFoundException();
             }
             else
             {
@@ -41,9 +54,14 @@ namespace ProjectManagementApp.BLL.Validations
             }
         }
 
-        public bool CheckUsername(string username)
+        public bool CheckTeamName(string newTeamName)
         {
-            return database.Users.Any(u => u.Username == username);
+            return database.Teams.Any(t => t.Name == newTeamName);
+        }
+
+        public bool CanAddToTeam(Team teamFromDB, User userToAdd)
+        {
+            return teamFromDB.Users.Any(u => u.Username == userToAdd.Username);
         }
     }
 }
