@@ -63,5 +63,44 @@ namespace ProjectManagementApp.BLL.Validations
         {
             return teamFromDB.Users.Any(u => u.Username == userToAdd.Username);
         }
+
+        public bool EnsureProjectExist(Project project)
+        {
+            if (project == null)
+            {
+                throw new ProjectNotFoundException();
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        public bool CheckProjectName(string newProjectTitle)
+        {
+            return database.Projects.Any(p => p.Title == newProjectTitle);
+        }
+
+        public bool CanAddToProject(Project project, Team team)
+        {
+            return project.Teams.Any(t => t.Id == team.Id);
+        }
+
+        public bool EnsureTaskExist(ToDoTask task)
+        {
+            if (task == null)
+            {
+                throw new ProjectNotFoundException();
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        public bool CheckTaskName(string title)
+        {
+            return database.ToDoTasks.Any(t => t.Title == title);
+        }
     }
 }
