@@ -32,7 +32,7 @@ namespace ProjectManagementApp.WEB.Controllers
             userService = new UserService(database, validations);
             teamService = new TeamService(database, userService, validations);
             projectService = new ProjectService(database, userService, teamService, validations);
-            taskService = new TaskService(database, teamService, projectService, userService, validations);
+            taskService = new TaskService(database, teamService, projectService, validations);
             workLogService = new WorkLogService(database, userService, taskService, validations);
             validations = new Validation(database);
         }
