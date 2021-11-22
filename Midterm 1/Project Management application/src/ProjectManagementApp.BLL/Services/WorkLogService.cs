@@ -16,12 +16,12 @@ namespace ProjectManagementApp.BLL.Services
         private readonly TaskService taskService;
         private Validation validations;
 
-        public WorkLogService(DatabaseContext _database, UserService _userService, TaskService _taskService)
+        public WorkLogService(DatabaseContext _database, UserService _userService, TaskService _taskService, Validation validation)
         {
             database = _database;
             userService = _userService;
             taskService = _taskService;
-            validations = new Validation(_database);
+            validations = validation;
         }
 
         public async Task<bool> CreateWorkLog(int userId, int taskId, int workedHours)

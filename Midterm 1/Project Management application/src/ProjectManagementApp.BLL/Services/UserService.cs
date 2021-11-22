@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ProjectManagementApp.BLL.Exceptions;
+using Common;
 
 namespace ProjectManagementApp.BLL.Services
 {
@@ -16,10 +17,10 @@ namespace ProjectManagementApp.BLL.Services
         private readonly DatabaseContext database;
         private Validation validations;
 
-        public UserService(DatabaseContext _database)
+        public UserService(DatabaseContext _database, Validation validation)
         {
             database = _database;
-            validations = new Validation(database);
+            validations = validation;
         }
 
         public async Task<bool> CreateUser(string username, string password, string firstName, string lastName, bool isAdmin, User currentUser)
@@ -93,7 +94,7 @@ namespace ProjectManagementApp.BLL.Services
 
             if (isValid)
             {
-                throw new UserExistException();
+                throw new UserExistException(String.Format(Constants.Exist, "User"));
             }
 
 

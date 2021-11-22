@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Common;
+using Microsoft.EntityFrameworkCore;
 using ProjectManagementApp.BLL.Exceptions;
 using ProjectManagementApp.BLL.Validations;
 using ProjectManagementApp.DAL;
@@ -18,12 +19,12 @@ namespace ProjectManagementApp.BLL.Services
         private readonly ProjectService projectService;
         private Validation validations;
 
-        public TaskService(DatabaseContext _database, TeamService _teamService, ProjectService _projectService)
+        public TaskService(DatabaseContext _database, TeamService _teamService, ProjectService _projectService, Validation validation)
         {
             database = _database;
             teamService = _teamService;
             projectService = _projectService;
-            validations = new Validation(database);
+            validations = validation;
         }
 
         public async Task<bool> CreateTask(string title, string description, bool isCompleted, Project project,  User owner, User asignee)
@@ -85,7 +86,7 @@ namespace ProjectManagementApp.BLL.Services
 
             if (isValid)
             {
-                throw new TaskExistException();
+                throw new TaskExistException(String.Format(Constants.Exist, "Task"));
             }
 
             task.Title = newTaskTitle;
