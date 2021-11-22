@@ -28,218 +28,130 @@ namespace ProjectManagementApp.WEB.Controllers
 
         public TaskController(DatabaseContext database) : base()
         {
-            userService = new UserService(database);
-            teamService = new TeamService(database, userService);
-            projectService = new ProjectService(database, userService, teamService);
-            taskService = new TaskService(database, teamService, projectService);
+            userService = new UserService(database, validations);
+            teamService = new TeamService(database, userService, validations);
+            projectService = new ProjectService(database, userService, teamService, validations);
+            taskService = new TaskService(database, teamService, projectService, userService, validations);
             validations = new Validation(database);
         }
 
         [HttpGet("/Project/{projectId}")]
         public async Task<ActionResult> GetAll(int projectId)
         {
-            try
+            User currentUser = await userService.GetCurrentUser(Request);
+            validations.EnsureUserExist(currentUser);
+
+            List<TaskResponseModel> tasks = new List<TaskResponseModel>();
+
+            foreach (ToDoTask task in await taskService.GetAll(projectId, currentUser))
             {
-                User currentUser = await userService.GetCurrentUser(Request);
-                validations.EnsureUserExist(currentUser);
-
-                Project project = await projectService.GetProject(projectId, currentUser);
-                validations.EnsureProjectExist(project);
-
-                List<TaskResponseModel> tasks = new List<TaskResponseModel>();
-
-                foreach (ToDoTask task in await taskService.GetAll(project))
+                tasks.Add(new TaskResponseModel()
                 {
-                    tasks.Add(new TaskResponseModel()
-                    {
-                        Id = task.Id,
-                        Title = task.Title,
-                        Description = task.Description,
-                        IsCompleted = task.IsCompleted,
-                        AsigneeId = task.AsigneeId,
-                        ProjectId = task.ProjectId,
-                        OwnerId = task.OwnerId
-                    });
-                }
+                    Id = task.Id,
+                    Title = task.Title,
+                    Description = task.Description,
+                    IsCompleted = task.IsCompleted,
+                    AsigneeId = task.AsigneeId,
+                    ProjectId = task.ProjectId,
+                    OwnerId = task.OwnerId
+                });
+            }
 
-                return Ok(tasks);
-            }
-            catch (UserNotFoundException)
-            {
-                return NotFound(Constants.UserNotFound);
-            }
-            catch (ProjectNotFoundException)
-            {
-                return NotFound(Constants.ProjectNotFound);
-            }
+            return Ok(tasks);
         }
 
         [HttpGet("{taskId}/Project/{projectId}")]
         public async Task<ActionResult<TaskResponseModel>> Get(int taskId, int projectId)
         {
-            try
-            {
-                User currentUser = await userService.GetCurrentUser(Request);
-                validations.EnsureUserExist(currentUser);
+            User currentUser = await userService.GetCurrentUser(Request);
+            validations.EnsureUserExist(currentUser);
 
-                Project projectFromDB = await projectService.GetProject(projectId, currentUser);
-                validations.EnsureProjectExist(projectFromDB);
+            Project projectFromDB = await projectService.GetProject(projectId, currentUser);
+            validations.EnsureProjectExist(projectFromDB);
 
-                ToDoTask taskFromDB = await taskService.GetTask(taskId);
-                validations.EnsureTaskExist(taskFromDB);
+            ToDoTask taskFromDB = await taskService.GetTask(taskId);
+            validations.EnsureTaskExist(taskFromDB);
 
-                return new TaskResponseModel()
-                {
-                    Id = taskFromDB.Id,
-                    Title = taskFromDB.Title,
-                    Description = taskFromDB.Description,
-                    IsCompleted = taskFromDB.IsCompleted,
-                    AsigneeId = taskFromDB.AsigneeId,
-                    ProjectId = taskFromDB.ProjectId
-                };
-            }
-            catch (UserNotFoundException)
+            return new TaskResponseModel()
             {
-                return NotFound(Constants.UserNotFound);
-            }
-            catch (ProjectNotFoundException)
-            {
-                return NotFound(Constants.ProjectNotFound);
-            }
-            catch (TaskNotFoundException)
-            {
-                return NotFound(Constants.TaskNotFound);
-            }
+                Id = taskFromDB.Id,
+                Title = taskFromDB.Title,
+                Description = taskFromDB.Description,
+                IsCompleted = taskFromDB.IsCompleted,
+                AsigneeId = taskFromDB.AsigneeId,
+                ProjectId = taskFromDB.ProjectId
+            };
         }
 
         [HttpPost("/Project/{projectId}/User/{userId}")]
         public async Task<ActionResult> Post(TaskRequestModel task, int projectId, int userId)
         {
-            try
+            User currentUser = await userService.GetCurrentUser(Request);
+            validations.EnsureUserExist(currentUser);
+
+            bool isCreated = await taskService.CreateTask(task.Title, task.Description, task.IsCompleted, projectId, currentUser, userId);
+
+            if (isCreated && ModelState.IsValid)
             {
-                User currentUser = await userService.GetCurrentUser(Request);
-                validations.EnsureUserExist(currentUser);
+                ToDoTask taskFromDB = await taskService.GetTask(task.Title);
 
-                Project project = await projectService.GetProject(projectId, currentUser);
-                validations.EnsureProjectExist(project);
-
-                User asignee = await userService.GetUser(userId);
-                validations.EnsureUserExist(asignee);
-
-                bool isCreated = await taskService.CreateTask(task.Title, task.Description, task.IsCompleted, project, currentUser, asignee);
-
-                if (isCreated && ModelState.IsValid)
-                {
-                    ToDoTask taskFromDB = await taskService.GetTask(task.Title);
-
-                    return CreatedAtAction(nameof(Post), new { id = taskFromDB.Id }, Constants.CreatedTask);
-                }
-                else
-                {
-                    return BadRequest(Constants.FailedOperation);
-                }
+                return CreatedAtAction(nameof(Post), new { id = taskFromDB.Id }, Constants.Created);
             }
-            catch (UserNotFoundException)
+            else
             {
-                return NotFound(Constants.UserNotFound);
-            }
-            catch (ProjectNotFoundException)
-            {
-                return NotFound(Constants.ProjectNotFound);
+                return BadRequest(Constants.FailedOperation);
             }
         }
 
         [HttpPut("{taskId}/Project/{projectId}")]
         public async Task<ActionResult<TaskResponseModel>> Put(TaskRequestModel task, int taskId, int projectId)
         {
-            try
+            User currentUser = await userService.GetCurrentUser(Request);
+            validations.EnsureUserExist(currentUser);
+
+            Project project = await projectService.GetProject(projectId, currentUser);
+            validations.EnsureProjectExist(project);
+
+            if (await taskService.EditTask(taskId, task.Title, task.Description, task.IsCompleted))
             {
-                User currentUser = await userService.GetCurrentUser(Request);
-                validations.EnsureUserExist(currentUser);
+                ToDoTask edited = await taskService.GetTask(task.Title);
 
-                Project project = await projectService.GetProject(projectId, currentUser);
-                validations.EnsureProjectExist(project);
-
-                ToDoTask taskFromDB = await taskService.GetTask(taskId);
-                validations.EnsureTaskExist(taskFromDB);
-
-                if (await taskService.EditTask(taskId, task.Title, task.Description, task.IsCompleted))
+                return new TaskResponseModel()
                 {
-                    ToDoTask edited = await taskService.GetTask(task.Title);
-
-                    return new TaskResponseModel()
-                    {
-                        Id = edited.Id,
-                        Title = edited.Title,
-                        Description = edited.Description,
-                        IsCompleted = edited.IsCompleted,
-                        OwnerId = edited.OwnerId,
-                        AsigneeId = edited.AsigneeId,
-                        ProjectId = edited.ProjectId
-                    };
-                }
-                else
-                {
-                    return BadRequest(Constants.FailedOperation);
-                }
-
+                    Id = edited.Id,
+                    Title = edited.Title,
+                    Description = edited.Description,
+                    IsCompleted = edited.IsCompleted,
+                    OwnerId = edited.OwnerId,
+                    AsigneeId = edited.AsigneeId,
+                    ProjectId = edited.ProjectId
+                };
             }
-            catch (UserNotFoundException)
+            else
             {
-                return NotFound(Constants.UserNotFound);
-            }
-            catch (UnauthorizedUserException)
-            {
-                return Unauthorized(Constants.Unauthorized);
-            }
-            catch (TaskExistException)
-            {
-                return BadRequest(Constants.TaskExist);
-            }
-            catch (TaskNotFoundException)
-            {
-                return NotFound(Constants.TaskNotFound);
-            }
-            catch (ProjectNotFoundException)
-            {
-                return NotFound(Constants.ProjectNotFound);
+                return BadRequest(Constants.FailedOperation);
             }
         }
 
         [HttpDelete("{taskId}/Project/{projectId}")]
         public async Task<ActionResult> Delete(int taskId, int projectId)
         {
-            try
-            {
-                User currentUser = await userService.GetCurrentUser(Request);
-                validations.EnsureUserExist(currentUser);
+            User currentUser = await userService.GetCurrentUser(Request);
+            validations.EnsureUserExist(currentUser);
 
-                Project projectFromDB = await projectService.GetProject(projectId, currentUser);
-                validations.EnsureProjectExist(projectFromDB);
+            Project projectFromDB = await projectService.GetProject(projectId, currentUser);
+            validations.EnsureProjectExist(projectFromDB);
 
-                ToDoTask taskFromDB = await taskService.GetTask(taskId);
-                validations.EnsureProjectExist(projectFromDB);
+            ToDoTask taskFromDB = await taskService.GetTask(taskId);
+            validations.EnsureProjectExist(projectFromDB);
 
-                if (await taskService.DeleteTask(taskFromDB.Title))
-                {
-                    return Ok(Constants.DeletedTask);
-                }
-                else
-                {
-                    return BadRequest(Constants.FailedOperation);
-                }
-            }
-            catch (UserNotFoundException)
+            if (await taskService.DeleteTask(taskFromDB.Title))
             {
-                return NotFound(Constants.UserNotFound);
+                return Ok(Constants.Deleted);
             }
-            catch (ProjectNotFoundException)
+            else
             {
-                return NotFound(Constants.ProjectNotFound);
-            }
-            catch (TaskNotFoundException)
-            {
-                return NotFound(Constants.TaskNotFound);
+                return BadRequest(Constants.FailedOperation);
             }
         }
     }

@@ -25,156 +25,105 @@ namespace ProjectManagementApp.WEB.Controllers
 
         public UserController(DatabaseContext database) : base()
         {
-            userService = new UserService(database);
             validations = new Validation(database);
+            userService = new UserService(database, validations);
         }
 
         [HttpGet]
         public async Task<ActionResult> GetAll()
         {
-            try
+            User currentUser = await userService.GetCurrentUser(Request);
+            validations.EnsureUserExist(currentUser);
+            validations.CheckRole(currentUser);
+
+            List<UserResponseModel> users = new List<UserResponseModel>();
+
+            foreach (User user in await userService.GetAllUsers())
             {
-                User currentUser = await userService.GetCurrentUser(Request);
-                validations.EnsureUserExist(currentUser);
-                validations.CheckRole(currentUser);
-
-                List<UserResponseModel> users = new List<UserResponseModel>();
-
-                foreach (User user in await userService.GetAllUsers())
+                users.Add(new UserResponseModel()
                 {
-                    users.Add(new UserResponseModel()
-                    {
-                        Username = user.Username,
-                        FirstName = user.FirstName,
-                        LastName = user.LastName,
-                        IsAdmin = user.IsAdmin,
-                        Id = user.Id
-                    });
-                }
+                    Username = user.Username,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    IsAdmin = user.IsAdmin,
+                    Id = user.Id
+                });
+            }
 
-                return Ok(users);
-            }
-            catch (UserNotFoundException)
-            {
-                return NotFound(Constants.UserNotFound);
-            }
-            catch (UnauthorizedUserException)
-            {
-                return Unauthorized(Constants.Unauthorized);
-            }
+            return Ok(users);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<UserResponseModel>> Get(int id)
         {
-            try
+            User currentUser = await userService.GetCurrentUser(Request);
+            validations.EnsureUserExist(currentUser);
+            validations.CheckRole(currentUser);
+
+            User userFromDB = await userService.GetUser(id);
+            validations.EnsureUserExist(userFromDB);
+
+
+            return new UserResponseModel()
             {
-                User currentUser = await userService.GetCurrentUser(Request);
-                validations.EnsureUserExist(currentUser);
-                validations.CheckRole(currentUser);
-
-                User userFromDB = await userService.GetUser(id);
-
-                validations.EnsureUserExist(userFromDB);
-
-
-                return new UserResponseModel()
-                {
-                    Username = userFromDB.Username,
-                    FirstName = userFromDB.FirstName,
-                    LastName = userFromDB.LastName,
-                    IsAdmin = userFromDB.IsAdmin,
-                    Id = userFromDB.Id
-                };
-            }
-            catch (UserNotFoundException)
-            {
-                return NotFound(Constants.UserNotFound);
-            }
-            catch (UnauthorizedUserException)
-            {
-                return Unauthorized(Constants.Unauthorized);
-            }
+                Username = userFromDB.Username,
+                FirstName = userFromDB.FirstName,
+                LastName = userFromDB.LastName,
+                IsAdmin = userFromDB.IsAdmin,
+                Id = userFromDB.Id
+            };
         }
 
         [HttpPost]
         public async Task<ActionResult> Post(UserRequestModel user)
         {
-            try
+            User currentUser = await userService.GetCurrentUser(Request);
+            validations.EnsureUserExist(currentUser);
+            validations.CheckRole(currentUser);
+
+            bool isCreated = await userService.CreateUser(user.Username, user.Password, user.FirstName, user.LastName, user.IsAdmin, currentUser);
+
+            if (isCreated && ModelState.IsValid)
             {
-                User currentUser = await userService.GetCurrentUser(Request);
+                User userFromDB = await userService.GetUser(user.Username);
 
-                validations.EnsureUserExist(currentUser);
-                validations.CheckRole(currentUser);
+                validations.EnsureUserExist(userFromDB);
 
-                bool isCreated = await userService.CreateUser(user.Username, user.Password, user.FirstName, user.LastName, user.IsAdmin, currentUser);
-
-                if (isCreated && ModelState.IsValid)
-                {
-                    User userFromDB = await userService.GetUser(user.Username);
-
-                    validations.EnsureUserExist(userFromDB);
-
-                    return CreatedAtAction(nameof(Post), new { id = userFromDB.Id }, Constants.CreatedUser);
-                }
-                else
-                {
-                    return BadRequest(Constants.FailedOperation);
-                }
+                return CreatedAtAction(nameof(Post), new { id = userFromDB.Id }, Constants.Created);
             }
-            catch (UserNotFoundException)
+            else
             {
-                return NotFound(Constants.UserNotFound);
-            }
-            catch (UnauthorizedUserException)
-            {
-                return Unauthorized(Constants.Unauthorized);
+                return BadRequest(Constants.FailedOperation);
             }
         }
 
         [HttpPut("{id}")]
         public async Task<ActionResult<UserResponseModel>> Put(UserRequestModel user, int id)
         {
-            try
+            User currentUser = await userService.GetCurrentUser(Request);
+            validations.EnsureUserExist(currentUser);
+            validations.CheckRole(currentUser);
+
+            User userFromDB = await userService.GetUser(id);
+
+            validations.EnsureUserExist(userFromDB);
+
+            if (await userService.EditUser(id, user.Username, user.Password, user.FirstName, user.LastName))
             {
-                User currentUser = await userService.GetCurrentUser(Request);
-                validations.EnsureUserExist(currentUser);
-                validations.CheckRole(currentUser);
+                User edited = await userService.GetUser(user.Username);
 
-                User userFromDB = await userService.GetUser(id);
-
-                validations.EnsureUserExist(userFromDB);
-
-                if (await userService.EditUser(id, user.Username, user.Password, user.FirstName, user.LastName))
+                return new UserResponseModel()
                 {
-                    User edited = await userService.GetUser(user.Username);
-
-                    return new UserResponseModel()
-                    {
-                        Username = edited.Username,
-                        FirstName = edited.FirstName,
-                        LastName = edited.LastName,
-                        IsAdmin = edited.IsAdmin,
-                        Id = edited.Id,
-                    };
-                }
-                else
-                {
-                    return BadRequest(Constants.FailedOperation);
-                }
-
+                    Username = edited.Username,
+                    FirstName = edited.FirstName,
+                    LastName = edited.LastName,
+                    IsAdmin = edited.IsAdmin,
+                    Id = edited.Id,
+                };
             }
-            catch (UserNotFoundException)
+            else
             {
-                return NotFound(Constants.UserNotFound);
-            }
-            catch (UnauthorizedUserException)
-            {
-                return Unauthorized(Constants.Unauthorized);
-            }
-            catch (UserExistException)
-            {
-                return BadRequest(Constants.UserExist);
+                return BadRequest(Constants.FailedOperation);
             }
         }
 
@@ -183,32 +132,20 @@ namespace ProjectManagementApp.WEB.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
-            try
+            User currentUser = await userService.GetCurrentUser(Request);
+            validations.EnsureUserExist(currentUser);
+            validations.CheckRole(currentUser);
+
+            User userFromDB = await userService.GetUser(id);
+            validations.EnsureUserExist(userFromDB);
+
+            if (await userService.DeleteUser(userFromDB.Username))
             {
-                User currentUser = await userService.GetCurrentUser(Request);
-
-                validations.EnsureUserExist(currentUser);
-                validations.CheckRole(currentUser);
-
-                User userFromDB = await userService.GetUser(id);
-                validations.EnsureUserExist(userFromDB);
-
-                if (await userService.DeleteUser(userFromDB.Username))
-                {
-                    return Ok(Constants.DeletedUser);
-                }
-                else
-                {
-                    return BadRequest(Constants.FailedOperation);
-                }
+                return Ok(Constants.Deleted);
             }
-            catch (UserNotFoundException)
+            else
             {
-                return NotFound(Constants.UserNotFound);
-            }
-            catch (UnauthorizedUserException)
-            {
-                return Unauthorized(Constants.Unauthorized);
+                return BadRequest(Constants.FailedOperation);
             }
         }
     }

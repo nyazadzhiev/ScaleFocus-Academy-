@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using WebApi.Middleware;
 
 namespace ProjectManagementApp.WEB
 {
@@ -55,6 +56,8 @@ namespace ProjectManagementApp.WEB
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseMiddleware<ErrorHandlerMiddleware>();
 
             app.UseAuthorization();
 
