@@ -6,7 +6,7 @@ namespace ProjectManagementApp.BLL.Exceptions
 {
     public class TeamNotFoundException : Exception
     {
-        public TeamNotFoundException(): base()
+        public TeamNotFoundException(string message) : base(message)
         {
 
         }

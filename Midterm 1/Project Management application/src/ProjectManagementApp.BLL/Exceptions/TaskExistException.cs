@@ -6,7 +6,7 @@ namespace ProjectManagementApp.BLL.Exceptions
 {
     public class TaskExistException : Exception
     {
-        public TaskExistException() : base()
+        public TaskExistException(string message) : base(message)
         {
 
         }

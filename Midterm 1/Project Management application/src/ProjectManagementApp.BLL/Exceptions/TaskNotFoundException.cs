@@ -6,9 +6,8 @@ namespace ProjectManagementApp.BLL.Exceptions
 {
     public class TaskNotFoundException : Exception
     {
-        public TaskNotFoundException() : base()
-        {
-
+        public TaskNotFoundException(string message) : base(message)
+        { 
         }
     }
 }

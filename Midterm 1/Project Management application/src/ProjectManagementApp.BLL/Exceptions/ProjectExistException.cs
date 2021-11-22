@@ -6,7 +6,7 @@ namespace ProjectManagementApp.BLL.Exceptions
 {
     public class ProjectExistException : Exception
     {
-        public ProjectExistException() : base()
+        public ProjectExistException(string message) : base(message)
         {
 
         }
