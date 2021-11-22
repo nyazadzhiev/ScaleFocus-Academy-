@@ -60,9 +60,7 @@ namespace ProjectManagementApp.WEB.Controllers
             validations.CheckRole(currentUser);
 
             Team teamFromDB = await teamService.GetTeam(id);
-
             validations.EnsureTeamExist(teamFromDB);
-
 
             return new TeamResponseModel()
             {
@@ -110,7 +108,7 @@ namespace ProjectManagementApp.WEB.Controllers
 
                 return new TeamResponseModel()
                 {
-                    Name = team.Name,
+                    Name = edited.Name
                 };
             }
             else
