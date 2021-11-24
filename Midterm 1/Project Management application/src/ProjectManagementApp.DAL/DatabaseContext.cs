@@ -71,6 +71,7 @@ namespace ProjectManagementApp.DAL
             modelBuilder.Entity<ToDoTask>().Property(t => t.Title).IsRequired().HasMaxLength(20);
             modelBuilder.Entity<ToDoTask>().Property(t => t.Description).IsRequired().HasMaxLength(300);
             modelBuilder.Entity<ToDoTask>().HasOne(t => t.Asignee).WithMany().HasForeignKey(t => t.AsigneeId).OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<ToDoTask>().HasOne(t => t.Owner).WithMany().HasForeignKey(t => t.OwnerId).OnDelete(DeleteBehavior.Restrict);
             modelBuilder.Entity<ToDoTask>().HasOne(t => t.Project).WithMany().HasForeignKey(t => t.ProjectId).OnDelete(DeleteBehavior.Cascade);
         }
 
