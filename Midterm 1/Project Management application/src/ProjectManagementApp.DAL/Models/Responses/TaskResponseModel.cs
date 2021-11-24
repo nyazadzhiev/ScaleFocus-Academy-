@@ -19,5 +19,7 @@ namespace ProjectManagementApp.DAL.Models.Responses
         public int AsigneeId { get; set; }
 
         public int ProjectId { get; set; }
+
+        public int TotalWorkedHours { get; set; }
     }
 }
