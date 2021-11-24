@@ -1,4 +1,5 @@
-﻿using ProjectManagementApp.BLL.Exceptions;
+﻿using Common;
+using ProjectManagementApp.BLL.Exceptions;
 using ProjectManagementApp.DAL;
 using ProjectManagementApp.DAL.Entities;
 using System;
@@ -21,7 +22,7 @@ namespace ProjectManagementApp.BLL.Validations
         {
             if (user == null)
             {
-                throw new UserNotFoundException();
+                throw new UserNotFoundException(String.Format(Constants.NotFound, "User"));
             }
             else
             {
@@ -33,7 +34,7 @@ namespace ProjectManagementApp.BLL.Validations
         {
             if (!user.IsAdmin)
             {
-                throw new UnauthorizedUserException();
+                throw new UnauthorizedUserException(Constants.Unauthorized);
             }
         }
 
@@ -46,7 +47,7 @@ namespace ProjectManagementApp.BLL.Validations
         {
             if (team == null)
             {
-                throw new TeamNotFoundException();
+                throw new TeamNotFoundException(String.Format(Constants.NotFound, "Team"));
             }
             else
             {
@@ -68,7 +69,7 @@ namespace ProjectManagementApp.BLL.Validations
         {
             if (project == null)
             {
-                throw new ProjectNotFoundException();
+                throw new ProjectNotFoundException(String.Format(Constants.NotFound, "Project"));
             }
             else
             {
@@ -90,7 +91,7 @@ namespace ProjectManagementApp.BLL.Validations
         {
             if (task == null)
             {
-                throw new ProjectNotFoundException();
+                throw new TaskNotFoundException(String.Format(Constants.NotFound, "Task"));
             }
             else
             {

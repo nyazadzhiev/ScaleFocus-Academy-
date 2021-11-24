@@ -6,7 +6,7 @@ namespace ProjectManagementApp.BLL.Exceptions
 {
     public class ProjectNotFoundException : Exception
     {
-        public ProjectNotFoundException() : base()
+        public ProjectNotFoundException(string message) : base(message)
         {
 
         }

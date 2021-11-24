@@ -29,11 +29,11 @@ namespace ProjectManagementApp.WEB.Controllers
 
         public WorkLogController(DatabaseContext database) : base()
         {
-            userService = new UserService(database);
-            teamService = new TeamService(database, userService);
-            projectService = new ProjectService(database, userService, teamService);
-            taskService = new TaskService(database, teamService, projectService);
-            workLogService = new WorkLogService(database, userService, taskService);
+            userService = new UserService(database, validations);
+            teamService = new TeamService(database, userService, validations);
+            projectService = new ProjectService(database, userService, teamService, validations);
+            taskService = new TaskService(database, teamService, projectService, validations);
+            workLogService = new WorkLogService(database, userService, taskService, validations);
             validations = new Validation(database);
         }
 
@@ -69,7 +69,7 @@ namespace ProjectManagementApp.WEB.Controllers
             return Ok(workLog);
         }
 
-        [HttpPost("Task/{taskId}}")]
+        [HttpPost("Task/{taskId}")]
         public async Task<ActionResult> Post(int taskId, WorkLogRequestModel model)
         {
             User currentUser = await userService.GetCurrentUser(Request);
@@ -79,7 +79,7 @@ namespace ProjectManagementApp.WEB.Controllers
 
             if(isCreated && ModelState.IsValid)
             {
-                return CreatedAtAction(nameof(Post), Constants.CreatedWorkLog);
+                return CreatedAtAction(nameof(Post), Constants.Created);
             }
             else
             {

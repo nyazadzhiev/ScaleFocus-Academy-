@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Common;
+using Microsoft.EntityFrameworkCore;
 using ProjectManagementApp.BLL.Exceptions;
 using ProjectManagementApp.BLL.Validations;
 using ProjectManagementApp.DAL;
@@ -17,11 +18,11 @@ namespace ProjectManagementApp.BLL.Services
         private readonly UserService userService;
         private Validation validations;
 
-        public TeamService(DatabaseContext _database, UserService _userService)
+        public TeamService(DatabaseContext _database, UserService _userService, Validation validation)
         {
             database = _database;
             userService = _userService;
-            validations = new Validation(database);
+            validations = validation;
         }
 
         public async Task<bool> CreateTeam(string name)
@@ -79,7 +80,7 @@ namespace ProjectManagementApp.BLL.Services
 
             if (isValid)
             {
-                throw new TeamExistException();
+                throw new TeamExistException(String.Format(Constants.Exist, "Team"));
             }
 
             team.Name = newTeamName;
@@ -101,7 +102,7 @@ namespace ProjectManagementApp.BLL.Services
 
             if (UserExistInTeam)
             {
-                throw new UserExistException();
+                throw new UserExistException(String.Format(Constants.Exist, "User"));
             }
 
             teamFromDB.Users.Add(userToAdd);

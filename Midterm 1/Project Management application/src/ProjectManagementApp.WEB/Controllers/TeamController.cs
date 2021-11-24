@@ -26,264 +26,148 @@ namespace ProjectManagementApp.WEB.Controllers
 
         public TeamController(DatabaseContext database) : base()
         {
-            userService = new UserService(database);
-            teamService = new TeamService(database, userService);
+            userService = new UserService(database, validations);
+            teamService = new TeamService(database, userService, validations);
             validations = new Validation(database);
         }
 
         [HttpGet]
         public async Task<ActionResult> GetAll()
         {
-            try
+            User currentUser = await userService.GetCurrentUser(Request);
+            validations.EnsureUserExist(currentUser);
+            validations.CheckRole(currentUser);
+
+            List<TeamResponseModel> teams = new List<TeamResponseModel>();
+
+            foreach (Team team in await teamService.GetAll())
             {
-                User currentUser = await userService.GetCurrentUser(Request);
-                validations.EnsureUserExist(currentUser);
-                validations.CheckRole(currentUser);
-
-                List<TeamResponseModel> teams = new List<TeamResponseModel>();
-
-                foreach (Team team in await teamService.GetAll())
+                teams.Add(new TeamResponseModel()
                 {
-                    teams.Add(new TeamResponseModel()
-                    {
-                        Name = team.Name,
-                        Id = team.Id
-                    });
-                }
+                    Name = team.Name,
+                    Id = team.Id
+                });
+            }
 
-                return Ok(teams);
-            }
-            catch (UserNotFoundException)
-            {
-                return NotFound(Constants.UserNotFound);
-            }
-            catch (UnauthorizedUserException)
-            {
-                return Unauthorized(Constants.Unauthorized);
-            }
+            return Ok(teams);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<TeamResponseModel>> Get(int id)
         {
-            try
-            {
-                User currentUser = await userService.GetCurrentUser(Request);
-                validations.EnsureUserExist(currentUser);
-                validations.CheckRole(currentUser);
+            User currentUser = await userService.GetCurrentUser(Request);
+            validations.EnsureUserExist(currentUser);
+            validations.CheckRole(currentUser);
 
-                Team teamFromDB = await teamService.GetTeam(id);
+            Team teamFromDB = await teamService.GetTeam(id);
+            validations.EnsureTeamExist(teamFromDB);
 
-                validations.EnsureTeamExist(teamFromDB);
-
-
-                return new TeamResponseModel()
-                {
-                    Name = teamFromDB.Name,
-                    Id = teamFromDB.Id
-                };
-            }
-            catch (UserNotFoundException)
+            return new TeamResponseModel()
             {
-                return NotFound(Constants.UserNotFound);
-            }
-            catch (UnauthorizedUserException)
-            {
-                return Unauthorized(Constants.Unauthorized);
-            }
-            catch (TeamNotFoundException)
-            {
-                return NotFound(Constants.TeamNotFound);
-            }
+                Name = teamFromDB.Name,
+                Id = teamFromDB.Id
+            };
         }
 
         [HttpPost]
         public async Task<ActionResult> Post(TeamRequestModel team)
         {
-            try
+            User currentUser = await userService.GetCurrentUser(Request);
+
+            validations.EnsureUserExist(currentUser);
+            validations.CheckRole(currentUser);
+
+            bool isCreated = await teamService.CreateTeam(team.Name);
+
+            if (isCreated && ModelState.IsValid)
             {
-                User currentUser = await userService.GetCurrentUser(Request);
-
-                validations.EnsureUserExist(currentUser);
-                validations.CheckRole(currentUser);
-
-                bool isCreated = await teamService.CreateTeam(team.Name);
-
-                if (isCreated && ModelState.IsValid)
-                {
-                    Team teamFromDB = await teamService.GetTeam(team.Name);
+                Team teamFromDB = await teamService.GetTeam(team.Name);
 
 
-                    return CreatedAtAction(nameof(Post), new { id = teamFromDB.Id }, Constants.CreatedTeam);
-                }
-                else
-                {
-                    return BadRequest(Constants.FailedOperation);
-                }
+                return CreatedAtAction(nameof(Post), new { id = teamFromDB.Id }, Constants.Created);
             }
-            catch (UserNotFoundException)
+            else
             {
-                return NotFound(Constants.UserNotFound);
-            }
-            catch (UnauthorizedUserException)
-            {
-                return Unauthorized(Constants.Unauthorized);
+                return BadRequest(Constants.FailedOperation);
             }
         }
 
         [HttpPut("{id}")]
         public async Task<ActionResult<TeamResponseModel>> Put(TeamRequestModel team, int id)
         {
-            try
+            User currentUser = await userService.GetCurrentUser(Request);
+            validations.EnsureUserExist(currentUser);
+            validations.CheckRole(currentUser);
+
+            Team teamFromDB = await teamService.GetTeam(id);
+            validations.EnsureTeamExist(teamFromDB);
+
+            if (await teamService.EditTeam(id, team.Name))
             {
-                User currentUser = await userService.GetCurrentUser(Request);
-                validations.EnsureUserExist(currentUser);
-                validations.CheckRole(currentUser);
+                Team edited = await teamService.GetTeam(team.Name);
 
-                Team teamFromDB = await teamService.GetTeam(id);
-
-                validations.EnsureTeamExist(teamFromDB);
-
-                if (await teamService.EditTeam(id, team.Name))
+                return new TeamResponseModel()
                 {
-                    Team edited = await teamService.GetTeam(team.Name);
-
-                    return new TeamResponseModel()
-                    {
-                        Name = team.Name,
-                    };
-                }
-                else
-                {
-                    return BadRequest(Constants.FailedOperation);
-                }
-
+                    Name = edited.Name
+                };
             }
-            catch (UserNotFoundException)
+            else
             {
-                return NotFound(Constants.UserNotFound);
-            }
-            catch (UnauthorizedUserException)
-            {
-                return Unauthorized(Constants.Unauthorized);
-            }
-            catch (UserExistException)
-            {
-                return BadRequest(Constants.UserExist);
-            }
-            catch (TeamNotFoundException)
-            {
-                return NotFound(Constants.TeamNotFound);
-            }
-            catch (TeamExistException)
-            {
-                return BadRequest(Constants.TeamExist);
+                return BadRequest(Constants.FailedOperation);
             }
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
-            try
-            {
-                User currentUser = await userService.GetCurrentUser(Request);
+            User currentUser = await userService.GetCurrentUser(Request);
+            validations.EnsureUserExist(currentUser);
+            validations.CheckRole(currentUser);
 
-                validations.EnsureUserExist(currentUser);
-                validations.CheckRole(currentUser);
+            Team teamFromDB = await teamService.GetTeam(id);
+            validations.EnsureTeamExist(teamFromDB);
 
-                Team teamFromDB = await teamService.GetTeam(id);
-                validations.EnsureTeamExist(teamFromDB);
-
-                if (await teamService.DeleteTeam(teamFromDB.Name))
-                {
-                    return Ok(Constants.DeletedTeam);
-                }
-                else
-                {
-                    return BadRequest(Constants.FailedOperation);
-                }
-            }
-            catch (UserNotFoundException)
+            if (await teamService.DeleteTeam(teamFromDB.Name))
             {
-                return NotFound(Constants.UserNotFound);
+                return Ok(Constants.Deleted);
             }
-            catch (UnauthorizedUserException)
+            else
             {
-                return Unauthorized(Constants.Unauthorized);
-            }
-            catch (TeamNotFoundException)
-            {
-                return NotFound(Constants.TeamNotFound);
+                return BadRequest(Constants.FailedOperation);
             }
         }
 
         [HttpPost("{teamId}/User/{userId}")]
         public async Task<ActionResult> AddUser(int teamId, int userId)
         {
-            try
-            {
-                User currentUser = await userService.GetCurrentUser(Request);
+            User currentUser = await userService.GetCurrentUser(Request);
+            validations.EnsureUserExist(currentUser);
+            validations.CheckRole(currentUser);
 
-                validations.EnsureUserExist(currentUser);
-                validations.CheckRole(currentUser);
-
-                if(await teamService.AddUser(teamId, userId))
-                {
-                    return Ok(Constants.UserAddedToTeam);
-                }
-                else
-                {
-                    return BadRequest(Constants.FailedOperation);
-                }
-            }
-            catch (UserNotFoundException)
+            if (await teamService.AddUser(teamId, userId))
             {
-                return NotFound(Constants.UserNotFound);
+                return Ok(Constants.UserAddedToTeam);
             }
-            catch (UnauthorizedUserException)
+            else
             {
-                return Unauthorized(Constants.Unauthorized);
-            }
-            catch (UserExistException)
-            {
-                return BadRequest(Constants.UserInTeam);
-            }
-            catch (TeamNotFoundException)
-            {
-                return NotFound(Constants.TeamNotFound);
+                return BadRequest(Constants.FailedOperation);
             }
         }
 
         [HttpDelete("{teamId}/User/{userId}")]
         public async Task<ActionResult> RemoveUser(int teamId, int userId)
         {
-            try
-            {
-                User currentUser = await userService.GetCurrentUser(Request);
+            User currentUser = await userService.GetCurrentUser(Request);
+            validations.EnsureUserExist(currentUser);
+            validations.CheckRole(currentUser);
 
-                validations.EnsureUserExist(currentUser);
-                validations.CheckRole(currentUser);
-
-                if (await teamService.RemoveUser(teamId, userId))
-                {
-                    return Ok(Constants.UserRemovedFromTeam);
-                }
-                else
-                {
-                    return BadRequest(Constants.FailedOperation);
-                }
-            }
-            catch (UserNotFoundException)
+            if (await teamService.RemoveUser(teamId, userId))
             {
-                return NotFound(Constants.UserNotFound);
+                return Ok(Constants.UserRemovedFromTeam);
             }
-            catch (UnauthorizedUserException)
+            else
             {
-                return Unauthorized(Constants.Unauthorized);
-            }
-            catch (TeamNotFoundException)
-            {
-                return NotFound(Constants.TeamNotFound);
+                return BadRequest(Constants.FailedOperation);
             }
         }
     }

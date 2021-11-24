@@ -27,254 +27,147 @@ namespace ProjectManagementApp.WEB.Controllers
 
         public ProjectController(DatabaseContext database) : base()
         {
-            userService = new UserService(database);
-            teamService = new TeamService(database, userService);
-            projectService = new ProjectService(database, userService, teamService);
+            userService = new UserService(database, validations);
+            teamService = new TeamService(database, userService, validations);
+            projectService = new ProjectService(database, userService, teamService, validations);
             validations = new Validation(database);
         }
 
         [HttpGet]
         public async Task<ActionResult> GetAll()
         {
-            try
+            User currentUser = await userService.GetCurrentUser(Request);
+            validations.EnsureUserExist(currentUser);
+
+            List<ProjectResponseModel> projects = new List<ProjectResponseModel>();
+
+            foreach (Project project in await projectService.GetAll(currentUser))
             {
-                User currentUser = await userService.GetCurrentUser(Request);
-                validations.EnsureUserExist(currentUser);
-
-                List<ProjectResponseModel> projects = new List<ProjectResponseModel>();
-
-                foreach (Project project in await projectService.GetAll(currentUser))
+                projects.Add(new ProjectResponseModel()
                 {
-                    projects.Add(new ProjectResponseModel()
-                    {
-                        Id = project.Id,
-                        Title = project.Title,
-                        OwnerId = project.OwnerId
-                    });
-                }
+                    Id = project.Id,
+                    Title = project.Title,
+                    OwnerId = project.OwnerId
+                });
+            }
 
-                return Ok(projects);
-            }
-            catch (UserNotFoundException)
-            {
-                return NotFound(Constants.UserNotFound);
-            }
+            return Ok(projects);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<ProjectResponseModel>> Get(int id)
         {
-            try
+            User currentUser = await userService.GetCurrentUser(Request);
+            validations.EnsureUserExist(currentUser);
+
+            Project projectFromDB = await projectService.GetProject(id, currentUser);
+            validations.EnsureProjectExist(projectFromDB);
+
+
+            return new ProjectResponseModel()
             {
-                User currentUser = await userService.GetCurrentUser(Request);
-                validations.EnsureUserExist(currentUser);
-
-                Project projectFromDB = await projectService.GetProject(id, currentUser);
-
-                validations.EnsureProjectExist(projectFromDB);
-
-
-                return new ProjectResponseModel()
-                {
-                    Id = projectFromDB.Id,
-                    Title = projectFromDB.Title,
-                    OwnerId = projectFromDB.OwnerId
-                };
-            }
-            catch (UserNotFoundException)
-            {
-                return NotFound(Constants.UserNotFound);
-            }
-            catch (ProjectNotFoundException)
-            {
-                return NotFound(Constants.ProjectNotFound);
-            }
+                Id = projectFromDB.Id,
+                Title = projectFromDB.Title,
+                OwnerId = projectFromDB.OwnerId
+            };
         }
 
         [HttpPost]
         public async Task<ActionResult> Post(ProjectRequestModel project)
         {
-            try
+            User currentUser = await userService.GetCurrentUser(Request);
+            validations.EnsureUserExist(currentUser);
+
+            bool isCreated = await projectService.CreateProject(project.Title, currentUser);
+
+            if (isCreated && ModelState.IsValid)
             {
-                User currentUser = await userService.GetCurrentUser(Request);
+                Project projectFromDB = await projectService.GetProject(project.Title, currentUser);
 
-                validations.EnsureUserExist(currentUser);
-
-                bool isCreated = await projectService.CreateProject(project.Title, currentUser);
-
-                if (isCreated && ModelState.IsValid)
-                {
-                    Project projectFromDB = await projectService.GetProject(project.Title, currentUser);
-
-                    return CreatedAtAction(nameof(Post), new { id = projectFromDB.Id }, Constants.CreatedProject);
-                }
-                else
-                {
-                    return BadRequest(Constants.FailedOperation);
-                }
+                return CreatedAtAction(nameof(Post), new { id = projectFromDB.Id }, Constants.Created);
             }
-            catch (UserNotFoundException)
+            else
             {
-                return NotFound(Constants.UserNotFound);
+                return BadRequest(Constants.FailedOperation);
             }
         }
 
         [HttpPut("{id}")]
         public async Task<ActionResult<ProjectResponseModel>> Put(ProjectRequestModel project, int id)
         {
-            try
+            User currentUser = await userService.GetCurrentUser(Request);
+            validations.EnsureUserExist(currentUser);
+
+            Project projectFromDB = await projectService.GetProject(id, currentUser);
+            validations.EnsureProjectExist(projectFromDB);
+
+            if (await projectService.EditProject(id, project.Title, currentUser))
             {
-                User currentUser = await userService.GetCurrentUser(Request);
-                validations.EnsureUserExist(currentUser);
+                Project edited = await projectService.GetProject(project.Title, currentUser);
 
-                Project projectFromDB = await projectService.GetProject(id, currentUser);
-
-                validations.EnsureProjectExist(projectFromDB);
-
-                if (await projectService.EditProject(id, project.Title, currentUser))
+                return new ProjectResponseModel()
                 {
-                    Project edited = await projectService.GetProject(project.Title, currentUser);
-
-                    return new ProjectResponseModel()
-                    {
-                        Id = edited.Id,
-                        Title = edited.Title,
-                        OwnerId = edited.OwnerId
-                    };
-                }
-                else
-                {
-                    return BadRequest(Constants.FailedOperation);
-                }
-
+                    Id = edited.Id,
+                    Title = edited.Title,
+                    OwnerId = edited.OwnerId
+                };
             }
-            catch (UserNotFoundException)
+            else
             {
-                return NotFound(Constants.UserNotFound);
-            }
-            catch (UnauthorizedUserException)
-            {
-                return Unauthorized(Constants.Unauthorized);
-            }
-            catch (ProjectExistException)
-            {
-                return BadRequest(Constants.ProjectExist);
-            }
-            catch (ProjectNotFoundException)
-            {
-                return NotFound(Constants.ProjectNotFound);
+                return BadRequest(Constants.FailedOperation);
             }
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
-            try
+            User currentUser = await userService.GetCurrentUser(Request);
+            validations.EnsureUserExist(currentUser);
+
+            Project projectFromDB = await projectService.GetProject(id, currentUser);
+            validations.EnsureProjectExist(projectFromDB);
+
+            if (await projectService.DeleteProject(projectFromDB.Title, currentUser))
             {
-                User currentUser = await userService.GetCurrentUser(Request);
-
-                validations.EnsureUserExist(currentUser);
-
-                Project projectFromDB = await projectService.GetProject(id, currentUser);
-                validations.EnsureProjectExist(projectFromDB);
-
-                if (await projectService.DeleteProject(projectFromDB.Title, currentUser))
-                {
-                    return Ok(Constants.DeletedProject);
-                }
-                else
-                {
-                    return BadRequest(Constants.FailedOperation);
-                }
+                return Ok(Constants.Deleted);
             }
-            catch (UserNotFoundException)
+            else
             {
-                return NotFound(Constants.UserNotFound);
-            }
-            catch (ProjectNotFoundException)
-            {
-                return NotFound(Constants.ProjectNotFound);
+                return BadRequest(Constants.FailedOperation);
             }
         }
 
         [HttpPost("{projectId}/Team/{teamId}")]
         public async Task<ActionResult> AddTeam(int projectId, int teamId)
         {
-            try
-            {
-                User currentUser = await userService.GetCurrentUser(Request);
+            User currentUser = await userService.GetCurrentUser(Request);
+            validations.EnsureUserExist(currentUser);
+            validations.CheckRole(currentUser);
 
-                validations.EnsureUserExist(currentUser);
-                validations.CheckRole(currentUser);
-
-                if (await projectService.AddTeam(projectId, teamId, currentUser))
-                {
-                    return Ok(Constants.TeamAddedToProject);
-                }
-                else
-                {
-                    return BadRequest(Constants.FailedOperation);
-                }
-            }
-            catch (UserNotFoundException)
+            if (await projectService.AddTeam(projectId, teamId, currentUser))
             {
-                return NotFound(Constants.UserNotFound);
+                return Ok(Constants.TeamAddedToProject);
             }
-            catch (UnauthorizedUserException)
+            else
             {
-                return Unauthorized(Constants.Unauthorized);
-            }
-            catch (UserExistException)
-            {
-                return BadRequest(Constants.UserInTeam);
-            }
-            catch (TeamNotFoundException)
-            {
-                return NotFound(Constants.TeamNotFound);
-            }
-            catch (ProjectNotFoundException)
-            {
-                return NotFound(Constants.ProjectNotFound);
-            }
-            catch (ProjectExistException)
-            {
-                return BadRequest(Constants.ProjectExist);
+                return BadRequest(Constants.FailedOperation);
             }
         }
 
         [HttpDelete("{projectId}/Team/{teamId}")]
         public async Task<ActionResult> RemoveTeam(int projectId, int teamId)
         {
-            try
-            {
-                User currentUser = await userService.GetCurrentUser(Request);
+            User currentUser = await userService.GetCurrentUser(Request);
 
-                validations.EnsureUserExist(currentUser);
+            validations.EnsureUserExist(currentUser);
 
-                if (await projectService.RemoveTeam(projectId, teamId, currentUser))
-                {
-                    return Ok(Constants.TeamRemovedFromProject);
-                }
-                else
-                {
-                    return BadRequest(Constants.FailedOperation);
-                }
-            }
-            catch (UserNotFoundException)
+            if (await projectService.RemoveTeam(projectId, teamId, currentUser))
             {
-                return NotFound(Constants.UserNotFound);
+                return Ok(Constants.TeamRemovedFromProject);
             }
-            catch (UnauthorizedUserException)
+            else
             {
-                return Unauthorized(Constants.Unauthorized);
-            }
-            catch (TeamNotFoundException)
-            {
-                return NotFound(Constants.TeamNotFound);
-            }
-            catch (ProjectNotFoundException)
-            {
-                return NotFound(Constants.ProjectNotFound);
+                return BadRequest(Constants.FailedOperation);
             }
         }
     }

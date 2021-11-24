@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Common;
+using Microsoft.EntityFrameworkCore;
 using ProjectManagementApp.BLL.Exceptions;
 using ProjectManagementApp.BLL.Validations;
 using ProjectManagementApp.DAL;
@@ -18,15 +19,15 @@ namespace ProjectManagementApp.BLL.Services
         private readonly ProjectService projectService;
         private Validation validations;
 
-        public TaskService(DatabaseContext _database, TeamService _teamService, ProjectService _projectService)
+        public TaskService(DatabaseContext _database, TeamService _teamService, ProjectService _projectService, Validation validation)
         {
             database = _database;
             teamService = _teamService;
             projectService = _projectService;
-            validations = new Validation(database);
+            validations = validation;
         }
 
-        public async Task<bool> CreateTask(string title, string description, bool isCompleted, Project project,  User owner, User asignee)
+        public async Task<bool> CreateTask(string title, string description, bool isCompleted, int projectId,  User currentUser, int userId)
         {
             if (database.ToDoTasks.Any(t => t.Title == title))
             {
@@ -38,9 +39,9 @@ namespace ProjectManagementApp.BLL.Services
                 Title = title,
                 Description = description,
                 IsCompleted = isCompleted,
-                ProjectId = project.Id,
-                AsigneeId = asignee.Id,
-                OwnerId = owner.Id
+                ProjectId = projectId,
+                AsigneeId = userId,
+                OwnerId = currentUser.Id
             };
 
             await database.ToDoTasks.AddAsync(newTask);
@@ -59,9 +60,12 @@ namespace ProjectManagementApp.BLL.Services
             return await database.ToDoTasks.FirstOrDefaultAsync(t => t.Id == id);
         }
 
-        public async Task<List<ToDoTask>> GetAll(Project project)
+        public async Task<List<ToDoTask>> GetAll(int projectId, User currentUser)
         {
-            return await database.ToDoTasks.Where(t => t.ProjectId == project.Id).ToListAsync();
+            Project project = await projectService.GetProject(projectId, currentUser);
+            validations.EnsureProjectExist(project);
+
+            return await database.ToDoTasks.Where(t => t.ProjectId == projectId).ToListAsync();
         }
 
         public async Task<bool> DeleteTask(string title)
@@ -85,7 +89,7 @@ namespace ProjectManagementApp.BLL.Services
 
             if (isValid)
             {
-                throw new TaskExistException();
+                throw new TaskExistException(String.Format(Constants.Exist, "Task"));
             }
 
             task.Title = newTaskTitle;
