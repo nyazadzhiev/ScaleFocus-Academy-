@@ -25,10 +25,7 @@ namespace ProjectManagementApp.BLL.Services
 
         public async Task<bool> CreateUser(string username, string password, string firstName, string lastName, bool isAdmin, User currentUser)
         {
-            if(database.Users.Any(u => u.Username == username))
-            {
-                return false;
-            }
+            validations.CheckUsername(username);
 
             User newUser = new User()
             {
@@ -65,38 +62,24 @@ namespace ProjectManagementApp.BLL.Services
             return await database.Users.FirstOrDefaultAsync(u => u.Id == id);
         }
 
-        public async Task<bool> DeleteUser(string username)
+        public async Task<bool> DeleteUser(int id)
         {
-            User user = await GetUser(username);
+            User user = await GetUser(id);
+            validations.EnsureUserExist(user);
 
-            bool isValidUser = validations.EnsureUserExist(user);
+            database.Users.Remove(user);
+            await database.SaveChangesAsync();
 
-            if (!isValidUser)
-            {
-                return false;
-            }
-            else
-            {
-                database.Users.Remove(user);
-                await database.SaveChangesAsync();
+            return true;
 
-                return true;
-            }
         }
 
         public async Task<bool> EditUser(int id, string newUsername, string newPassword, string newFirstName, string newLastName)
         {
             User user = await GetUser(id);
-
             validations.EnsureUserExist(user);
 
-            bool isValid = validations.CheckUsername(newUsername);
-
-            if (isValid)
-            {
-                throw new UserExistException(String.Format(Constants.Exist, "User"));
-            }
-
+            validations.CheckUsername(newUsername);
 
             user.Username = newUsername;
             user.Password = newPassword;

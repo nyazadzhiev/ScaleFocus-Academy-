@@ -29,12 +29,12 @@ namespace ProjectManagementApp.WEB.Controllers
 
         public WorkLogController(DatabaseContext database) : base()
         {
+            validations = new Validation(database);
             userService = new UserService(database, validations);
             teamService = new TeamService(database, userService, validations);
             projectService = new ProjectService(database, userService, teamService, validations);
             taskService = new TaskService(database, teamService, projectService, validations);
             workLogService = new WorkLogService(database, userService, taskService, validations);
-            validations = new Validation(database);
         }
 
         [HttpGet("{taskId}")]
@@ -42,6 +42,10 @@ namespace ProjectManagementApp.WEB.Controllers
         {
             User currentUser = await userService.GetCurrentUser(Request);
             validations.EnsureUserExist(currentUser);
+
+            ToDoTask task = await taskService.GetTask(taskId);
+            validations.EnsureTaskExist(task);
+            validations.CheckTaskAccess(currentUser, task);
 
             List<WorkLogResponseModel> workLogs = new List<WorkLogResponseModel>();
 
@@ -65,6 +69,7 @@ namespace ProjectManagementApp.WEB.Controllers
             validations.EnsureUserExist(currentUser);
 
             WorkLog workLog = await workLogService.GetWorkLog(taskId, workId);
+            validations.EnsureWorkLogExist(workLog);
 
             return Ok(workLog);
         }
@@ -75,11 +80,11 @@ namespace ProjectManagementApp.WEB.Controllers
             User currentUser = await userService.GetCurrentUser(Request);
             validations.EnsureUserExist(currentUser);
 
-            bool isCreated = await workLogService.CreateWorkLog(currentUser.Id, taskId, model.WorkedHours);
+            bool isCreated = await workLogService.CreateWorkLog(currentUser, taskId, model.WorkedHours);
 
             if(isCreated && ModelState.IsValid)
             {
-                return CreatedAtAction(nameof(Post), Constants.Created);
+                return CreatedAtAction(nameof(Post), String.Format(Constants.Created, "WorkLog"));
             }
             else
             {

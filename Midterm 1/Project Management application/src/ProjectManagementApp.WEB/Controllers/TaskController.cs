@@ -13,6 +13,7 @@ using Common;
 using ProjectManagementApp.DAL.Models.Responses;
 using ProjectManagementApp.BLL.Validations;
 using ProjectManagementApp.BLL.Exceptions;
+using System.Linq;
 
 namespace ProjectManagementApp.WEB.Controllers
 {
@@ -28,11 +29,11 @@ namespace ProjectManagementApp.WEB.Controllers
 
         public TaskController(DatabaseContext database) : base()
         {
+            validations = new Validation(database);
             userService = new UserService(database, validations);
             teamService = new TeamService(database, userService, validations);
             projectService = new ProjectService(database, userService, teamService, validations);
             taskService = new TaskService(database, teamService, projectService, validations);
-            validations = new Validation(database);
         }
 
         [HttpGet("/Project/{projectId}")]
@@ -53,7 +54,8 @@ namespace ProjectManagementApp.WEB.Controllers
                     IsCompleted = task.IsCompleted,
                     AsigneeId = task.AsigneeId,
                     ProjectId = task.ProjectId,
-                    OwnerId = task.OwnerId
+                    OwnerId = task.OwnerId,
+                    TotalWorkedHours = task.Worklogs.Sum(w => w.WorkedTime)
                 });
             }
 
@@ -66,10 +68,7 @@ namespace ProjectManagementApp.WEB.Controllers
             User currentUser = await userService.GetCurrentUser(Request);
             validations.EnsureUserExist(currentUser);
 
-            Project projectFromDB = await projectService.GetProject(projectId, currentUser);
-            validations.EnsureProjectExist(projectFromDB);
-
-            ToDoTask taskFromDB = await taskService.GetTask(taskId);
+            ToDoTask taskFromDB = await taskService.GetTask(taskId, projectId, currentUser);
             validations.EnsureTaskExist(taskFromDB);
 
             return new TaskResponseModel()
@@ -79,7 +78,9 @@ namespace ProjectManagementApp.WEB.Controllers
                 Description = taskFromDB.Description,
                 IsCompleted = taskFromDB.IsCompleted,
                 AsigneeId = taskFromDB.AsigneeId,
-                ProjectId = taskFromDB.ProjectId
+                ProjectId = taskFromDB.ProjectId,
+                OwnerId = taskFromDB.OwnerId,
+                TotalWorkedHours = taskFromDB.Worklogs.Sum(w => w.WorkedTime)
             };
         }
 
@@ -95,7 +96,7 @@ namespace ProjectManagementApp.WEB.Controllers
             {
                 ToDoTask taskFromDB = await taskService.GetTask(task.Title);
 
-                return CreatedAtAction(nameof(Post), new { id = taskFromDB.Id }, Constants.Created);
+                return CreatedAtAction(nameof(Post), new { id = taskFromDB.Id }, String.Format(Constants.Created, "Task"));
             }
             else
             {
@@ -109,12 +110,9 @@ namespace ProjectManagementApp.WEB.Controllers
             User currentUser = await userService.GetCurrentUser(Request);
             validations.EnsureUserExist(currentUser);
 
-            Project project = await projectService.GetProject(projectId, currentUser);
-            validations.EnsureProjectExist(project);
-
-            if (await taskService.EditTask(taskId, task.Title, task.Description, task.IsCompleted))
+            if (await taskService.EditTask(taskId, projectId, currentUser, task.Title, task.Description, task.IsCompleted))
             {
-                ToDoTask edited = await taskService.GetTask(task.Title);
+                ToDoTask edited = await taskService.GetTask(taskId);
 
                 return new TaskResponseModel()
                 {
@@ -124,7 +122,8 @@ namespace ProjectManagementApp.WEB.Controllers
                     IsCompleted = edited.IsCompleted,
                     OwnerId = edited.OwnerId,
                     AsigneeId = edited.AsigneeId,
-                    ProjectId = edited.ProjectId
+                    ProjectId = edited.ProjectId,
+                    TotalWorkedHours = edited.Worklogs.Sum(w => w.WorkedTime)
                 };
             }
             else
@@ -139,15 +138,25 @@ namespace ProjectManagementApp.WEB.Controllers
             User currentUser = await userService.GetCurrentUser(Request);
             validations.EnsureUserExist(currentUser);
 
-            Project projectFromDB = await projectService.GetProject(projectId, currentUser);
-            validations.EnsureProjectExist(projectFromDB);
-
-            ToDoTask taskFromDB = await taskService.GetTask(taskId);
-            validations.EnsureProjectExist(projectFromDB);
-
-            if (await taskService.DeleteTask(taskFromDB.Title))
+            if (await taskService.DeleteTask(taskId, projectId, currentUser))
             {
-                return Ok(Constants.Deleted);
+                return Ok(String.Format(Constants.Deleted, "Task"));
+            }
+            else
+            {
+                return BadRequest(Constants.FailedOperation);
+            }
+        }
+
+        [HttpPut("{taskId}/Project/{projectId}/ChangeStatus")]
+        public async Task<ActionResult> ChangeStatus(int taskId, int projectId)
+        {
+            User currentUser = await userService.GetCurrentUser(Request);
+            validations.EnsureUserExist(currentUser);
+
+            if(await taskService.ChangeStatus(taskId, projectId, currentUser))
+            {
+                return Ok(Constants.StatusChanged);
             }
             else
             {

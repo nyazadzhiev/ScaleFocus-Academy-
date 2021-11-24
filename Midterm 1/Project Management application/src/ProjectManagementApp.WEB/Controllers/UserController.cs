@@ -89,7 +89,7 @@ namespace ProjectManagementApp.WEB.Controllers
 
                 validations.EnsureUserExist(userFromDB);
 
-                return CreatedAtAction(nameof(Post), new { id = userFromDB.Id }, Constants.Created);
+                return CreatedAtAction(nameof(Post), new { id = userFromDB.Id }, String.Format(Constants.Created, "User"));
             }
             else
             {
@@ -103,10 +103,6 @@ namespace ProjectManagementApp.WEB.Controllers
             User currentUser = await userService.GetCurrentUser(Request);
             validations.EnsureUserExist(currentUser);
             validations.CheckRole(currentUser);
-
-            User userFromDB = await userService.GetUser(id);
-
-            validations.EnsureUserExist(userFromDB);
 
             if (await userService.EditUser(id, user.Username, user.Password, user.FirstName, user.LastName))
             {
@@ -127,8 +123,6 @@ namespace ProjectManagementApp.WEB.Controllers
             }
         }
 
-
-
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
@@ -136,12 +130,9 @@ namespace ProjectManagementApp.WEB.Controllers
             validations.EnsureUserExist(currentUser);
             validations.CheckRole(currentUser);
 
-            User userFromDB = await userService.GetUser(id);
-            validations.EnsureUserExist(userFromDB);
-
-            if (await userService.DeleteUser(userFromDB.Username))
+            if (await userService.DeleteUser(id))
             {
-                return Ok(Constants.Deleted);
+                return Ok(String.Format(Constants.Deleted, "User"));
             }
             else
             {

@@ -27,10 +27,7 @@ namespace ProjectManagementApp.BLL.Services
 
         public async Task<bool> CreateTeam(string name)
         {
-            if(database.Teams.Any(t => t.Name == name))
-            {
-                return false;
-            }
+            validations.CheckTeamName(name);
 
             Team newTeam = new Team()
             {
@@ -58,10 +55,9 @@ namespace ProjectManagementApp.BLL.Services
             return await database.Teams.FirstOrDefaultAsync(t => t.Id == id);
         }
 
-        public async Task<bool> DeleteTeam(string name)
+        public async Task<bool> DeleteTeam(int id)
         {
-            Team team = await GetTeam(name);
-
+            Team team= await GetTeam(id);
             validations.EnsureTeamExist(team);
 
             database.Teams.Remove(team);
@@ -73,15 +69,8 @@ namespace ProjectManagementApp.BLL.Services
         public async Task<bool> EditTeam(int id, string newTeamName)
         {
             Team team = await GetTeam(id);
-
             validations.EnsureTeamExist(team);
-
-            bool isValid = validations.CheckTeamName(newTeamName);
-
-            if (isValid)
-            {
-                throw new TeamExistException(String.Format(Constants.Exist, "Team"));
-            }
+            validations.CheckTeamName(newTeamName);
 
             team.Name = newTeamName;
 
@@ -97,15 +86,10 @@ namespace ProjectManagementApp.BLL.Services
 
             Team teamFromDB = await GetTeam(teamId);
             validations.EnsureTeamExist(teamFromDB);
-
-            bool UserExistInTeam = validations.CanAddToTeam(teamFromDB, userToAdd);
-
-            if (UserExistInTeam)
-            {
-                throw new UserExistException(String.Format(Constants.Exist, "User"));
-            }
+            validations.CanAddToTeam(teamFromDB, userToAdd);
 
             teamFromDB.Users.Add(userToAdd);
+            userToAdd.Teams.Add(teamFromDB);
             await database.SaveChangesAsync();
 
             return true;
@@ -120,6 +104,7 @@ namespace ProjectManagementApp.BLL.Services
             validations.EnsureTeamExist(teamFromDB);
 
             teamFromDB.Users.Remove(userToRemove);
+            userToRemove.Teams.Remove(teamFromDB);
             await database.SaveChangesAsync();
 
             return true;

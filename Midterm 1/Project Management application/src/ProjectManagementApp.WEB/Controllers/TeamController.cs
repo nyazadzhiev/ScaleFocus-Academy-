@@ -26,9 +26,9 @@ namespace ProjectManagementApp.WEB.Controllers
 
         public TeamController(DatabaseContext database) : base()
         {
+            validations = new Validation(database);
             userService = new UserService(database, validations);
             teamService = new TeamService(database, userService, validations);
-            validations = new Validation(database);
         }
 
         [HttpGet]
@@ -73,7 +73,6 @@ namespace ProjectManagementApp.WEB.Controllers
         public async Task<ActionResult> Post(TeamRequestModel team)
         {
             User currentUser = await userService.GetCurrentUser(Request);
-
             validations.EnsureUserExist(currentUser);
             validations.CheckRole(currentUser);
 
@@ -83,8 +82,7 @@ namespace ProjectManagementApp.WEB.Controllers
             {
                 Team teamFromDB = await teamService.GetTeam(team.Name);
 
-
-                return CreatedAtAction(nameof(Post), new { id = teamFromDB.Id }, Constants.Created);
+                return CreatedAtAction(nameof(Post), new { id = teamFromDB.Id }, String.Format(Constants.Created, "Team"));
             }
             else
             {
@@ -98,9 +96,6 @@ namespace ProjectManagementApp.WEB.Controllers
             User currentUser = await userService.GetCurrentUser(Request);
             validations.EnsureUserExist(currentUser);
             validations.CheckRole(currentUser);
-
-            Team teamFromDB = await teamService.GetTeam(id);
-            validations.EnsureTeamExist(teamFromDB);
 
             if (await teamService.EditTeam(id, team.Name))
             {
@@ -124,12 +119,9 @@ namespace ProjectManagementApp.WEB.Controllers
             validations.EnsureUserExist(currentUser);
             validations.CheckRole(currentUser);
 
-            Team teamFromDB = await teamService.GetTeam(id);
-            validations.EnsureTeamExist(teamFromDB);
-
-            if (await teamService.DeleteTeam(teamFromDB.Name))
+            if (await teamService.DeleteTeam(id))
             {
-                return Ok(Constants.Deleted);
+                return Ok(String.Format(Constants.Deleted, "Team"));
             }
             else
             {

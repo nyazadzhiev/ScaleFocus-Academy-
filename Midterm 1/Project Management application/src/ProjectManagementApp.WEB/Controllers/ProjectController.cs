@@ -27,10 +27,10 @@ namespace ProjectManagementApp.WEB.Controllers
 
         public ProjectController(DatabaseContext database) : base()
         {
+            validations = new Validation(database);
             userService = new UserService(database, validations);
             teamService = new TeamService(database, userService, validations);
             projectService = new ProjectService(database, userService, teamService, validations);
-            validations = new Validation(database);
         }
 
         [HttpGet]
@@ -41,7 +41,7 @@ namespace ProjectManagementApp.WEB.Controllers
 
             List<ProjectResponseModel> projects = new List<ProjectResponseModel>();
 
-            foreach (Project project in await projectService.GetAll(currentUser))
+            foreach (Project project in projectService.GetAll(currentUser))
             {
                 projects.Add(new ProjectResponseModel()
                 {
@@ -62,7 +62,7 @@ namespace ProjectManagementApp.WEB.Controllers
 
             Project projectFromDB = await projectService.GetProject(id, currentUser);
             validations.EnsureProjectExist(projectFromDB);
-
+            validations.CheckProjectAccess(currentUser, projectFromDB);
 
             return new ProjectResponseModel()
             {
@@ -84,7 +84,7 @@ namespace ProjectManagementApp.WEB.Controllers
             {
                 Project projectFromDB = await projectService.GetProject(project.Title, currentUser);
 
-                return CreatedAtAction(nameof(Post), new { id = projectFromDB.Id }, Constants.Created);
+                return CreatedAtAction(nameof(Post), new { id = projectFromDB.Id }, String.Format(Constants.Created, "Project"));
             }
             else
             {
@@ -97,9 +97,6 @@ namespace ProjectManagementApp.WEB.Controllers
         {
             User currentUser = await userService.GetCurrentUser(Request);
             validations.EnsureUserExist(currentUser);
-
-            Project projectFromDB = await projectService.GetProject(id, currentUser);
-            validations.EnsureProjectExist(projectFromDB);
 
             if (await projectService.EditProject(id, project.Title, currentUser))
             {
@@ -124,12 +121,9 @@ namespace ProjectManagementApp.WEB.Controllers
             User currentUser = await userService.GetCurrentUser(Request);
             validations.EnsureUserExist(currentUser);
 
-            Project projectFromDB = await projectService.GetProject(id, currentUser);
-            validations.EnsureProjectExist(projectFromDB);
-
-            if (await projectService.DeleteProject(projectFromDB.Title, currentUser))
+            if (await projectService.DeleteProject(id, currentUser))
             {
-                return Ok(Constants.Deleted);
+                return Ok(String.Format(Constants.Deleted, "Project"));
             }
             else
             {
@@ -142,7 +136,6 @@ namespace ProjectManagementApp.WEB.Controllers
         {
             User currentUser = await userService.GetCurrentUser(Request);
             validations.EnsureUserExist(currentUser);
-            validations.CheckRole(currentUser);
 
             if (await projectService.AddTeam(projectId, teamId, currentUser))
             {
@@ -158,7 +151,6 @@ namespace ProjectManagementApp.WEB.Controllers
         public async Task<ActionResult> RemoveTeam(int projectId, int teamId)
         {
             User currentUser = await userService.GetCurrentUser(Request);
-
             validations.EnsureUserExist(currentUser);
 
             if (await projectService.RemoveTeam(projectId, teamId, currentUser))
