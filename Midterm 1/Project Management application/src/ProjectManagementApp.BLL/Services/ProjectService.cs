@@ -29,10 +29,7 @@ namespace ProjectManagementApp.BLL.Services
 
         public async Task<bool> CreateProject(string title, User currentUser)
         {
-            if (database.Projects.Any(p => p.Title == title))
-            {
-                return false;
-            }
+            validations.CheckProjectName(title);
 
             Project newProject = new Project()
             {
@@ -48,24 +45,38 @@ namespace ProjectManagementApp.BLL.Services
 
         public async Task<Project> GetProject(string title, User user)
         {
-            return await database.Projects.FirstOrDefaultAsync(p => p.Title == title && p.OwnerId == user.Id);
+            return await database.Projects.FirstOrDefaultAsync(p => p.Title == title);
         }
 
         public async Task<Project> GetProject(int id, User user)
         {
-            return await database.Projects.FirstOrDefaultAsync(p => p.Id == id && p.OwnerId == user.Id);
+            return await database.Projects.FirstOrDefaultAsync(p => p.Id == id);
         }
 
-        public async Task<List<Project>> GetAll(User user)
+        public List<Project> GetAll(User user)
         {
-            return await database.Projects.Where(p => p.OwnerId == user.Id).ToListAsync();
+            List<Project> projects = new List<Project>();
+            foreach(Project project in  database.Projects.Where(p => p.OwnerId == user.Id))
+            {
+                projects.Add(project);
+            }
+
+            foreach(Team team in user.Teams)
+            {
+                foreach(Project project in team.Projects)
+                {
+                    projects.Add(project);
+                }
+            }
+
+            return projects;
         }
 
-        public async Task<bool> DeleteProject(string title, User user)
+        public async Task<bool> DeleteProject(int id, User user)
         {
-            Project project = await GetProject(title, user);
-
+            Project project = await GetProject(id, user);
             validations.EnsureProjectExist(project);
+            validations.CheckProjectAccess(user, project);
 
             database.Projects.Remove(project);
             await database.SaveChangesAsync();
@@ -76,15 +87,9 @@ namespace ProjectManagementApp.BLL.Services
         public async Task<bool> EditProject(int id, string newProjectTitle, User user)
         {
             Project project = await GetProject(id, user);
-
             validations.EnsureProjectExist(project);
-
-            bool isValid = validations.CheckProjectName(newProjectTitle);
-
-            if (isValid)
-            {
-                throw new ProjectExistException(String.Format(Constants.Exist, "Project"));
-            }
+            validations.CheckProjectAccess(user, project);
+            validations.CheckProjectName(newProjectTitle);
 
             project.Title = newProjectTitle;
 
@@ -97,16 +102,11 @@ namespace ProjectManagementApp.BLL.Services
         {
             Project project = await GetProject(projectId, user);
             validations.EnsureProjectExist(project);
+            validations.CheckProjectAccess(user, project);
 
             Team team = await teamService.GetTeam(teamId);
             validations.EnsureTeamExist(team);
-
-            bool teamExistInProject = validations.CanAddToProject(project, team);
-
-            if (teamExistInProject)
-            {
-                throw new ProjectExistException(String.Format(Constants.Exist, "Project"));
-            }
+            validations.CanAddToProject(project, team);
 
             project.Teams.Add(team);
             await database.SaveChangesAsync();
@@ -118,6 +118,7 @@ namespace ProjectManagementApp.BLL.Services
         {
             Project project = await GetProject(projectId, user);
             validations.EnsureProjectExist(project);
+            validations.CheckProjectAccess(user, project);
 
             Team team = await teamService.GetTeam(teamId);
             validations.EnsureTeamExist(team);

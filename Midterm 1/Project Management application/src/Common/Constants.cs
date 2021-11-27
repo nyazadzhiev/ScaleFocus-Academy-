@@ -8,7 +8,7 @@ namespace Common
 
         public const string Unauthorized = "You don't have permission";
 
-        public const string FailedOperation = "Something happened";
+        public const string FailedOperation = "Operation Failed";
 
         public const string Created = "{0} was created";
 
@@ -25,5 +25,7 @@ namespace Common
         public const string TeamAddedToProject = "Team was added to project";
 
         public const string TeamRemovedFromProject = "Team was removed from project";
+
+        public const string StatusChanged = "Task status was changed";
     }
 }

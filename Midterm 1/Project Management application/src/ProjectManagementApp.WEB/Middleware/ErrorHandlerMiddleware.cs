@@ -30,7 +30,6 @@ namespace WebApi.Middleware
 
                 switch (error)
                 {
-                    case UserNotFoundException userNotFound:
                     case TeamNotFoundException teamNotFound:
                     case ProjectNotFoundException projectNotFound:
                     case TaskNotFoundException taskNotFound:
@@ -42,6 +41,7 @@ namespace WebApi.Middleware
                     case TaskExistException taskExistException:
                         response.StatusCode = (int)HttpStatusCode.Conflict;
                         break;
+                    case UserNotFoundException userNotFound:
                     case UnauthorizedUserException unauthorizedUserException:
                         response.StatusCode = (int)HttpStatusCode.Unauthorized;
                         break;

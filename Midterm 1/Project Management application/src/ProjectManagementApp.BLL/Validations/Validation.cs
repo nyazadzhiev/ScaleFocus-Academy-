@@ -18,15 +18,11 @@ namespace ProjectManagementApp.BLL.Validations
             database = _database;
         }
 
-        public bool EnsureUserExist(User user)
+        public void EnsureUserExist(User user)
         {
             if (user == null)
             {
                 throw new UserNotFoundException(String.Format(Constants.NotFound, "User"));
-            }
-            else
-            {
-                return true;
             }
         }
 
@@ -38,70 +34,100 @@ namespace ProjectManagementApp.BLL.Validations
             }
         }
 
-        public bool CheckUsername(string username)
+        public void CheckUsername(string username)
         {
-            return database.Users.Any(u => u.Username == username);
+            if(database.Users.Any(u => u.Username == username))
+            {
+                throw new UserExistException(String.Format(Constants.Exist, "User"));
+            }
         }
 
-        public bool EnsureTeamExist(Team team)
+        public void EnsureTeamExist(Team team)
         {
             if (team == null)
             {
                 throw new TeamNotFoundException(String.Format(Constants.NotFound, "Team"));
             }
-            else
+        }
+
+        public void CheckTeamName(string newTeamName)
+        {
+            if(database.Teams.Any(t => t.Name == newTeamName))
             {
-                return true;
+                throw new TeamExistException(String.Format(Constants.Exist, "team"));
             }
         }
 
-        public bool CheckTeamName(string newTeamName)
+        public void CanAddToTeam(Team teamFromDB, User userToAdd)
         {
-            return database.Teams.Any(t => t.Name == newTeamName);
+            if(teamFromDB.Users.Any(u => u.Username == userToAdd.Username))
+            {
+                throw new UserExistException(String.Format(Constants.Exist, "user"));
+            }
         }
 
-        public bool CanAddToTeam(Team teamFromDB, User userToAdd)
-        {
-            return teamFromDB.Users.Any(u => u.Username == userToAdd.Username);
-        }
-
-        public bool EnsureProjectExist(Project project)
+        public void EnsureProjectExist(Project project)
         {
             if (project == null)
             {
                 throw new ProjectNotFoundException(String.Format(Constants.NotFound, "Project"));
             }
-            else
+        }
+
+        public void CheckProjectName(string newProjectTitle)
+        {
+            if(database.Projects.Any(p => p.Title == newProjectTitle))
             {
-                return true;
+                throw new ProjectExistException(String.Format(Constants.Exist, "Project"));
             }
         }
 
-        public bool CheckProjectName(string newProjectTitle)
+        public void CanAddToProject(Project project, Team team)
         {
-            return database.Projects.Any(p => p.Title == newProjectTitle);
+            if(project.Teams.Any(t => t.Id == team.Id))
+            {
+                throw new TeamExistException(String.Format(Constants.Exist, "Team"));
+            }
         }
 
-        public bool CanAddToProject(Project project, Team team)
-        {
-            return project.Teams.Any(t => t.Id == team.Id);
-        }
-
-        public bool EnsureTaskExist(ToDoTask task)
+        public void EnsureTaskExist(ToDoTask task)
         {
             if (task == null)
             {
                 throw new TaskNotFoundException(String.Format(Constants.NotFound, "Task"));
             }
-            else
+        }
+
+        public void CheckTaskName(string title)
+        {
+            if(database.ToDoTasks.Any(t => t.Title == title))
             {
-                return true;
+                throw new TaskExistException(String.Format(Constants.Exist, "Task"));
             }
         }
 
-        public bool CheckTaskName(string title)
+        public void CheckProjectAccess(User user, Project project)
         {
-            return database.ToDoTasks.Any(t => t.Title == title);
+            if(project.OwnerId != user.Id && !project.Teams.Any(t => t.Users.Any(u => u.Username == user.Username)))
+            {
+                throw new UnauthorizedUserException(Constants.Unauthorized);
+            }
+        }
+
+        public void EnsureWorkLogExist(WorkLog workLog)
+        {
+            if(workLog == null)
+            {
+                throw new WorkLogNotFoundException(String.Format(Constants.NotFound, "WorkLog"));
+            }
+        }
+
+        public void CheckTaskAccess(User currentUser, ToDoTask task)
+        {
+            if(task.AsigneeId != currentUser.Id)
+            {
+                throw new UnauthorizedUserException(Constants.Unauthorized);
+            }
         }
     }
 }

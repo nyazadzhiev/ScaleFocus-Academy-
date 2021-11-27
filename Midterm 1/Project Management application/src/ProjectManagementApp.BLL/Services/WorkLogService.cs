@@ -24,17 +24,15 @@ namespace ProjectManagementApp.BLL.Services
             validations = validation;
         }
 
-        public async Task<bool> CreateWorkLog(int userId, int taskId, int workedHours)
+        public async Task<bool> CreateWorkLog(User user, int taskId, int workedHours)
         {
-            User user = await userService.GetUser(userId);
-            validations.EnsureUserExist(user);
-
             ToDoTask task = await taskService.GetTask(taskId);
             validations.EnsureTaskExist(task);
+            validations.CheckTaskAccess(user, task);
 
             WorkLog newWorkLog = new WorkLog()
             {
-                UserId = userId,
+                UserId = user.Id,
                 ToDoTaskId = taskId,
                 WorkedTime = workedHours
             };
