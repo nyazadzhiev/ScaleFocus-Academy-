@@ -9,11 +9,11 @@ using System.Text;
 
 namespace ProjectManagementApp.BLL.Validations
 {
-    public class Validation
+    public class ValidationService : IValidationService
     {
         private readonly DatabaseContext database;
 
-        public Validation(DatabaseContext _database)
+        public ValidationService(DatabaseContext _database)
         {
             database = _database;
         }
