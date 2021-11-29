@@ -20,21 +20,22 @@ namespace ProjectManagementApp.WEB.Controllers
     [ApiController]
     public class WorkLogController : ControllerBase
     {
-        private readonly UserService userService;
-        private readonly TeamService teamService;
-        private readonly TaskService taskService;
-        private readonly ProjectService projectService;
-        private readonly WorkLogService workLogService;
-        private Validation validations;
+        private readonly IUserService userService;
+        private readonly ITeamService teamService;
+        private readonly ITaskService taskService;
+        private readonly IProjectService projectService;
+        private readonly IWorkLogService workLogService;
+        private IValidationService validations;
 
-        public WorkLogController(DatabaseContext database) : base()
+        public WorkLogController(IValidationService validation, IUserService _userService, ITeamService _teamService,
+            IProjectService _projectService, ITaskService _taskService, IWorkLogService _workLogService) : base()
         {
-            validations = new Validation(database);
-            userService = new UserService(database, validations);
-            teamService = new TeamService(database, userService, validations);
-            projectService = new ProjectService(database, userService, teamService, validations);
-            taskService = new TaskService(database, teamService, projectService, validations);
-            workLogService = new WorkLogService(database, userService, taskService, validations);
+            validations = validation;
+            userService = _userService;
+            teamService = _teamService;
+            projectService = _projectService;
+            taskService = _taskService;
+            workLogService = _workLogService;
         }
 
         [HttpGet("{taskId}")]

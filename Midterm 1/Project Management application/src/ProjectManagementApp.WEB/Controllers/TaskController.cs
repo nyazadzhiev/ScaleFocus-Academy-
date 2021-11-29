@@ -6,14 +6,14 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using ProjectManagementApp.BLL.Services;
 using ProjectManagementApp.DAL;
-using ProjectManagementApp.DAL.Models.Requests;
 using ProjectManagementApp.DAL.Entities;
 using ProjectManagementApp.WEB.Auth;
 using Common;
-using ProjectManagementApp.DAL.Models.Responses;
 using ProjectManagementApp.BLL.Validations;
 using ProjectManagementApp.BLL.Exceptions;
 using System.Linq;
+using ProjectManagementApp.DAL.Models.Responses;
+using ProjectManagementApp.DAL.Models.Requests;
 
 namespace ProjectManagementApp.WEB.Controllers
 {
@@ -21,19 +21,19 @@ namespace ProjectManagementApp.WEB.Controllers
     [ApiController]
     public class TaskController : ControllerBase
     {
-        private readonly UserService userService;
-        private readonly TeamService teamService;
-        private readonly TaskService taskService;
-        private readonly ProjectService projectService;
-        private Validation validations;
+        private readonly IUserService userService;
+        private readonly ITeamService teamService;
+        private readonly ITaskService taskService;
+        private readonly IProjectService projectService;
+        private IValidationService validations;
 
-        public TaskController(DatabaseContext database) : base()
+        public TaskController(IValidationService validation, IUserService _userService, ITeamService _teamService, IProjectService _projectService, ITaskService _taskService) : base()
         {
-            validations = new Validation(database);
-            userService = new UserService(database, validations);
-            teamService = new TeamService(database, userService, validations);
-            projectService = new ProjectService(database, userService, teamService, validations);
-            taskService = new TaskService(database, teamService, projectService, validations);
+            validations = validation;
+            userService = _userService;
+            teamService = _teamService;
+            projectService = _projectService;
+            taskService = _taskService;
         }
 
         [HttpGet("/Project/{projectId}")]

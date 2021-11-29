@@ -20,17 +20,17 @@ namespace ProjectManagementApp.WEB.Controllers
     [ApiController]
     public class ProjectController : ControllerBase
     {
-        private readonly UserService userService;
-        private readonly TeamService teamService;
-        private readonly ProjectService projectService;
-        private Validation validations;
+        private readonly IUserService userService;
+        private readonly ITeamService teamService;
+        private readonly IProjectService projectService;
+        private IValidationService validations;
 
-        public ProjectController(DatabaseContext database) : base()
+        public ProjectController(IValidationService validation, IUserService _userService, ITeamService _teamService, IProjectService _projectService) : base()
         {
-            validations = new Validation(database);
-            userService = new UserService(database, validations);
-            teamService = new TeamService(database, userService, validations);
-            projectService = new ProjectService(database, userService, teamService, validations);
+            validations = validation;
+            userService = _userService;
+            teamService = _teamService;
+            projectService = _projectService;
         }
 
         [HttpGet]

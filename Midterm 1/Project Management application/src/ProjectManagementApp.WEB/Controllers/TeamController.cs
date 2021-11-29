@@ -20,15 +20,15 @@ namespace ProjectManagementApp.WEB.Controllers
     [ApiController]
     public class TeamController : ControllerBase
     {
-        private readonly UserService userService;
-        private readonly TeamService teamService;
-        private Validation validations;
+        private readonly IUserService userService;
+        private readonly ITeamService teamService;
+        private IValidationService validations;
 
-        public TeamController(DatabaseContext database) : base()
+        public TeamController(IValidationService validation, IUserService _userService, ITeamService _teamService) : base()
         {
-            validations = new Validation(database);
-            userService = new UserService(database, validations);
-            teamService = new TeamService(database, userService, validations);
+            validations = validation;
+            userService = _userService;
+            teamService = _teamService;
         }
 
         [HttpGet]

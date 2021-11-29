@@ -20,13 +20,13 @@ namespace ProjectManagementApp.WEB.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly UserService userService;
-        private Validation validations;
+        private readonly IUserService userService;
+        private IValidationService validations;
 
-        public UserController(DatabaseContext database) : base()
+        public UserController(IValidationService validation, IUserService _userService) : base()
         {
-            validations = new Validation(database);
-            userService = new UserService(database, validations);
+            validations = validation;
+            userService = _userService;
         }
 
         [HttpGet]
