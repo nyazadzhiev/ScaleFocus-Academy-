@@ -4,6 +4,7 @@ using ProjectManagementApp.BLL.Exceptions;
 using ProjectManagementApp.BLL.Validations;
 using ProjectManagementApp.DAL;
 using ProjectManagementApp.DAL.Entities;
+using ProjectManagementApp.DAL.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,15 +13,15 @@ using System.Threading.Tasks;
 
 namespace ProjectManagementApp.BLL.Services
 {
-    public class TeamService
+    public class TeamService : ITeamService
     {
-        private readonly DatabaseContext database;
-        private readonly UserService userService;
-        private Validation validations;
+        private readonly ITeamRepository repository;
+        private readonly IUserService userService;
+        private IValidationService validations;
 
-        public TeamService(DatabaseContext _database, UserService _userService, Validation validation)
+        public TeamService(ITeamRepository teamRepository, IUserService _userService, IValidationService validation)
         {
-            database = _database;
+            repository = teamRepository;
             userService = _userService;
             validations = validation;
         }
@@ -34,25 +35,25 @@ namespace ProjectManagementApp.BLL.Services
                 Name = name
             };
 
-            await database.Teams.AddAsync(newTeam);
-            await database.SaveChangesAsync();
+            await repository.AddAsync(newTeam);
+            await repository.SaveChangesAsync();
 
             return newTeam.Id != 0;
         }
 
         public async Task<List<Team>> GetAll()
         {
-            return await database.Teams.ToListAsync();
+            return await repository.GetTeamsAsync();
         }
 
         public async Task<Team> GetTeam(string name)
         {
-            return await database.Teams.FirstOrDefaultAsync(t => t.Name == name);
+            return await repository.GetTeamAsync(name);
         }
 
         public async Task<Team> GetTeam(int id)
         {
-            return await database.Teams.FirstOrDefaultAsync(t => t.Id == id);
+            return await repository.GetTeamAsync(id);
         }
 
         public async Task<bool> DeleteTeam(int id)
@@ -60,8 +61,8 @@ namespace ProjectManagementApp.BLL.Services
             Team team= await GetTeam(id);
             validations.EnsureTeamExist(team);
 
-            database.Teams.Remove(team);
-            await database.SaveChangesAsync();
+            repository.DeleteTeam(team);
+            await repository.SaveChangesAsync();
 
             return true;
         }
@@ -74,7 +75,7 @@ namespace ProjectManagementApp.BLL.Services
 
             team.Name = newTeamName;
 
-            await database.SaveChangesAsync();
+            await repository.SaveChangesAsync();
 
             return true;
         }
@@ -90,7 +91,7 @@ namespace ProjectManagementApp.BLL.Services
 
             teamFromDB.Users.Add(userToAdd);
             userToAdd.Teams.Add(teamFromDB);
-            await database.SaveChangesAsync();
+            await repository.SaveChangesAsync();
 
             return true;
         }
@@ -105,7 +106,7 @@ namespace ProjectManagementApp.BLL.Services
 
             teamFromDB.Users.Remove(userToRemove);
             userToRemove.Teams.Remove(teamFromDB);
-            await database.SaveChangesAsync();
+            await repository.SaveChangesAsync();
 
             return true;
         }

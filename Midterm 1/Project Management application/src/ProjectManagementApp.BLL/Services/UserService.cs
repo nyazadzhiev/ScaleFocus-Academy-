@@ -9,17 +9,18 @@ using System.Text;
 using System.Threading.Tasks;
 using ProjectManagementApp.BLL.Exceptions;
 using Common;
+using ProjectManagementApp.DAL.Repositories;
 
 namespace ProjectManagementApp.BLL.Services
 {
-    public class UserService
+    public class UserService : IUserService
     {
-        private readonly DatabaseContext database;
-        private Validation validations;
+        private readonly IUserRepository repository;
+        private IValidationService validations;
 
-        public UserService(DatabaseContext _database, Validation validation)
+        public UserService(IUserRepository userRepository, IValidationService validation)
         {
-            database = _database;
+            repository = userRepository;
             validations = validation;
         }
 
@@ -36,30 +37,30 @@ namespace ProjectManagementApp.BLL.Services
                 IsAdmin = isAdmin
             };
 
-            await database.Users.AddAsync(newUser);
-            await database.SaveChangesAsync();
+            await repository.AddUser(newUser);
+            await repository.SaveChangesAsync();
 
             return newUser.Id != 0;
         }
 
         public async Task<User> GetUser(string username, string password)
         {
-            return await database.Users.FirstOrDefaultAsync(u => u.Username == username && u.Password == password);
+            return await repository.GetUserAsync(username, password);
         }
 
         public async Task<List<User>> GetAllUsers()
         {
-            return await database.Users.ToListAsync();
+            return await repository.GetUsersAsync();
         }
 
         public async Task<User> GetUser(string username)
         {
-            return await database.Users.FirstOrDefaultAsync(u => u.Username == username);
+            return await repository.GetUserAsync(username);
         }
 
         public async Task<User> GetUser(int id)
         {
-            return await database.Users.FirstOrDefaultAsync(u => u.Id == id);
+            return await repository.GetUserAsync(id);
         }
 
         public async Task<bool> DeleteUser(int id)
@@ -67,8 +68,8 @@ namespace ProjectManagementApp.BLL.Services
             User user = await GetUser(id);
             validations.EnsureUserExist(user);
 
-            database.Users.Remove(user);
-            await database.SaveChangesAsync();
+            repository.DeleteUser(user);
+            await repository.SaveChangesAsync();
 
             return true;
 
@@ -87,7 +88,7 @@ namespace ProjectManagementApp.BLL.Services
             user.LastName = newLastName;
 
 
-            await database.SaveChangesAsync();
+            await repository.SaveChangesAsync();
 
             return true;
         }

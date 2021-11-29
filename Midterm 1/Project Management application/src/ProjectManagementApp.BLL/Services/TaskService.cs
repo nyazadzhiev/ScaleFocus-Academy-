@@ -4,6 +4,7 @@ using ProjectManagementApp.BLL.Exceptions;
 using ProjectManagementApp.BLL.Validations;
 using ProjectManagementApp.DAL;
 using ProjectManagementApp.DAL.Entities;
+using ProjectManagementApp.DAL.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,17 +13,15 @@ using System.Threading.Tasks;
 
 namespace ProjectManagementApp.BLL.Services
 {
-    public class TaskService
+    public class TaskService : ITaskService
     {
-        private readonly DatabaseContext database;
-        private readonly TeamService teamService;
-        private readonly ProjectService projectService;
-        private Validation validations;
+        private readonly ITaskRepository repository;
+        private readonly IProjectService projectService;
+        private IValidationService validations;
 
-        public TaskService(DatabaseContext _database, TeamService _teamService, ProjectService _projectService, Validation validation)
+        public TaskService(ITaskRepository taskRepository, IProjectService _projectService, IValidationService validation)
         {
-            database = _database;
-            teamService = _teamService;
+            repository = taskRepository;
             projectService = _projectService;
             validations = validation;
         }
@@ -45,20 +44,20 @@ namespace ProjectManagementApp.BLL.Services
                 OwnerId = currentUser.Id
             };
 
-            await database.ToDoTasks.AddAsync(newTask);
-            await database.SaveChangesAsync();
+            await repository.AddTaskAsync(newTask);
+            await repository.SaveChangesAsync();
 
             return newTask.Id != 0;
         }
 
         public async Task<ToDoTask> GetTask(int id)
         {
-            return await database.ToDoTasks.FirstOrDefaultAsync(t => t.Id == id);
+            return await repository.GetTaskAsync(id);
         }
 
         public async Task<ToDoTask> GetTask(string title)
         {
-            return await database.ToDoTasks.FirstOrDefaultAsync(t => t.Title == title);
+            return await repository.GetTaskAsync(title);
         }
 
         public async Task<ToDoTask> GetTask(int taskId, int projectId, User user)
@@ -67,7 +66,7 @@ namespace ProjectManagementApp.BLL.Services
             validations.EnsureProjectExist(projectFromDB);
             validations.CheckProjectAccess(user, projectFromDB);
 
-            return await database.ToDoTasks.FirstOrDefaultAsync(t => t.Id == taskId);
+            return await repository.GetTaskAsync(taskId);
         }
 
         public async Task<List<ToDoTask>> GetAll(int projectId, User currentUser)
@@ -76,7 +75,7 @@ namespace ProjectManagementApp.BLL.Services
             validations.EnsureProjectExist(project);
             validations.CheckProjectAccess(currentUser, project);
 
-            return await database.ToDoTasks.Where(t => t.ProjectId == projectId).ToListAsync();
+            return await repository.GetTasksAsync(projectId);
         }
 
         public async Task<bool> DeleteTask(int taskId, int projectId, User user)
@@ -88,8 +87,8 @@ namespace ProjectManagementApp.BLL.Services
             ToDoTask task = await GetTask(taskId, projectId, user);
             validations.EnsureProjectExist(project);
 
-            database.ToDoTasks.Remove(task);
-            await database.SaveChangesAsync();
+            repository.DeleteTask(task);
+            await repository.SaveChangesAsync();
 
             return true;
         }
@@ -108,7 +107,7 @@ namespace ProjectManagementApp.BLL.Services
             task.Description = newDesc;
             task.IsCompleted = newStatus;
 
-            await database.SaveChangesAsync();
+            await repository.SaveChangesAsync();
 
             return true;
         }
@@ -124,7 +123,7 @@ namespace ProjectManagementApp.BLL.Services
 
             task.IsCompleted = !task.IsCompleted;
 
-            await database.SaveChangesAsync();
+            await repository.SaveChangesAsync();
 
             return true;
         }
