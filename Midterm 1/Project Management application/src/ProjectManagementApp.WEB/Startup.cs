@@ -7,7 +7,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using ProjectManagementApp.BLL.Services;
+using ProjectManagementApp.BLL.Validations;
 using ProjectManagementApp.DAL;
+using ProjectManagementApp.DAL.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,6 +35,21 @@ namespace ProjectManagementApp.WEB
 
             var database = new DatabaseContext(Configuration);
             DatabaseSeeder.Seed(database);
+
+            services.AddTransient<IValidationService, ValidationService>();
+
+            services.AddTransient<IUserRepository, UserRepository>();
+            services.AddTransient<ITeamRepository, TeamRepository>();
+            services.AddTransient<IProjectRepository, ProjectRepository>();
+            services.AddTransient<ITaskRepository, TaskRepository>();
+            services.AddTransient<IWorkLogRepository, WorkLogRepository>();
+
+            services.AddTransient<IUserService, UserService>();
+            services.AddTransient<ITeamService, TeamService>();
+            services.AddTransient<IProjectService, ProjectService>();
+            services.AddTransient<ITaskService, TaskService>();
+            services.AddTransient<IWorkLogService, WorkLogService>();
+
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
