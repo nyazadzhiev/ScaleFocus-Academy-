@@ -1,6 +1,7 @@
 ﻿using ProjectManagementApp.BLL.Validations;
 using ProjectManagementApp.DAL;
 using ProjectManagementApp.DAL.Entities;
+using ProjectManagementApp.DAL.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,17 +10,15 @@ using System.Threading.Tasks;
 
 namespace ProjectManagementApp.BLL.Services
 {
-    public class WorkLogService
+    public class WorkLogService : IWorkLogService
     {
-        private readonly DatabaseContext database;
-        private readonly UserService userService;
-        private readonly TaskService taskService;
-        private Validation validations;
+        private readonly IWorkLogRepository repository;
+        private readonly ITaskService taskService;
+        private IValidationService validations;
 
-        public WorkLogService(DatabaseContext _database, UserService _userService, TaskService _taskService, Validation validation)
+        public WorkLogService(IWorkLogRepository workLogRepository, ITaskService _taskService, IValidationService validation)
         {
-            database = _database;
-            userService = _userService;
+            repository = workLogRepository;
             taskService = _taskService;
             validations = validation;
         }
@@ -37,9 +36,9 @@ namespace ProjectManagementApp.BLL.Services
                 WorkedTime = workedHours
             };
 
-            await database.WorkLogs.AddAsync(newWorkLog);
+            await repository.AddWorkLogAsync(newWorkLog);
             task.Worklogs.Add(newWorkLog);
-            await database.SaveChangesAsync();
+            await repository.SaveChangesAsync();
 
             return newWorkLog.Id != 0;
         }
