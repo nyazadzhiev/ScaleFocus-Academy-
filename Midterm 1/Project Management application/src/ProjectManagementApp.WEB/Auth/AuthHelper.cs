@@ -11,7 +11,7 @@ namespace ProjectManagementApp.WEB.Auth
 {
     public static class AuthHelper
     {
-        public static async Task<User> GetCurrentUser(this UserService userService, HttpRequest request)
+        public static async Task<User> GetCurrentUser(this IUserService userService, HttpRequest request)
         {
             StringValues UsernameAuthHeader;
             StringValues PasswordAuthHeader;
