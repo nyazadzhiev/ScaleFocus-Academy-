@@ -8,7 +8,7 @@ namespace ProjectManagementApp.BLL.Services
 {
     public interface IUserService
     {
-        public Task<bool> CreateUser(string username, string password, string firstName, string lastName, bool isAdmin, User currentUser);
+        public Task<bool> CreateUser(string username, string password, string firstName, string lastName, bool isAdmin);
 
         public Task<User> GetUser(string username, string password);
 
