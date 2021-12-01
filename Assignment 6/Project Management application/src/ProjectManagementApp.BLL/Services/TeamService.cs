@@ -38,7 +38,7 @@ namespace ProjectManagementApp.BLL.Services
             await repository.AddAsync(newTeam);
             await repository.SaveChangesAsync();
 
-            return newTeam.Id != 0;
+            return true;
         }
 
         public async Task<List<Team>> GetAll()

@@ -24,7 +24,7 @@ namespace ProjectManagementApp.BLL.Services
             validations = validation;
         }
 
-        public async Task<bool> CreateUser(string username, string password, string firstName, string lastName, bool isAdmin, User currentUser)
+        public async Task<bool> CreateUser(string username, string password, string firstName, string lastName, bool isAdmin)
         {
             validations.CheckUsername(username);
 
@@ -40,7 +40,7 @@ namespace ProjectManagementApp.BLL.Services
             await repository.AddUser(newUser);
             await repository.SaveChangesAsync();
 
-            return newUser.Id != 0;
+            return true;
         }
 
         public async Task<User> GetUser(string username, string password)

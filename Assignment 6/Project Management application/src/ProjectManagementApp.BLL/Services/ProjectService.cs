@@ -39,7 +39,7 @@ namespace ProjectManagementApp.BLL.Services
             await repository.AddProjectAsync(newProject);
             await repository.SaveChangesAsync();
 
-            return newProject.Id != 0;
+            return true;
         }
 
         public async Task<Project> GetProject(string title, User user)

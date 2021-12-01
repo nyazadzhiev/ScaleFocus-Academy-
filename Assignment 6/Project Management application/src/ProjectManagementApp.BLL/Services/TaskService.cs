@@ -47,7 +47,7 @@ namespace ProjectManagementApp.BLL.Services
             await repository.AddTaskAsync(newTask);
             await repository.SaveChangesAsync();
 
-            return newTask.Id != 0;
+            return true;
         }
 
         public async Task<ToDoTask> GetTask(int id)

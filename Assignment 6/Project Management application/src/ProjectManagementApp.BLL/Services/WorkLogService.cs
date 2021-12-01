@@ -40,7 +40,7 @@ namespace ProjectManagementApp.BLL.Services
             task.Worklogs.Add(newWorkLog);
             await repository.SaveChangesAsync();
 
-            return newWorkLog.Id != 0;
+            return true;
         }
 
         public async Task<List<WorkLog>> GetAll(int taskId)
