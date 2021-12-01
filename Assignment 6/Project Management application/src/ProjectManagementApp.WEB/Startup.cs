@@ -11,6 +11,7 @@ using ProjectManagementApp.BLL.Services;
 using ProjectManagementApp.BLL.Validations;
 using ProjectManagementApp.DAL;
 using ProjectManagementApp.DAL.Repositories;
+using ProjectManagementApp.WEB.Auth;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -49,7 +50,6 @@ namespace ProjectManagementApp.WEB
             services.AddTransient<IProjectService, ProjectService>();
             services.AddTransient<ITaskService, TaskService>();
             services.AddTransient<IWorkLogService, WorkLogService>();
-
 
             services.AddControllers();
             services.AddSwaggerGen(c =>

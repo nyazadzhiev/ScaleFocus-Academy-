@@ -100,14 +100,14 @@ namespace ProjectManagmenetApp.Test.ProjectManagementApp.ServiceTest
 
             using(var context = new DatabaseContext(options))
             {
-                context.Users.Add(regularUser);
+                context.Users.Add(adminUser);
                 context.SaveChanges();
 
                 var validation = new ValidationService(context);
 
-                Assert.Throws<UserExistException>(() => validation.CheckUsername(regularUser.Username));
+                Assert.Throws<UserExistException>(() => validation.CheckUsername(adminUser.Username));
 
-                context.Users.Remove(regularUser);
+                context.Users.Remove(adminUser);
                 context.SaveChanges();
             }
         }
