@@ -21,12 +21,14 @@ namespace ProjectManagementApp.WEB.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService userService;
+        private readonly IAuthProvider _authProvider;
         private IValidationService validations;
 
-        public UserController(IValidationService validation, IUserService _userService) : base()
+        public UserController(IValidationService validation, IUserService _userService, IAuthProvider authProvider) : base()
         {
             validations = validation;
             userService = _userService;
+            _authProvider = authProvider;
         }
 
         [HttpGet]
@@ -77,11 +79,11 @@ namespace ProjectManagementApp.WEB.Controllers
         [HttpPost]
         public async Task<ActionResult> Post(UserRequestModel user)
         {
-            User currentUser = await userService.GetCurrentUser(Request);
+            User currentUser = await _authProvider.GetCurrentUser(Request);
             validations.EnsureUserExist(currentUser);
             validations.CheckRole(currentUser);
 
-            bool isCreated = await userService.CreateUser(user.Username, user.Password, user.FirstName, user.LastName, user.IsAdmin, currentUser);
+            bool isCreated = await userService.CreateUser(user.Username, user.Password, user.FirstName, user.LastName, user.IsAdmin);
 
             if (isCreated && ModelState.IsValid)
             {
