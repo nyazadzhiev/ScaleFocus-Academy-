@@ -20,6 +20,7 @@ namespace ProjectManagementApp.DAL.Entities
         {
             this.Teams = new List<Team>();
             this.ToDoTasks = new List<ToDoTask>();
+            this.WorkLogs = new List<WorkLog>();
         }
     }
 }
