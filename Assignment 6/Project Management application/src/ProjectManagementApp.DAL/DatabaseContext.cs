@@ -11,6 +11,11 @@ namespace ProjectManagementApp.DAL
     {
         private readonly IConfiguration _config;
 
+        public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options)
+        {
+
+        }
+
         public DatabaseContext(IConfiguration config) : base()
         {
             _config = config;
@@ -24,8 +29,14 @@ namespace ProjectManagementApp.DAL
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseLazyLoadingProxies();
-            optionsBuilder.UseSqlServer(_config.GetConnectionString("Default"));
+            string connectionString = _config.GetConnectionString("Default");
+            if (connectionString != null)
+            {
+                optionsBuilder.UseLazyLoadingProxies();
+                optionsBuilder.UseSqlServer();
+            }
+
+            base.OnConfiguring(optionsBuilder);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -48,6 +59,7 @@ namespace ProjectManagementApp.DAL
             modelBuilder.Entity<User>().Property(u => u.LastName).IsRequired().HasMaxLength(50);
             modelBuilder.Entity<User>().HasMany<Team>(u => u.Teams).WithMany(t => t.Users);
             modelBuilder.Entity<User>().HasMany<ToDoTask>(u => u.ToDoTasks).WithOne(t => t.Asignee);
+            modelBuilder.Entity<User>().HasMany<WorkLog>(u => u.WorkLogs).WithOne(w => w.User);
         }
 
         private static void SetupTeamConfiguration(ModelBuilder modelBuilder)
