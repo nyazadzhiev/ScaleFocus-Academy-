@@ -22,6 +22,8 @@ namespace Common
 
         public const string UserRemovedFromTeam = "User removed from team";
 
+        public const string UserAlreadyAssigned = "User is already assigned";
+
         public const string TeamAddedToProject = "Team was added to project";
 
         public const string TeamRemovedFromProject = "Team was removed from project";
