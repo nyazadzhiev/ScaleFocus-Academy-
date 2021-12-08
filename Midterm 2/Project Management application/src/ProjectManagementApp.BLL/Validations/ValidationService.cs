@@ -70,7 +70,7 @@ namespace ProjectManagementApp.BLL.Validations
         {
             if(teamFromDB.Users.Any(u => u.Username == userToAdd.Username))
             {
-                throw new UserExistException(String.Format(Constants.Exist, "user"));
+                throw new UserExistException(Constants.UserAlreadyAssigned);
             }
         }
 
