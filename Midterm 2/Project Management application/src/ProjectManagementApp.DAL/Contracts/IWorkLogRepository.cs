@@ -10,6 +10,8 @@ namespace ProjectManagementApp.DAL.Repositories
     {
         public Task AddWorkLogAsync(WorkLog workLog);
 
+        public void DeleteWorkLog(WorkLog workLog);
+
         public Task SaveChangesAsync();
     }
 }

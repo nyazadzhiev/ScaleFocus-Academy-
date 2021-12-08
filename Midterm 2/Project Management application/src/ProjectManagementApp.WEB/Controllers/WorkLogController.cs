@@ -69,7 +69,7 @@ namespace ProjectManagementApp.WEB.Controllers
             User currentUser = await userService.GetCurrentUser(Request);
             validations.LoginCheck(currentUser);
 
-            WorkLog workLog = await workLogService.GetWorkLog(taskId, workId);
+            WorkLog workLog = await workLogService.GetWorkLog(taskId, workId, currentUser);
             validations.EnsureWorkLogExist(workLog);
 
             return Ok(workLog);
@@ -86,6 +86,44 @@ namespace ProjectManagementApp.WEB.Controllers
             if(isCreated && ModelState.IsValid)
             {
                 return CreatedAtAction(nameof(Post), String.Format(Constants.Created, "WorkLog"));
+            }
+            else
+            {
+                return BadRequest(Constants.FailedOperation);
+            }
+        }
+
+        [HttpPut("Task/{taskId}/WorkLog/{workLofId}")]
+        public async Task<ActionResult<WorkLogResponseModel>> EditWorkLog(int taskId, int workLogId, WorkLogRequestModel model)
+        {
+            User currentUser = await userService.GetCurrentUser(Request);
+            validations.LoginCheck(currentUser);
+
+            if(await workLogService.EditWorkLog(taskId, workLogId, currentUser))
+            {
+                return new WorkLogResponseModel()
+                {
+                    Id = workLogId,
+                    TaskId = taskId,
+                    UserId = currentUser.Id,
+                    WorkedHours = model.WorkedHours
+                };
+            }
+            else
+            {
+                return BadRequest(Constants.FailedOperation);
+            }
+        }
+
+        [HttpDelete("Task/{taskId}/WorkLog/{workLofId}")]
+        public async Task<ActionResult> Delete(int taskId, int workLogId)
+        {
+            User currentUser = await userService.GetCurrentUser(Request);
+            validations.LoginCheck(currentUser);
+
+            if (await workLogService.DeleteWorkLog(taskId, workLogId, currentUser))
+            {
+                return Ok(String.Format(Constants.Deleted, "WorkLog"));
             }
             else
             {

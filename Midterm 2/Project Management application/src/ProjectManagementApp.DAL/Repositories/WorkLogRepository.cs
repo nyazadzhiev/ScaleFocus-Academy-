@@ -20,6 +20,11 @@ namespace ProjectManagementApp.DAL.Repositories
             await database.WorkLogs.AddAsync(workLog);
         }
 
+        public void DeleteWorkLog(WorkLog workLog)
+        {
+            database.WorkLogs.Remove(workLog);
+        }
+
         public async Task SaveChangesAsync()
         {
             await database.SaveChangesAsync();

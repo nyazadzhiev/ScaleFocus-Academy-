@@ -43,6 +43,31 @@ namespace ProjectManagementApp.BLL.Services
             return true;
         }
 
+        public async Task<bool> DeleteWorkLog(int taskId, int workLogId, User user)
+        {
+            WorkLog workLog = await GetWorkLog(taskId, workLogId, user);
+
+            repository.DeleteWorkLog(workLog);
+            await repository.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<bool> EditWorkLog(int taskId, int workLogId, User user, int newWorkedTime)
+        {
+            WorkLog workLog = await GetWorkLog(taskId, workLogId, user);
+
+            workLog.WorkedTime = newWorkedTime;
+            await repository.SaveChangesAsync();
+
+            return true;
+        }
+
+        public Task<bool> EditWorkLog(int taskId, int workLogId, User user)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<List<WorkLog>> GetAll(int taskId)
         {
             ToDoTask task = await taskService.GetTask(taskId);
@@ -51,10 +76,11 @@ namespace ProjectManagementApp.BLL.Services
             return task.Worklogs;
         }
 
-        public async Task<WorkLog> GetWorkLog(int taskId, int workLogId)
+        public async Task<WorkLog> GetWorkLog(int taskId, int workLogId, User user)
         {
             ToDoTask task = await taskService.GetTask(taskId);
             validations.EnsureTaskExist(task);
+            validations.CheckTaskAccess(user, task);
 
             return task.Worklogs.Find(w => w.Id == workLogId);
         }

@@ -12,6 +12,10 @@ namespace ProjectManagementApp.BLL.Services
 
         public Task<List<WorkLog>> GetAll(int taskId);
 
-        public Task<WorkLog> GetWorkLog(int taskId, int workLogId);
+        public Task<WorkLog> GetWorkLog(int taskId, int workLogId, User user);
+
+        public Task<bool> EditWorkLog(int taskId, int workLogId, User user);
+
+        public Task<bool> DeleteWorkLog(int taskId, int workLogId, User user);
     }
 }
