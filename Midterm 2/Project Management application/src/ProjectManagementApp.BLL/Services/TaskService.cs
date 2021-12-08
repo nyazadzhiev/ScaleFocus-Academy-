@@ -66,7 +66,11 @@ namespace ProjectManagementApp.BLL.Services
             validations.EnsureProjectExist(projectFromDB);
             validations.CheckProjectAccess(user, projectFromDB);
 
-            return await repository.GetTaskAsync(taskId);
+            ToDoTask task = await repository.GetTaskAsync(taskId);
+            validations.EnsureTaskExist(task);
+            validations.CheckTaskAccess(user, task);
+
+            return task;
         }
 
         public async Task<List<ToDoTask>> GetAll(int projectId, User currentUser)

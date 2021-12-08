@@ -69,7 +69,6 @@ namespace ProjectManagementApp.WEB.Controllers
             validations.LoginCheck(currentUser);
 
             ToDoTask taskFromDB = await taskService.GetTask(taskId, projectId, currentUser);
-            validations.EnsureTaskExist(taskFromDB);
 
             return new TaskResponseModel()
             {
