@@ -20,8 +20,6 @@ namespace ProjectManagementApp.DAL
                     PasswordHasher<User> hasher = new PasswordHasher<User>();
                     SeedAdmin(database, hasher);
                     SeedManager(database, hasher);
-
-                    database.SaveChanges();
                 }
             }
         }
@@ -60,6 +58,8 @@ namespace ProjectManagementApp.DAL
             database.Roles.Add(identityRole);
             database.Users.Add(admin);
             database.UserRoles.Add(identityUserRole);
+
+            database.SaveChanges();
         }
 
         private static void SeedManager(DatabaseContext database, PasswordHasher<User> hasher)
@@ -96,6 +96,8 @@ namespace ProjectManagementApp.DAL
             database.Roles.Add(identityRole);
             database.Users.Add(manager);
             database.UserRoles.Add(identityUserRole);
+
+            database.SaveChanges();
         }
     }
 }
