@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectManagementApp.BLL.Services
+namespace ProjectManagementApp.BLL.Contracts
 {
     public interface IProjectService
     {

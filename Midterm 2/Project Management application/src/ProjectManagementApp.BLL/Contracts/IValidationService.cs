@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace ProjectManagementApp.BLL.Validations
+namespace ProjectManagementApp.BLL.Contracts
 {
     public interface IValidationService
     {
@@ -11,7 +11,7 @@ namespace ProjectManagementApp.BLL.Validations
 
         public void LoginCheck(User user);
 
-        public void CheckRole(User user);
+        //public void CheckRole(User user);
 
         public void CheckUsername(string username);
 

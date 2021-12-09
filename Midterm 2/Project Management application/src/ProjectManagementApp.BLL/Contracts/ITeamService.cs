@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectManagementApp.BLL.Services
+namespace ProjectManagementApp.BLL.Contracts
 {
     public interface ITeamService
     {
@@ -20,8 +20,8 @@ namespace ProjectManagementApp.BLL.Services
 
         public Task<bool> EditTeam(int id, string newTeamName);
 
-        public Task<bool> AddUser(int teamId, int userId);
+        public Task<bool> AddUser(int teamId, string userId);
 
-        public Task<bool> RemoveUser(int teamId, int userId);
+        public Task<bool> RemoveUser(int teamId, string userId);
     }
 }

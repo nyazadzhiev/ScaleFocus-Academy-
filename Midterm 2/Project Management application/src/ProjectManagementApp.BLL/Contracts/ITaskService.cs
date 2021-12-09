@@ -4,11 +4,11 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectManagementApp.BLL.Services
+namespace ProjectManagementApp.BLL.Contracts
 {
     public interface ITaskService
     {
-        public Task<bool> CreateTask(string title, string description, bool isCompleted, int projectId, User currentUser, int userId);
+        public Task<bool> CreateTask(string title, string description, bool isCompleted, int projectId, User currentUser, string userId);
 
         public Task<ToDoTask> GetTask(int id);
 
