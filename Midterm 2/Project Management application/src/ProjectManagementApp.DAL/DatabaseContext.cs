@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using ProjectManagementApp.DAL.Entities;
 using System;
@@ -7,21 +8,13 @@ using System.Text;
 
 namespace ProjectManagementApp.DAL
 {
-    public class DatabaseContext : DbContext
+    public class DatabaseContext : IdentityDbContext<User>
     {
-        private readonly IConfiguration _config;
-
         public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options)
         {
 
         }
 
-        public DatabaseContext(IConfiguration config) : base()
-        {
-            _config = config;
-        }
-
-        public DbSet<User> Users { get; set; }
         public DbSet<Team> Teams { get; set; }
         public DbSet<Project> Projects { get; set; }
         public DbSet<ToDoTask> ToDoTasks { get; set; }
@@ -29,12 +22,7 @@ namespace ProjectManagementApp.DAL
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            string connectionString = _config.GetConnectionString("Default");
-            if (connectionString != null)
-            {
-                optionsBuilder.UseLazyLoadingProxies();
-                optionsBuilder.UseSqlServer();
-            }
+            optionsBuilder.UseLazyLoadingProxies();
 
             base.OnConfiguring(optionsBuilder);
         }
@@ -53,8 +41,6 @@ namespace ProjectManagementApp.DAL
         private static void SetupUserConfiguration(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>().HasKey(u => u.Id);
-            modelBuilder.Entity<User>().Property(u => u.Username).IsRequired().HasMaxLength(50);
-            modelBuilder.Entity<User>().Property(u => u.Password).IsRequired().HasMaxLength(50);
             modelBuilder.Entity<User>().Property(u => u.FirstName).IsRequired().HasMaxLength(50);
             modelBuilder.Entity<User>().Property(u => u.LastName).IsRequired().HasMaxLength(50);
             modelBuilder.Entity<User>().HasMany<Team>(u => u.Teams).WithMany(t => t.Users);
