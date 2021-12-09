@@ -1,5 +1,6 @@
 ﻿using Common;
 using Microsoft.EntityFrameworkCore;
+using ProjectManagementApp.BLL.Contracts;
 using ProjectManagementApp.BLL.Exceptions;
 using ProjectManagementApp.BLL.Validations;
 using ProjectManagementApp.DAL;
@@ -26,7 +27,7 @@ namespace ProjectManagementApp.BLL.Services
             validations = validation;
         }
 
-        public async Task<bool> CreateTask(string title, string description, bool isCompleted, int projectId,  User currentUser, int userId)
+        public async Task<bool> CreateTask(string title, string description, bool isCompleted, int projectId,  User currentUser, string userId)
         {
             validations.CheckTaskName(title);
 

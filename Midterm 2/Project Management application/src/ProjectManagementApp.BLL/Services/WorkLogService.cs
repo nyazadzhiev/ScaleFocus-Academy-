@@ -1,4 +1,5 @@
-﻿using ProjectManagementApp.BLL.Validations;
+﻿using ProjectManagementApp.BLL.Contracts;
+using ProjectManagementApp.BLL.Validations;
 using ProjectManagementApp.DAL;
 using ProjectManagementApp.DAL.Entities;
 using ProjectManagementApp.DAL.Repositories;

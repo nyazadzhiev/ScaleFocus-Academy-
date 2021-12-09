@@ -1,5 +1,6 @@
 ﻿using Common;
 using Microsoft.EntityFrameworkCore;
+using ProjectManagementApp.BLL.Contracts;
 using ProjectManagementApp.BLL.Exceptions;
 using ProjectManagementApp.BLL.Validations;
 using ProjectManagementApp.DAL;

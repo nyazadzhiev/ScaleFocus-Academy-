@@ -1,5 +1,6 @@
 ﻿using Common;
 using Microsoft.EntityFrameworkCore;
+using ProjectManagementApp.BLL.Contracts;
 using ProjectManagementApp.BLL.Exceptions;
 using ProjectManagementApp.BLL.Validations;
 using ProjectManagementApp.DAL;
@@ -80,9 +81,9 @@ namespace ProjectManagementApp.BLL.Services
             return true;
         }
 
-        public async Task<bool> AddUser(int teamId, int userId)
+        public async Task<bool> AddUser(int teamId, string userId)
         {
-            User userToAdd = await userService.GetUser(userId);
+            User userToAdd = await userService.GetUserById(userId);
             validations.EnsureUserExist(userToAdd);
 
             Team teamFromDB = await GetTeam(teamId);
@@ -96,9 +97,9 @@ namespace ProjectManagementApp.BLL.Services
             return true;
         }
 
-        public async Task<bool> RemoveUser(int teamId, int userId)
+        public async Task<bool> RemoveUser(int teamId, string userId)
         {
-            User userToRemove = await userService.GetUser(userId);
+            User userToRemove = await userService.GetUserById(userId);
             validations.EnsureUserExist(userToRemove);
 
             Team teamFromDB = await GetTeam(teamId);

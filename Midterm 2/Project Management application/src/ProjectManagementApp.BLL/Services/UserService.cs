@@ -10,85 +10,78 @@ using System.Threading.Tasks;
 using ProjectManagementApp.BLL.Exceptions;
 using Common;
 using ProjectManagementApp.DAL.Repositories;
+using ProjectManagementApp.BLL.Contracts;
+using System.Security.Claims;
 
 namespace ProjectManagementApp.BLL.Services
 {
     public class UserService : IUserService
     {
-        private readonly IUserRepository repository;
         private IValidationService validations;
 
-        public UserService(IUserRepository userRepository, IValidationService validation)
+        private readonly IUserManager _userManager;
+
+        public UserService(IUserManager userManager, IValidationService validationService)
         {
-            repository = userRepository;
-            validations = validation;
+            _userManager = userManager;
+            validations = validationService;
         }
+
 
         public async Task<bool> CreateUser(string username, string password, string firstName, string lastName, bool isAdmin)
         {
             validations.CheckUsername(username);
 
-            User newUser = new User()
-            {
-                Username = username,
-                Password = password,
-                FirstName = firstName,
-                LastName = lastName,
-                IsAdmin = isAdmin
-            };
+            User user = new User() { UserName = username };
 
-            await repository.AddUser(newUser);
-            await repository.SaveChangesAsync();
+            await _userManager.CreateUserAsync(user, password);
 
             return true;
         }
 
-        public async Task<User> GetUser(string username, string password)
+        public async Task<User> GetCurrentUser(ClaimsPrincipal principal)
         {
-            return await repository.GetUserAsync(username, password);
+            return await _userManager.GetUserAsync(principal);
         }
 
         public async Task<List<User>> GetAllUsers()
         {
-            return await repository.GetUsersAsync();
+            return await _userManager.GetAllAsync();
         }
 
-        public async Task<User> GetUser(string username)
+        public async Task<User> GetUserByUsername(string username)
         {
-            return await repository.GetUserAsync(username);
+            return await _userManager.GetUserByUsernameAsync(username);
         }
 
-        public async Task<User> GetUser(int id)
+        public async Task<User> GetUserById(string id)
         {
-            return await repository.GetUserAsync(id);
+            return await _userManager.GetUserByIdAsync(id);
         }
 
-        public async Task<bool> DeleteUser(int id)
+        public async Task<bool> IsUserInRole(string userId, string roleName)
         {
-            User user = await GetUser(id);
+            return await _userManager.IsUserInRole(userId, roleName);
+        }
+
+        public async Task<bool> DeleteUser(string id)
+        {
+            User user = await GetUserById(id);
             validations.EnsureUserExist(user);
 
-            repository.DeleteUser(user);
-            await repository.SaveChangesAsync();
+            await _userManager.DeleteUserAsync(user);
 
             return true;
 
         }
 
-        public async Task<bool> EditUser(int id, string newUsername, string newPassword, string newFirstName, string newLastName)
+        public async Task<bool> EditUser(string id, string newUsername, string newPassword, string newFirstName, string newLastName)
         {
-            User user = await GetUser(id);
+            User user = await GetUserById(id);
             validations.EnsureUserExist(user);
-
             validations.CheckUsername(newUsername);
 
-            user.Username = newUsername;
-            user.Password = newPassword;
-            user.FirstName = newFirstName;
-            user.LastName = newLastName;
-
-
-            await repository.SaveChangesAsync();
+            await _userManager.UpdateUserAsync(user, newUsername, newPassword, newFirstName, newLastName);
 
             return true;
         }
