@@ -8,11 +8,11 @@ using ProjectManagementApp.BLL.Services;
 using ProjectManagementApp.DAL;
 using ProjectManagementApp.DAL.Models.Requests;
 using ProjectManagementApp.DAL.Entities;
-using ProjectManagementApp.WEB.Auth;
 using Common;
 using ProjectManagementApp.DAL.Models.Responses;
 using ProjectManagementApp.BLL.Validations;
 using ProjectManagementApp.BLL.Exceptions;
+using ProjectManagementApp.BLL.Contracts;
 
 namespace ProjectManagementApp.WEB.Controllers
 {
@@ -36,7 +36,7 @@ namespace ProjectManagementApp.WEB.Controllers
         [HttpGet]
         public async Task<ActionResult> GetAll()
         {
-            User currentUser = await userService.GetCurrentUser(Request);
+            User currentUser = await userService.GetCurrentUser(User);
             validations.LoginCheck(currentUser);
 
             List<ProjectResponseModel> projects = new List<ProjectResponseModel>();
@@ -57,7 +57,7 @@ namespace ProjectManagementApp.WEB.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<ProjectResponseModel>> Get(int id)
         {
-            User currentUser = await userService.GetCurrentUser(Request);
+            User currentUser = await userService.GetCurrentUser(User);
             validations.LoginCheck(currentUser);
 
             Project projectFromDB = await projectService.GetProject(id, currentUser);
@@ -75,7 +75,7 @@ namespace ProjectManagementApp.WEB.Controllers
         [HttpPost]
         public async Task<ActionResult> Post(ProjectRequestModel project)
         {
-            User currentUser = await userService.GetCurrentUser(Request);
+            User currentUser = await userService.GetCurrentUser(User);
             validations.LoginCheck(currentUser);
 
             bool isCreated = await projectService.CreateProject(project.Title, currentUser);
@@ -95,7 +95,7 @@ namespace ProjectManagementApp.WEB.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult<ProjectResponseModel>> Put(ProjectRequestModel project, int id)
         {
-            User currentUser = await userService.GetCurrentUser(Request);
+            User currentUser = await userService.GetCurrentUser(User);
             validations.LoginCheck(currentUser);
 
             if (await projectService.EditProject(id, project.Title, currentUser))
@@ -118,7 +118,7 @@ namespace ProjectManagementApp.WEB.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
-            User currentUser = await userService.GetCurrentUser(Request);
+            User currentUser = await userService.GetCurrentUser(User);
             validations.LoginCheck(currentUser);
 
             if (await projectService.DeleteProject(id, currentUser))
@@ -134,7 +134,7 @@ namespace ProjectManagementApp.WEB.Controllers
         [HttpPost("{projectId}/Team/{teamId}")]
         public async Task<ActionResult> AddTeam(int projectId, int teamId)
         {
-            User currentUser = await userService.GetCurrentUser(Request);
+            User currentUser = await userService.GetCurrentUser(User);
             validations.LoginCheck(currentUser);
 
             if (await projectService.AddTeam(projectId, teamId, currentUser))
@@ -150,7 +150,7 @@ namespace ProjectManagementApp.WEB.Controllers
         [HttpDelete("{projectId}/Team/{teamId}")]
         public async Task<ActionResult> RemoveTeam(int projectId, int teamId)
         {
-            User currentUser = await userService.GetCurrentUser(Request);
+            User currentUser = await userService.GetCurrentUser(User);
             validations.LoginCheck(currentUser);
 
             if (await projectService.RemoveTeam(projectId, teamId, currentUser))

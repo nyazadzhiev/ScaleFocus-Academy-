@@ -8,11 +8,11 @@ using ProjectManagementApp.BLL.Services;
 using ProjectManagementApp.DAL;
 using ProjectManagementApp.DAL.Models.Requests;
 using ProjectManagementApp.DAL.Entities;
-using ProjectManagementApp.WEB.Auth;
 using Common;
 using ProjectManagementApp.DAL.Models.Responses;
 using ProjectManagementApp.BLL.Validations;
 using ProjectManagementApp.BLL.Exceptions;
+using ProjectManagementApp.BLL.Contracts;
 
 namespace ProjectManagementApp.WEB.Controllers
 {
@@ -34,9 +34,9 @@ namespace ProjectManagementApp.WEB.Controllers
         [HttpGet]
         public async Task<ActionResult> GetAll()
         {
-            User currentUser = await userService.GetCurrentUser(Request);
+            User currentUser = await userService.GetCurrentUser(User);
             validations.LoginCheck(currentUser);
-            validations.CheckRole(currentUser);
+            //validations.CheckRole(currentUser);
 
             List<TeamResponseModel> teams = new List<TeamResponseModel>();
 
@@ -55,9 +55,9 @@ namespace ProjectManagementApp.WEB.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<TeamResponseModel>> Get(int id)
         {
-            User currentUser = await userService.GetCurrentUser(Request);
+            User currentUser = await userService.GetCurrentUser(User);
             validations.LoginCheck(currentUser);
-            validations.CheckRole(currentUser);
+            //validations.CheckRole(currentUser);
 
             Team teamFromDB = await teamService.GetTeam(id);
             validations.EnsureTeamExist(teamFromDB);
@@ -72,9 +72,9 @@ namespace ProjectManagementApp.WEB.Controllers
         [HttpPost]
         public async Task<ActionResult> Post(TeamRequestModel team)
         {
-            User currentUser = await userService.GetCurrentUser(Request);
+            User currentUser = await userService.GetCurrentUser(User);
             validations.LoginCheck(currentUser);
-            validations.CheckRole(currentUser);
+            //validations.CheckRole(currentUser);
 
             bool isCreated = await teamService.CreateTeam(team.Name);
 
@@ -93,9 +93,9 @@ namespace ProjectManagementApp.WEB.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult<TeamResponseModel>> Put(TeamRequestModel team, int id)
         {
-            User currentUser = await userService.GetCurrentUser(Request);
+            User currentUser = await userService.GetCurrentUser(User);
             validations.LoginCheck(currentUser);
-            validations.CheckRole(currentUser);
+            //validations.CheckRole(currentUser);
 
             if (await teamService.EditTeam(id, team.Name))
             {
@@ -115,9 +115,9 @@ namespace ProjectManagementApp.WEB.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
-            User currentUser = await userService.GetCurrentUser(Request);
+            User currentUser = await userService.GetCurrentUser(User);
             validations.LoginCheck(currentUser);
-            validations.CheckRole(currentUser);
+            //validations.CheckRole(currentUser);
 
             if (await teamService.DeleteTeam(id))
             {
@@ -130,11 +130,11 @@ namespace ProjectManagementApp.WEB.Controllers
         }
 
         [HttpPost("{teamId}/User/{userId}")]
-        public async Task<ActionResult> AddUser(int teamId, int userId)
+        public async Task<ActionResult> AddUser(int teamId, string userId)
         {
-            User currentUser = await userService.GetCurrentUser(Request);
+            User currentUser = await userService.GetCurrentUser(User);
             validations.LoginCheck(currentUser);
-            validations.CheckRole(currentUser);
+            //validations.CheckRole(currentUser);
 
             if (await teamService.AddUser(teamId, userId))
             {
@@ -147,11 +147,11 @@ namespace ProjectManagementApp.WEB.Controllers
         }
 
         [HttpDelete("{teamId}/User/{userId}")]
-        public async Task<ActionResult> RemoveUser(int teamId, int userId)
+        public async Task<ActionResult> RemoveUser(int teamId, string userId)
         {
-            User currentUser = await userService.GetCurrentUser(Request);
+            User currentUser = await userService.GetCurrentUser(User);
             validations.LoginCheck(currentUser);
-            validations.CheckRole(currentUser);
+            //validations.CheckRole(currentUser);
 
             if (await teamService.RemoveUser(teamId, userId))
             {

@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 using ProjectManagementApp.BLL.Services;
 using ProjectManagementApp.DAL;
 using ProjectManagementApp.DAL.Entities;
-using ProjectManagementApp.WEB.Auth;
 using Common;
 using ProjectManagementApp.BLL.Validations;
 using ProjectManagementApp.BLL.Exceptions;
 using System.Linq;
 using ProjectManagementApp.DAL.Models.Responses;
 using ProjectManagementApp.DAL.Models.Requests;
+using ProjectManagementApp.BLL.Contracts;
 
 namespace ProjectManagementApp.WEB.Controllers
 {
@@ -39,7 +39,7 @@ namespace ProjectManagementApp.WEB.Controllers
         [HttpGet("/Project/{projectId}")]
         public async Task<ActionResult> GetAll(int projectId)
         {
-            User currentUser = await userService.GetCurrentUser(Request);
+            User currentUser = await userService.GetCurrentUser(User);
             validations.LoginCheck(currentUser);
 
             List<TaskResponseModel> tasks = new List<TaskResponseModel>();
@@ -65,7 +65,7 @@ namespace ProjectManagementApp.WEB.Controllers
         [HttpGet("{taskId}/Project/{projectId}")]
         public async Task<ActionResult<TaskResponseModel>> Get(int taskId, int projectId)
         {
-            User currentUser = await userService.GetCurrentUser(Request);
+            User currentUser = await userService.GetCurrentUser(User);
             validations.LoginCheck(currentUser);
 
             ToDoTask taskFromDB = await taskService.GetTask(taskId, projectId, currentUser);
@@ -84,9 +84,9 @@ namespace ProjectManagementApp.WEB.Controllers
         }
 
         [HttpPost("/Project/{projectId}/User/{userId}")]
-        public async Task<ActionResult> Post(TaskRequestModel task, int projectId, int userId)
+        public async Task<ActionResult> Post(TaskRequestModel task, int projectId, string userId)
         {
-            User currentUser = await userService.GetCurrentUser(Request);
+            User currentUser = await userService.GetCurrentUser(User);
             validations.LoginCheck(currentUser);
 
             bool isCreated = await taskService.CreateTask(task.Title, task.Description, task.IsCompleted, projectId, currentUser, userId);
@@ -106,7 +106,7 @@ namespace ProjectManagementApp.WEB.Controllers
         [HttpPut("{taskId}/Project/{projectId}")]
         public async Task<ActionResult<TaskResponseModel>> Put(TaskRequestModel task, int taskId, int projectId)
         {
-            User currentUser = await userService.GetCurrentUser(Request);
+            User currentUser = await userService.GetCurrentUser(User);
             validations.LoginCheck(currentUser);
 
             if (await taskService.EditTask(taskId, projectId, currentUser, task.Title, task.Description, task.IsCompleted))
@@ -134,7 +134,7 @@ namespace ProjectManagementApp.WEB.Controllers
         [HttpDelete("{taskId}/Project/{projectId}")]
         public async Task<ActionResult> Delete(int taskId, int projectId)
         {
-            User currentUser = await userService.GetCurrentUser(Request);
+            User currentUser = await userService.GetCurrentUser(User);
             validations.LoginCheck(currentUser);
 
             if (await taskService.DeleteTask(taskId, projectId, currentUser))
@@ -150,7 +150,7 @@ namespace ProjectManagementApp.WEB.Controllers
         [HttpPut("{taskId}/Project/{projectId}/ChangeStatus")]
         public async Task<ActionResult> ChangeStatus(int taskId, int projectId)
         {
-            User currentUser = await userService.GetCurrentUser(Request);
+            User currentUser = await userService.GetCurrentUser(User);
             validations.LoginCheck(currentUser);
 
             if(await taskService.ChangeStatus(taskId, projectId, currentUser))

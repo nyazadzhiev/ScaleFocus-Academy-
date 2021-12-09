@@ -8,11 +8,11 @@ using ProjectManagementApp.BLL.Services;
 using ProjectManagementApp.DAL;
 using ProjectManagementApp.DAL.Models.Requests;
 using ProjectManagementApp.DAL.Entities;
-using ProjectManagementApp.WEB.Auth;
 using Common;
 using ProjectManagementApp.DAL.Models.Responses;
 using ProjectManagementApp.BLL.Validations;
 using ProjectManagementApp.BLL.Exceptions;
+using ProjectManagementApp.BLL.Contracts;
 
 namespace ProjectManagementApp.WEB.Controllers
 {
@@ -41,7 +41,7 @@ namespace ProjectManagementApp.WEB.Controllers
         [HttpGet("{taskId}")]
         public async Task<ActionResult> GetAll(int taskId)
         {
-            User currentUser = await userService.GetCurrentUser(Request);
+            User currentUser = await userService.GetCurrentUser(User);
             validations.LoginCheck(currentUser);
 
             ToDoTask task = await taskService.GetTask(taskId);
@@ -66,7 +66,7 @@ namespace ProjectManagementApp.WEB.Controllers
         [HttpGet("Task/{taskId}/WorkLog/{workId}")]
         public async Task<ActionResult> Get(int taskId, int workId)
         {
-            User currentUser = await userService.GetCurrentUser(Request);
+            User currentUser = await userService.GetCurrentUser(User);
             validations.LoginCheck(currentUser);
 
             WorkLog workLog = await workLogService.GetWorkLog(taskId, workId, currentUser);
@@ -78,7 +78,7 @@ namespace ProjectManagementApp.WEB.Controllers
         [HttpPost("Task/{taskId}")]
         public async Task<ActionResult> Post(int taskId, WorkLogRequestModel model)
         {
-            User currentUser = await userService.GetCurrentUser(Request);
+            User currentUser = await userService.GetCurrentUser(User);
             validations.LoginCheck(currentUser);
 
             bool isCreated = await workLogService.CreateWorkLog(currentUser, taskId, model.WorkedHours);
@@ -96,7 +96,7 @@ namespace ProjectManagementApp.WEB.Controllers
         [HttpPut("Task/{taskId}/WorkLog/{workLofId}")]
         public async Task<ActionResult<WorkLogResponseModel>> EditWorkLog(int taskId, int workLogId, WorkLogRequestModel model)
         {
-            User currentUser = await userService.GetCurrentUser(Request);
+            User currentUser = await userService.GetCurrentUser(User);
             validations.LoginCheck(currentUser);
 
             if(await workLogService.EditWorkLog(taskId, workLogId, currentUser))
@@ -118,7 +118,7 @@ namespace ProjectManagementApp.WEB.Controllers
         [HttpDelete("Task/{taskId}/WorkLog/{workLofId}")]
         public async Task<ActionResult> Delete(int taskId, int workLogId)
         {
-            User currentUser = await userService.GetCurrentUser(Request);
+            User currentUser = await userService.GetCurrentUser(User);
             validations.LoginCheck(currentUser);
 
             if (await workLogService.DeleteWorkLog(taskId, workLogId, currentUser))
