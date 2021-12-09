@@ -14,9 +14,9 @@ namespace ProjectManagementApp.DAL.Models.Responses
 
         public bool IsCompleted { get; set; }
 
-        public int OwnerId { get; set; }
+        public string OwnerId { get; set; }
 
-        public int AsigneeId { get; set; }
+        public string AsigneeId { get; set; }
 
         public int ProjectId { get; set; }
 

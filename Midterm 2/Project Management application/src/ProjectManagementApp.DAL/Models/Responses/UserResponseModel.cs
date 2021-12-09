@@ -6,7 +6,7 @@ namespace ProjectManagementApp.DAL.Models.Responses
 {
     public class UserResponseModel
     {
-        public int Id { get; set; }
+        public string Id { get; set; }
         public string Username { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }

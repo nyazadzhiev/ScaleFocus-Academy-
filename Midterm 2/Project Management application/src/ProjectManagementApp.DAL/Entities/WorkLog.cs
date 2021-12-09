@@ -7,7 +7,7 @@ namespace ProjectManagementApp.DAL.Entities
     public class WorkLog
     {
         public int Id { get; set; }
-        public int UserId { get; set; }
+        public string UserId { get; set; }
         public virtual User User { get; set; }
         public int ToDoTaskId { get; set; }
         public virtual ToDoTask ToDoTask { get; set; }

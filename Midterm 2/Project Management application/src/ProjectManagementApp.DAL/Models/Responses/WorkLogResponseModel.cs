@@ -10,7 +10,7 @@ namespace ProjectManagementApp.DAL.Models.Responses
 
         public int TaskId { get; set; }
 
-        public int UserId { get; set; }
+        public string UserId { get; set; }
 
         public int WorkedHours { get; set; }
     }

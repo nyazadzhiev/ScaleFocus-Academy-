@@ -6,7 +6,7 @@ namespace ProjectManagementApp.DAL.Entities
     {
         public int Id { get; set; }
         public string Title { get; set; }
-        public int OwnerId { get; set; }
+        public string OwnerId { get; set; }
         public virtual User Owner { get; set; }
         public virtual List<Team> Teams { get; set; }
         public virtual List<ToDoTask> Tasks { get; set; }
