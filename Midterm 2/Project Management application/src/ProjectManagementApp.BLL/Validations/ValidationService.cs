@@ -1,4 +1,5 @@
 ﻿using Common;
+using ProjectManagementApp.BLL.Contracts;
 using ProjectManagementApp.BLL.Exceptions;
 using ProjectManagementApp.DAL;
 using ProjectManagementApp.DAL.Entities;
@@ -34,17 +35,18 @@ namespace ProjectManagementApp.BLL.Validations
             }
         }
 
-        public void CheckRole(User user)
+        /*public void CheckRole(User user)
         {
             if (!user.IsAdmin)
             {
                 throw new UnauthorizedUserException(Constants.Unauthorized);
             }
-        }
+        }*/
+
 
         public void CheckUsername(string username)
         {
-            if(database.Users.Any(u => u.Username == username))
+            if(database.Users.Any(u => u.UserName == username))
             {
                 throw new UserExistException(String.Format(Constants.Exist, "User"));
             }
@@ -68,7 +70,7 @@ namespace ProjectManagementApp.BLL.Validations
 
         public void CanAddToTeam(Team teamFromDB, User userToAdd)
         {
-            if(teamFromDB.Users.Any(u => u.Username == userToAdd.Username))
+            if(teamFromDB.Users.Any(u => u.UserName == userToAdd.UserName))
             {
                 throw new UserExistException(Constants.UserAlreadyAssigned);
             }
@@ -116,7 +118,7 @@ namespace ProjectManagementApp.BLL.Validations
 
         public void CheckProjectAccess(User user, Project project)
         {
-            if(project.OwnerId != user.Id && !project.Teams.Any(t => t.Users.Any(u => u.Username == user.Username)))
+            if(!project.OwnerId.Equals(user.Id) && !project.Teams.Any(t => t.Users.Any(u => u.UserName == user.UserName)))
             {
                 throw new UnauthorizedUserException(Constants.Unauthorized);
             }
@@ -132,7 +134,7 @@ namespace ProjectManagementApp.BLL.Validations
 
         public void CheckTaskAccess(User currentUser, ToDoTask task)
         {
-            if(task.AsigneeId != currentUser.Id)
+            if(!task.AsigneeId.Equals(currentUser.Id))
             {
                 throw new UnauthorizedUserException(Constants.Unauthorized);
             }
