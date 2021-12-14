@@ -12,9 +12,9 @@ namespace ProjectManagementApp.DAL.Repositories
 
         public Task SaveChangesAsync();
 
-        public Task<ToDoTask> GetTaskAsync(int id);
+        public Task<ToDoTask> GetTaskByIdAsync(int id);
 
-        public Task<ToDoTask> GetTaskAsync(string title);
+        public Task<ToDoTask> GetTaskByTitleAsync(string title);
 
         public Task<List<ToDoTask>> GetTasksAsync(int projectId);
 

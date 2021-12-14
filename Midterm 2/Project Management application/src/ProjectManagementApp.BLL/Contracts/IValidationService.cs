@@ -7,34 +7,34 @@ namespace ProjectManagementApp.BLL.Contracts
 {
     public interface IValidationService
     {
-        public void EnsureUserExist(User user);
+        void EnsureUserExist(User user);
 
-        public void LoginCheck(User user);
+        void LoginCheck(User user);
 
-        //public void CheckRole(User user);
+        void CheckRole(string role);
 
-        public void CheckUsername(string username);
+        void CheckUsername(string username);
 
-        public void EnsureTeamExist(Team team);
+        void EnsureTeamExist(Team team);
 
-        public void CheckTeamName(string newTeamName);
+        void CheckTeamName(string newTeamName);
 
-        public void CanAddToTeam(Team teamFromDB, User userToAdd);
+        void CanAddToTeam(Team teamFromDB, User userToAdd);
 
-        public void EnsureProjectExist(Project project);
+        void EnsureProjectExist(Project project);
 
-        public void CheckProjectName(string newProjectTitle);
+        void CheckProjectName(string newProjectTitle);
 
-        public void CanAddToProject(Project project, Team team);
+        void CanAddToProject(Project project, Team team);
 
-        public void EnsureTaskExist(ToDoTask task);
-            
-        public void CheckTaskName(string title);
+        void EnsureTaskExist(ToDoTask task);
 
-        public void CheckProjectAccess(User user, Project project);
+        void CheckTaskName(string title);
 
-        public void EnsureWorkLogExist(WorkLog workLog);
+        void CheckProjectAccess(User user, Project project);
 
-        public void CheckTaskAccess(User currentUser, ToDoTask task);
+        void EnsureWorkLogExist(WorkLog workLog);
+
+        void CheckTaskAccess(User currentUser, ToDoTask task);
     }
 }

@@ -8,10 +8,10 @@ namespace ProjectManagementApp.DAL.Repositories
 {
     public interface IWorkLogRepository
     {
-        public Task AddWorkLogAsync(WorkLog workLog);
+        Task AddWorkLogAsync(WorkLog workLog);
 
-        public void DeleteWorkLog(WorkLog workLog);
+        void DeleteWorkLog(WorkLog workLog);
 
-        public Task SaveChangesAsync();
+        Task SaveChangesAsync();
     }
 }

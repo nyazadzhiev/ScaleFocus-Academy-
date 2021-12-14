@@ -9,19 +9,22 @@ namespace ProjectManagementApp.BLL.Contracts
 {
     public interface IUserService
     {
-        public Task<bool> CreateUser(string username, string password, string firstName, string lastName, bool isAdmin);
+        Task<bool> CreateUser(string username, string password, string firstName, string lastName, string role);
 
-        public Task<User> GetCurrentUser(ClaimsPrincipal principal);
+        Task<User> GetCurrentUserAsync(ClaimsPrincipal principal);
+
+        User GetCurrentUser(ClaimsPrincipal principal);
+
         Task<bool> IsUserInRole(string userId, string roleId);
 
-        public Task<List<User>> GetAllUsers();
+        Task<List<User>> GetAllUsers();
 
-        public Task<User> GetUserByUsername(string username);
+        Task<User> GetUserByUsername(string username);
 
-        public Task<User> GetUserById(string id);
+        Task<User> GetUserById(string id);
 
-        public Task<bool> DeleteUser(string id);
+        Task<bool> DeleteUser(string id);
 
-        public Task<bool> EditUser(string id, string newUsername, string newPassword, string newFirstName, string newLastName);
+        Task<bool> EditUser(string id, string newUsername, string newPassword, string newFirstName, string newLastName);
     }
 }

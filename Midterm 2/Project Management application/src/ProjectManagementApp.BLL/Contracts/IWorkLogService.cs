@@ -8,14 +8,14 @@ namespace ProjectManagementApp.BLL.Contracts
 {
     public interface IWorkLogService
     {
-        public Task<bool> CreateWorkLog(User user, int taskId, int workedHours);
+        Task<bool> CreateWorkLog(User user, int taskId, int workedHours);
 
-        public Task<List<WorkLog>> GetAll(int taskId);
+        Task<List<WorkLog>> GetAll(int taskId);
 
-        public Task<WorkLog> GetWorkLog(int taskId, int workLogId, User user);
+        Task<WorkLog> GetWorkLog(int taskId, int workLogId, User user);
 
-        public Task<bool> EditWorkLog(int taskId, int workLogId, User user);
+        Task<bool> EditWorkLog(int taskId, int workLogId, User user, int newWorkedTime);
 
-        public Task<bool> DeleteWorkLog(int taskId, int workLogId, User user);
+        Task<bool> DeleteWorkLog(int taskId, int workLogId, User user);
     }
 }

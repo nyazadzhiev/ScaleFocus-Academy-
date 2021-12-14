@@ -8,20 +8,20 @@ namespace ProjectManagementApp.BLL.Contracts
 {
     public interface ITeamService
     {
-        public Task<bool> CreateTeam(string name);
+        Task<bool> CreateTeam(string name);
 
-        public Task<List<Team>> GetAll();
+        Task<List<Team>> GetAll();
 
-        public Task<Team> GetTeam(string name);
+        Task<Team> GetTeam(string name);
 
-        public Task<Team> GetTeam(int id);
+        Task<Team> GetTeam(int id);
 
-        public Task<bool> DeleteTeam(int id);
+        Task<bool> DeleteTeam(int id);
 
-        public Task<bool> EditTeam(int id, string newTeamName);
+        Task<bool> EditTeam(int id, string newTeamName);
 
-        public Task<bool> AddUser(int teamId, string userId);
+        Task<bool> AddUser(int teamId, string userId);
 
-        public Task<bool> RemoveUser(int teamId, string userId);
+        Task<bool> RemoveUser(int teamId, string userId);
     }
 }

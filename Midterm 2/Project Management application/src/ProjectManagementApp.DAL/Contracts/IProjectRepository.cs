@@ -10,14 +10,16 @@ namespace ProjectManagementApp.DAL.Repositories
     {
         public Task AddProjectAsync(Project project);
 
-        public Task SaveChangesAsync();
+        Task SaveChangesAsync();
 
-        public Task<Project> GetProject(string title);
+        Task<Project> GetProject(string title);
 
-        public Task<Project> GetProject(int id);
+        Task<Project> GetProject(int id);
 
-        public List<Project> GetProjects(User user);
+        List<Project> GetAllProjects();
 
-        public void DeleteProject(Project project);
+        List<Project> GetUserProjects(User user);
+
+        void DeleteProject(Project project);
     }
 }
