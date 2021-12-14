@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ProjectManagementApp.DAL.Models.Requests
 {
-    public class UserRequestModel
+    public class EditUserRequestModel
     {
         [Required]
         [MinLength(5)]
@@ -26,8 +26,5 @@ namespace ProjectManagementApp.DAL.Models.Requests
         [MinLength(3)]
         [MaxLength(20)]
         public string LastName { get; set; }
-
-        [Required]
-        public string Role { get; set; }
     }
 }
