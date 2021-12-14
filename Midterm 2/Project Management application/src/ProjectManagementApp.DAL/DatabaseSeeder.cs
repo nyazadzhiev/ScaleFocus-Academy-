@@ -20,8 +20,23 @@ namespace ProjectManagementApp.DAL
                     PasswordHasher<User> hasher = new PasswordHasher<User>();
                     SeedAdmin(database, hasher);
                     SeedManager(database, hasher);
+                    SeedUserRole(database);
                 }
             }
+        }
+
+        private static void SeedUserRole(DatabaseContext database)
+        {
+            IdentityRole identityRole = new IdentityRole()
+            {
+                Id = Guid.NewGuid().ToString("D"),
+                Name = "User",
+                NormalizedName = "User".ToUpper(),
+                ConcurrencyStamp = Guid.NewGuid().ToString("D")
+            };
+
+            database.Roles.Add(identityRole);
+            database.SaveChanges();
         }
 
         private static void SeedAdmin(DatabaseContext database, PasswordHasher<User> hasher)
