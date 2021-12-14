@@ -16,13 +16,15 @@ namespace ProjectManagementApp.BLL.Services
 {
     public class TaskService : ITaskService
     {
+        private readonly IUserService userService;
         private readonly ITaskRepository repository;
         private readonly IProjectService projectService;
         private IValidationService validations;
 
-        public TaskService(ITaskRepository taskRepository, IProjectService _projectService, IValidationService validation)
+        public TaskService(IUserService _userService, ITaskRepository taskRepository, IProjectService _projectService, IValidationService validation)
         {
             repository = taskRepository;
+            userService = _userService;
             projectService = _projectService;
             validations = validation;
         }
@@ -33,7 +35,10 @@ namespace ProjectManagementApp.BLL.Services
 
             Project project = await projectService.GetProject(projectId, currentUser);
             validations.EnsureProjectExist(project);
-            validations.CheckProjectAccess(currentUser, project);
+
+            User user = await userService.GetUserById(userId);
+            validations.EnsureUserExist(user);
+            validations.CheckProjectAccess(user, project);
 
             ToDoTask newTask = new ToDoTask()
             {
@@ -51,25 +56,23 @@ namespace ProjectManagementApp.BLL.Services
             return true;
         }
 
-        public async Task<ToDoTask> GetTask(int id)
+        public async Task<ToDoTask> GetTaskById(int id)
         {
-            return await repository.GetTaskAsync(id);
+            return await repository.GetTaskByIdAsync(id);
         }
 
-        public async Task<ToDoTask> GetTask(string title)
+        public async Task<ToDoTask> GetTaskByTitle(string title)
         {
-            return await repository.GetTaskAsync(title);
+            return await repository.GetTaskByTitleAsync(title);
         }
 
         public async Task<ToDoTask> GetTask(int taskId, int projectId, User user)
         {
             Project projectFromDB = await projectService.GetProject(projectId, user);
             validations.EnsureProjectExist(projectFromDB);
-            validations.CheckProjectAccess(user, projectFromDB);
 
-            ToDoTask task = await repository.GetTaskAsync(taskId);
+            ToDoTask task = await repository.GetTaskByIdAsync(taskId);
             validations.EnsureTaskExist(task);
-            validations.CheckTaskAccess(user, task);
 
             return task;
         }
@@ -78,7 +81,6 @@ namespace ProjectManagementApp.BLL.Services
         {
             Project project = await projectService.GetProject(projectId, currentUser);
             validations.EnsureProjectExist(project);
-            validations.CheckProjectAccess(currentUser, project);
 
             return await repository.GetTasksAsync(projectId);
         }
@@ -98,7 +100,7 @@ namespace ProjectManagementApp.BLL.Services
             return true;
         }
 
-        public async Task<bool> EditTask(int taskId,int projectId, User user, string newTaskTitle, string newDesc, bool newStatus)
+        public async Task<bool> EditTask(int taskId, int projectId, User user, string newTaskTitle, string newDesc, bool newStatus)
         {
             Project project = await projectService.GetProject(projectId, user);
             validations.EnsureProjectExist(project);
@@ -121,12 +123,31 @@ namespace ProjectManagementApp.BLL.Services
         {
             Project project = await projectService.GetProject(projectId, user);
             validations.EnsureProjectExist(project);
-            validations.CheckProjectAccess(user, project);
 
             ToDoTask task = await GetTask(taskId, projectId, user);
             validations.EnsureTaskExist(task);
 
             task.IsCompleted = !task.IsCompleted;
+
+            await repository.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<bool> Reassign(int taskId, int projectId, string userId, User currentUser)
+        {
+            Project project = await projectService.GetProject(projectId, currentUser);
+            validations.EnsureProjectExist(project);
+
+            ToDoTask task = await GetTask(taskId, projectId, currentUser);
+            validations.EnsureTaskExist(task);
+
+            User user = await userService.GetUserById(userId);
+            validations.EnsureUserExist(user);
+            validations.CheckProjectAccess(user, project);
+
+            task.AsigneeId = userId;
+            task.Asignee = user;
 
             await repository.SaveChangesAsync();
 

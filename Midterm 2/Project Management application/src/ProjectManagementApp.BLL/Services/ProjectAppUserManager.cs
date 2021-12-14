@@ -7,6 +7,7 @@ using ProjectManagementApp.DAL.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -79,6 +80,11 @@ namespace ProjectManagementApp.BLL.Services
             await DeleteAsync(user);
         }
 
+        public async Task AddUserToRoleAsync(User user, string role)
+        {
+            await AddToRoleAsync(user, role);
+        }
+
         public async Task<bool> IsUserInRole(string userId, string roleId)
         {
             User user = await FindByIdAsync(userId);
@@ -100,6 +106,11 @@ namespace ProjectManagementApp.BLL.Services
                 return result;
             }
             return false;
+        }
+
+        public User GetUser(ClaimsPrincipal claimsPrincipal)
+        {
+            return GetUser(claimsPrincipal);
         }
     }
 }

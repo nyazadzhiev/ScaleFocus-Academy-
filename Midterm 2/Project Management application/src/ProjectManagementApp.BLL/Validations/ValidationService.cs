@@ -35,13 +35,13 @@ namespace ProjectManagementApp.BLL.Validations
             }
         }
 
-        /*public void CheckRole(User user)
+        public void CheckRole(string role)
         {
-            if (!user.IsAdmin)
+            if (!Constants.Roles.Contains(role.ToUpper()))
             {
-                throw new UnauthorizedUserException(Constants.Unauthorized);
+                throw new InvalidInputException(Constants.InvalidInput);
             }
-        }*/
+        }
 
 
         public void CheckUsername(string username)

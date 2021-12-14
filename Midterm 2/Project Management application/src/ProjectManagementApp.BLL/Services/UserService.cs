@@ -28,20 +28,27 @@ namespace ProjectManagementApp.BLL.Services
         }
 
 
-        public async Task<bool> CreateUser(string username, string password, string firstName, string lastName, bool isAdmin)
+        public async Task<bool> CreateUser(string username, string password, string firstName, string lastName, string role)
         {
             validations.CheckUsername(username);
+            validations.CheckRole(role);
 
-            User user = new User() { UserName = username };
+            User user = new User() { UserName = username, FirstName = firstName, LastName = lastName };
 
             await _userManager.CreateUserAsync(user, password);
+            await _userManager.AddUserToRoleAsync(user, role);
 
             return true;
         }
 
-        public async Task<User> GetCurrentUser(ClaimsPrincipal principal)
+        public async Task<User> GetCurrentUserAsync(ClaimsPrincipal principal)
         {
             return await _userManager.GetUserAsync(principal);
+        }
+
+        public User GetCurrentUser(ClaimsPrincipal principal)
+        {
+            return _userManager.GetUser(principal);
         }
 
         public async Task<List<User>> GetAllUsers()

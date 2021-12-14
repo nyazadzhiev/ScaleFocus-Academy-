@@ -26,7 +26,7 @@ namespace ProjectManagementApp.BLL.Services
 
         public async Task<bool> CreateWorkLog(User user, int taskId, int workedHours)
         {
-            ToDoTask task = await taskService.GetTask(taskId);
+            ToDoTask task = await taskService.GetTaskById(taskId);
             validations.EnsureTaskExist(task);
             validations.CheckTaskAccess(user, task);
 
@@ -64,14 +64,9 @@ namespace ProjectManagementApp.BLL.Services
             return true;
         }
 
-        public Task<bool> EditWorkLog(int taskId, int workLogId, User user)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<List<WorkLog>> GetAll(int taskId)
         {
-            ToDoTask task = await taskService.GetTask(taskId);
+            ToDoTask task = await taskService.GetTaskById(taskId);
             validations.EnsureTaskExist(task);
 
             return task.Worklogs;
@@ -79,7 +74,7 @@ namespace ProjectManagementApp.BLL.Services
 
         public async Task<WorkLog> GetWorkLog(int taskId, int workLogId, User user)
         {
-            ToDoTask task = await taskService.GetTask(taskId);
+            ToDoTask task = await taskService.GetTaskById(taskId);
             validations.EnsureTaskExist(task);
             validations.CheckTaskAccess(user, task);
 

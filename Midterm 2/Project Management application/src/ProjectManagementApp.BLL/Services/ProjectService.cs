@@ -53,30 +53,20 @@ namespace ProjectManagementApp.BLL.Services
             return await repository.GetProject(id);
         }
 
-        public List<Project> GetAll(User user)
+        public List<Project> GetAllProjects()
         {
-            List<Project> projects = new List<Project>();
-            foreach(Project project in  repository.GetProjects(user))
-            {
-                projects.Add(project);
-            }
+            return repository.GetAllProjects();
+        }
 
-            foreach(Team team in user.Teams)
-            {
-                foreach(Project project in team.Projects)
-                {
-                    projects.Add(project);
-                }
-            }
-
-            return projects;
+        public List<Project> GetMyProjects(User user)
+        {
+            return repository.GetUserProjects(user);
         }
 
         public async Task<bool> DeleteProject(int id, User user)
         {
             Project project = await GetProject(id, user);
             validations.EnsureProjectExist(project);
-            validations.CheckProjectAccess(user, project);
 
             repository.DeleteProject(project);
             await repository.SaveChangesAsync();
@@ -88,7 +78,6 @@ namespace ProjectManagementApp.BLL.Services
         {
             Project project = await GetProject(id, user);
             validations.EnsureProjectExist(project);
-            validations.CheckProjectAccess(user, project);
             validations.CheckProjectName(newProjectTitle);
 
             project.Title = newProjectTitle;
@@ -102,7 +91,6 @@ namespace ProjectManagementApp.BLL.Services
         {
             Project project = await GetProject(projectId, user);
             validations.EnsureProjectExist(project);
-            validations.CheckProjectAccess(user, project);
 
             Team team = await teamService.GetTeam(teamId);
             validations.EnsureTeamExist(team);
@@ -118,7 +106,6 @@ namespace ProjectManagementApp.BLL.Services
         {
             Project project = await GetProject(projectId, user);
             validations.EnsureProjectExist(project);
-            validations.CheckProjectAccess(user, project);
 
             Team team = await teamService.GetTeam(teamId);
             validations.EnsureTeamExist(team);
