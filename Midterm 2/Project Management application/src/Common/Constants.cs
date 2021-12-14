@@ -30,6 +30,18 @@ namespace Common
 
         public const string StatusChanged = "Task status was changed";
 
+        public const string TaskReassigned = "Task assigne was changed";
+
         public const string LoginFailed = "Login failed";
+
+        public const string Admin = "Admin";
+
+        public const string Manager = "Manager";
+
+        public const string User = "User";
+
+        public const string InvalidInput = "You entered invalid value";
+
+        public static string[] Roles = new string[] { Admin.ToUpper(), Manager.ToUpper(), User.ToUpper() };
     }
 }
