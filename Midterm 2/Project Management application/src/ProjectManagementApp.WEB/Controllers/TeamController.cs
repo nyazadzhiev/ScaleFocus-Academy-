@@ -17,6 +17,7 @@ using ProjectManagementApp.BLL.Contracts;
 namespace ProjectManagementApp.WEB.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize(Roles = "Admin, Manager")]
     [ApiController]
     public class TeamController : ControllerBase
     {
@@ -34,7 +35,7 @@ namespace ProjectManagementApp.WEB.Controllers
         [HttpGet]
         public async Task<ActionResult> GetAll()
         {
-            User currentUser = await userService.GetCurrentUser(User);
+            User currentUser = await userService.GetCurrentUserAsync(User);
             validations.LoginCheck(currentUser);
             //validations.CheckRole(currentUser);
 
@@ -55,7 +56,7 @@ namespace ProjectManagementApp.WEB.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<TeamResponseModel>> Get(int id)
         {
-            User currentUser = await userService.GetCurrentUser(User);
+            User currentUser = await userService.GetCurrentUserAsync(User);
             validations.LoginCheck(currentUser);
             //validations.CheckRole(currentUser);
 
@@ -72,7 +73,7 @@ namespace ProjectManagementApp.WEB.Controllers
         [HttpPost]
         public async Task<ActionResult> Post(TeamRequestModel team)
         {
-            User currentUser = await userService.GetCurrentUser(User);
+            User currentUser = await userService.GetCurrentUserAsync(User);
             validations.LoginCheck(currentUser);
             //validations.CheckRole(currentUser);
 
@@ -93,7 +94,7 @@ namespace ProjectManagementApp.WEB.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult<TeamResponseModel>> Put(TeamRequestModel team, int id)
         {
-            User currentUser = await userService.GetCurrentUser(User);
+            User currentUser = await userService.GetCurrentUserAsync(User);
             validations.LoginCheck(currentUser);
             //validations.CheckRole(currentUser);
 
@@ -115,7 +116,7 @@ namespace ProjectManagementApp.WEB.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
-            User currentUser = await userService.GetCurrentUser(User);
+            User currentUser = await userService.GetCurrentUserAsync(User);
             validations.LoginCheck(currentUser);
             //validations.CheckRole(currentUser);
 
@@ -132,7 +133,7 @@ namespace ProjectManagementApp.WEB.Controllers
         [HttpPost("{teamId}/User/{userId}")]
         public async Task<ActionResult> AddUser(int teamId, string userId)
         {
-            User currentUser = await userService.GetCurrentUser(User);
+            User currentUser = await userService.GetCurrentUserAsync(User);
             validations.LoginCheck(currentUser);
             //validations.CheckRole(currentUser);
 
@@ -149,7 +150,7 @@ namespace ProjectManagementApp.WEB.Controllers
         [HttpDelete("{teamId}/User/{userId}")]
         public async Task<ActionResult> RemoveUser(int teamId, string userId)
         {
-            User currentUser = await userService.GetCurrentUser(User);
+            User currentUser = await userService.GetCurrentUserAsync(User);
             validations.LoginCheck(currentUser);
             //validations.CheckRole(currentUser);
 

@@ -17,7 +17,7 @@ using ProjectManagementApp.BLL.Contracts;
 
 namespace ProjectManagementApp.WEB.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/Project/{projectId}/[controller]")]
     [ApiController]
     public class TaskController : ControllerBase
     {
@@ -36,10 +36,11 @@ namespace ProjectManagementApp.WEB.Controllers
             taskService = _taskService;
         }
 
-        [HttpGet("/Project/{projectId}")]
+        [Authorize(Policy = "ProjectAccess")]
+        [HttpGet]
         public async Task<ActionResult> GetAll(int projectId)
         {
-            User currentUser = await userService.GetCurrentUser(User);
+            User currentUser = await userService.GetCurrentUserAsync(User);
             validations.LoginCheck(currentUser);
 
             List<TaskResponseModel> tasks = new List<TaskResponseModel>();
@@ -62,10 +63,11 @@ namespace ProjectManagementApp.WEB.Controllers
             return Ok(tasks);
         }
 
-        [HttpGet("{taskId}/Project/{projectId}")]
+        [Authorize]
+        [HttpGet("{taskId}")]
         public async Task<ActionResult<TaskResponseModel>> Get(int taskId, int projectId)
         {
-            User currentUser = await userService.GetCurrentUser(User);
+            User currentUser = await userService.GetCurrentUserAsync(User);
             validations.LoginCheck(currentUser);
 
             ToDoTask taskFromDB = await taskService.GetTask(taskId, projectId, currentUser);
@@ -83,17 +85,18 @@ namespace ProjectManagementApp.WEB.Controllers
             };
         }
 
-        [HttpPost("/Project/{projectId}/User/{userId}")]
+        [Authorize(Policy = "ProjectAccess")]
+        [HttpPost("User/{userId}")]
         public async Task<ActionResult> Post(TaskRequestModel task, int projectId, string userId)
         {
-            User currentUser = await userService.GetCurrentUser(User);
+            User currentUser = await userService.GetCurrentUserAsync(User);
             validations.LoginCheck(currentUser);
 
             bool isCreated = await taskService.CreateTask(task.Title, task.Description, task.IsCompleted, projectId, currentUser, userId);
 
             if (isCreated && ModelState.IsValid)
             {
-                ToDoTask taskFromDB = await taskService.GetTask(task.Title);
+                ToDoTask taskFromDB = await taskService.GetTaskByTitle(task.Title);
 
                 return CreatedAtAction(nameof(Post), new { id = taskFromDB.Id }, String.Format(Constants.Created, "Task"));
             }
@@ -103,15 +106,16 @@ namespace ProjectManagementApp.WEB.Controllers
             }
         }
 
-        [HttpPut("{taskId}/Project/{projectId}")]
+        [Authorize(Policy = "TaskAccess")]
+        [HttpPut("{taskId}")]
         public async Task<ActionResult<TaskResponseModel>> Put(TaskRequestModel task, int taskId, int projectId)
         {
-            User currentUser = await userService.GetCurrentUser(User);
+            User currentUser = await userService.GetCurrentUserAsync(User);
             validations.LoginCheck(currentUser);
 
             if (await taskService.EditTask(taskId, projectId, currentUser, task.Title, task.Description, task.IsCompleted))
             {
-                ToDoTask edited = await taskService.GetTask(taskId);
+                ToDoTask edited = await taskService.GetTaskById(taskId);
 
                 return new TaskResponseModel()
                 {
@@ -131,10 +135,11 @@ namespace ProjectManagementApp.WEB.Controllers
             }
         }
 
-        [HttpDelete("{taskId}/Project/{projectId}")]
+        [Authorize(Policy = "TaskAccess")]
+        [HttpDelete("{taskId}")]
         public async Task<ActionResult> Delete(int taskId, int projectId)
         {
-            User currentUser = await userService.GetCurrentUser(User);
+            User currentUser = await userService.GetCurrentUserAsync(User);
             validations.LoginCheck(currentUser);
 
             if (await taskService.DeleteTask(taskId, projectId, currentUser))
@@ -147,15 +152,33 @@ namespace ProjectManagementApp.WEB.Controllers
             }
         }
 
-        [HttpPut("{taskId}/Project/{projectId}/ChangeStatus")]
+        [Authorize(Policy = "TaskAccess")]
+        [HttpPut("{taskId}/ChangeStatus")]
         public async Task<ActionResult> ChangeStatus(int taskId, int projectId)
         {
-            User currentUser = await userService.GetCurrentUser(User);
+            User currentUser = await userService.GetCurrentUserAsync(User);
             validations.LoginCheck(currentUser);
 
             if(await taskService.ChangeStatus(taskId, projectId, currentUser))
             {
                 return Ok(Constants.StatusChanged);
+            }
+            else
+            {
+                return BadRequest(Constants.FailedOperation);
+            }
+        }
+
+        [Authorize(Policy = "TaskAccess")]
+        [HttpPut("{taskId}/User/{userId}/Reassign")]
+        public async Task<ActionResult> ReassignTask(int taskId, int projectId, string userId)
+        {
+            User currentUser = await userService.GetCurrentUserAsync(User);
+            validations.LoginCheck(currentUser);
+
+            if (await taskService.Reassign(taskId, projectId, userId, currentUser))
+            {
+                return Ok(Constants.TaskReassigned);
             }
             else
             {

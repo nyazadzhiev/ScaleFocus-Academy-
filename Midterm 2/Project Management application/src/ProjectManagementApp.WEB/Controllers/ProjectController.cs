@@ -33,15 +33,16 @@ namespace ProjectManagementApp.WEB.Controllers
             projectService = _projectService;
         }
 
-        [HttpGet]
-        public async Task<ActionResult> GetAll()
+        [Authorize]
+        [HttpGet("MyProjects")]
+        public async Task<ActionResult> GetMyProjects()
         {
-            User currentUser = await userService.GetCurrentUser(User);
+            User currentUser = await userService.GetCurrentUserAsync(User);
             validations.LoginCheck(currentUser);
 
             List<ProjectResponseModel> projects = new List<ProjectResponseModel>();
 
-            foreach (Project project in projectService.GetAll(currentUser))
+            foreach (Project project in projectService.GetMyProjects(currentUser))
             {
                 projects.Add(new ProjectResponseModel()
                 {
@@ -54,15 +55,37 @@ namespace ProjectManagementApp.WEB.Controllers
             return Ok(projects);
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<ProjectResponseModel>> Get(int id)
+        [Authorize]
+        [HttpGet]
+        public async Task<ActionResult> GetAllProjects()
         {
-            User currentUser = await userService.GetCurrentUser(User);
+            User currentUser = await userService.GetCurrentUserAsync(User);
             validations.LoginCheck(currentUser);
 
-            Project projectFromDB = await projectService.GetProject(id, currentUser);
+            List<ProjectResponseModel> projects = new List<ProjectResponseModel>();
+
+            foreach (Project project in projectService.GetAllProjects())
+            {
+                projects.Add(new ProjectResponseModel()
+                {
+                    Id = project.Id,
+                    Title = project.Title,
+                    OwnerId = project.OwnerId
+                });
+            }
+
+            return Ok(projects);
+        }
+
+        [Authorize(Policy = "ProjectOwner")]
+        [HttpGet("{projectId}")]
+        public async Task<ActionResult<ProjectResponseModel>> Get(int projectId)
+        {
+            User currentUser = await userService.GetCurrentUserAsync(User);
+            validations.LoginCheck(currentUser);
+
+            Project projectFromDB = await projectService.GetProject(projectId, currentUser);
             validations.EnsureProjectExist(projectFromDB);
-            validations.CheckProjectAccess(currentUser, projectFromDB);
 
             return new ProjectResponseModel()
             {
@@ -72,10 +95,11 @@ namespace ProjectManagementApp.WEB.Controllers
             };
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult> Post(ProjectRequestModel project)
         {
-            User currentUser = await userService.GetCurrentUser(User);
+            User currentUser = await userService.GetCurrentUserAsync(User);
             validations.LoginCheck(currentUser);
 
             bool isCreated = await projectService.CreateProject(project.Title, currentUser);
@@ -92,13 +116,14 @@ namespace ProjectManagementApp.WEB.Controllers
             }
         }
 
-        [HttpPut("{id}")]
-        public async Task<ActionResult<ProjectResponseModel>> Put(ProjectRequestModel project, int id)
+        [Authorize(Policy = "ProjectOwner")]
+        [HttpPut("{projectId}")]
+        public async Task<ActionResult<ProjectResponseModel>> Put(EditProjectRequestModel project, int projectId)
         {
-            User currentUser = await userService.GetCurrentUser(User);
+            User currentUser = await userService.GetCurrentUserAsync(User);
             validations.LoginCheck(currentUser);
 
-            if (await projectService.EditProject(id, project.Title, currentUser))
+            if (await projectService.EditProject(projectId, project.Title, currentUser))
             {
                 Project edited = await projectService.GetProject(project.Title, currentUser);
 
@@ -115,13 +140,14 @@ namespace ProjectManagementApp.WEB.Controllers
             }
         }
 
-        [HttpDelete("{id}")]
-        public async Task<ActionResult> Delete(int id)
+        [Authorize(Policy = "ProjectOwner")]
+        [HttpDelete("{projectId}")]
+        public async Task<ActionResult> Delete(int projectId)
         {
-            User currentUser = await userService.GetCurrentUser(User);
+            User currentUser = await userService.GetCurrentUserAsync(User);
             validations.LoginCheck(currentUser);
 
-            if (await projectService.DeleteProject(id, currentUser))
+            if (await projectService.DeleteProject(projectId, currentUser))
             {
                 return Ok(String.Format(Constants.Deleted, "Project"));
             }
@@ -131,10 +157,11 @@ namespace ProjectManagementApp.WEB.Controllers
             }
         }
 
+        [Authorize(Policy = "ProjectOwner")]
         [HttpPost("{projectId}/Team/{teamId}")]
         public async Task<ActionResult> AddTeam(int projectId, int teamId)
         {
-            User currentUser = await userService.GetCurrentUser(User);
+            User currentUser = await userService.GetCurrentUserAsync(User);
             validations.LoginCheck(currentUser);
 
             if (await projectService.AddTeam(projectId, teamId, currentUser))
@@ -147,10 +174,11 @@ namespace ProjectManagementApp.WEB.Controllers
             }
         }
 
+        [Authorize(Policy = "ProjectOwner")]
         [HttpDelete("{projectId}/Team/{teamId}")]
         public async Task<ActionResult> RemoveTeam(int projectId, int teamId)
         {
-            User currentUser = await userService.GetCurrentUser(User);
+            User currentUser = await userService.GetCurrentUserAsync(User);
             validations.LoginCheck(currentUser);
 
             if (await projectService.RemoveTeam(projectId, teamId, currentUser))

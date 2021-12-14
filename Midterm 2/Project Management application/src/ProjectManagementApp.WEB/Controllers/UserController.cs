@@ -29,10 +29,11 @@ namespace ProjectManagementApp.WEB.Controllers
             userService = _userService;
         }
 
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult> GetAll()
         {
-            User currentUser = await userService.GetCurrentUser(User);
+            User currentUser = await userService.GetCurrentUserAsync(User);
             validations.LoginCheck(currentUser);
             //validations.CheckRole(currentUser);
 
@@ -52,10 +53,11 @@ namespace ProjectManagementApp.WEB.Controllers
             return Ok(users);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("{id}")]
         public async Task<ActionResult<UserResponseModel>> Get(string id)
         {
-            User currentUser = await userService.GetCurrentUser(User);
+            User currentUser = await userService.GetCurrentUserAsync(User);
             validations.LoginCheck(currentUser);
             //validations.CheckRole(currentUser);
 
@@ -72,14 +74,15 @@ namespace ProjectManagementApp.WEB.Controllers
             };
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult> Post(UserRequestModel user)
         {
-            User currentUser = await userService.GetCurrentUser(User);
+            User currentUser = await userService.GetCurrentUserAsync(User);
             validations.LoginCheck(currentUser);
             //validations.CheckRole(currentUser);
 
-            bool isCreated = await userService.CreateUser(user.Username, user.Password, user.FirstName, user.LastName, user.IsAdmin);
+            bool isCreated = await userService.CreateUser(user.Username, user.Password, user.FirstName, user.LastName, user.Role);
 
             if (isCreated && ModelState.IsValid)
             {
@@ -95,10 +98,11 @@ namespace ProjectManagementApp.WEB.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
-        public async Task<ActionResult<UserResponseModel>> Put(UserRequestModel user, string id)
+        public async Task<ActionResult<UserResponseModel>> Put(EditUserRequestModel user, string id)
         {
-            User currentUser = await userService.GetCurrentUser(User);
+            User currentUser = await userService.GetCurrentUserAsync(User);
             validations.LoginCheck(currentUser);
             //validations.CheckRole(currentUser);
 
@@ -120,10 +124,11 @@ namespace ProjectManagementApp.WEB.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(string id)
         {
-            User currentUser = await userService.GetCurrentUser(User);
+            User currentUser = await userService.GetCurrentUserAsync(User);
             validations.LoginCheck(currentUser);
             //validations.CheckRole(currentUser);
 
