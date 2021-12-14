@@ -45,6 +45,9 @@ namespace WebApi.Middleware
                     case UnauthorizedUserException unauthorizedUserException:
                         response.StatusCode = (int)HttpStatusCode.Unauthorized;
                         break;
+                    case InvalidInputException invalidInputException:
+                        response.StatusCode = (int)HttpStatusCode.BadRequest;
+                        break;
                     default:
                         response.StatusCode = (int)HttpStatusCode.InternalServerError;
                         break;
