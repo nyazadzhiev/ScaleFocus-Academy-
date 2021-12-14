@@ -27,12 +27,12 @@ namespace ProjectManagementApp.DAL.Repositories
             await database.SaveChangesAsync();
         }
 
-        public async Task<ToDoTask> GetTaskAsync(int id)
+        public async Task<ToDoTask> GetTaskByIdAsync(int id)
         {
             return await database.ToDoTasks.FirstOrDefaultAsync(t => t.Id == id);
         }
 
-        public async Task<ToDoTask> GetTaskAsync(string title)
+        public async Task<ToDoTask> GetTaskByTitleAsync(string title)
         {
             return await database.ToDoTasks.FirstOrDefaultAsync(t => t.Title == title);
         }

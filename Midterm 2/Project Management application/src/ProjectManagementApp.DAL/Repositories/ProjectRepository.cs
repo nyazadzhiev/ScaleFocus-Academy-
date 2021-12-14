@@ -37,9 +37,15 @@ namespace ProjectManagementApp.DAL.Repositories
             return await database.Projects.FirstOrDefaultAsync(p => p.Id == id);
         }
 
-        public List<Project> GetProjects(User user)
+        public List<Project> GetAllProjects()
         {
-            return database.Projects.Where(p => p.OwnerId == user.Id).ToList();
+            return database.Projects.ToList();
+        }
+
+        public List<Project> GetUserProjects(User user)
+        {
+            return database.Projects.Where(p => p.OwnerId == user.Id ||
+            p.Teams.Any(t => t.Users.Any(u => u.Id == user.Id))).ToList();
         }
 
         public void DeleteProject(Project project)
