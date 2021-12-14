@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -12,6 +14,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using ProjectManagementApp.BLL;
 using ProjectManagementApp.BLL.Contracts;
+using ProjectManagementApp.BLL.Handlers;
 using ProjectManagementApp.BLL.Services;
 using ProjectManagementApp.BLL.Validations;
 using ProjectManagementApp.DAL;
@@ -69,7 +72,6 @@ namespace ProjectManagementApp.WEB
                 });
             });
 
-
             services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(Configuration["ConnectionStrings:Default"]));
 
             services.AddIdentityCore<User>(options =>
@@ -81,6 +83,66 @@ namespace ProjectManagementApp.WEB
             })
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<DatabaseContext>();
+
+            var builder = services.AddIdentityServer((options) =>
+            {
+                options.EmitStaticAudienceClaim = true;
+            })
+                       .AddInMemoryApiScopes(IdentityConfig.ApiScopes)
+                       .AddInMemoryClients(IdentityConfig.Clients);
+
+            builder.AddDeveloperSigningCredential();
+            builder.AddResourceOwnerValidator<PasswordValidator>();
+
+            services
+                .AddAuthorization(options =>
+                {
+                    options.AddPolicy(
+                        "ProjectOwner", policy =>
+                        {
+                            policy.RequireAuthenticatedUser();
+                            policy.Requirements.Add(new ProjectOwnerRequirement());
+                        });
+
+                    options.AddPolicy(
+                        "TaskAccess", policy =>
+                        {
+                            policy.RequireAuthenticatedUser();
+                            policy.Requirements.Add(new TaskAccessRequirement());
+                        });
+
+                    options.AddPolicy(
+                        "WorkLogAccess", policy => 
+                        {
+                            policy.RequireAuthenticatedUser();
+                            policy.Requirements.Add(new TaskAssigneeRequirement());
+                        });
+
+                                        options.AddPolicy(
+                        "ProjectAccess", policy => 
+                        {
+                            policy.RequireAuthenticatedUser();
+                            policy.Requirements.Add(new ProjectAccessRequirement());
+                        });
+                })
+                
+                .AddAuthentication(options =>
+                {
+                    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+
+                .AddJwtBearer(options =>
+                {
+                    options.Authority = "https://localhost:5001";
+                    options.Audience = "https://localhost:5001/resources";
+                });
+
+            services.AddTransient<IAuthorizationHandler, ProjectOwnerHandler>();
+            services.AddTransient<IAuthorizationHandler, TaskAccessHandler>();
+            services.AddTransient<IAuthorizationHandler, TaskAssigneeHandler>();
+            services.AddTransient<IAuthorizationHandler, ProjectAccessHandler>();
 
             services.AddTransient<IValidationService, ValidationService>();
 
@@ -95,31 +157,6 @@ namespace ProjectManagementApp.WEB
             services.AddTransient<IProjectService, ProjectService>();
             services.AddTransient<ITaskService, TaskService>();
             services.AddTransient<IWorkLogService, WorkLogService>();
-
-            var builder = services.AddIdentityServer((options) =>
-            {
-                options.EmitStaticAudienceClaim = true;
-            })
-                       .AddInMemoryApiScopes(IdentityConfig.ApiScopes)
-                       .AddInMemoryClients(IdentityConfig.Clients);
-
-            builder.AddDeveloperSigningCredential();
-            builder.AddResourceOwnerValidator<PasswordValidator>();
-
-            services
-                .AddAuthorization()
-                .AddAuthentication(options =>
-                {
-                    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                })
-
-                .AddJwtBearer(options =>
-                {
-                    options.Authority = "https://localhost:5001";
-                    options.Audience = "https://localhost:5001/resources";
-                });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
