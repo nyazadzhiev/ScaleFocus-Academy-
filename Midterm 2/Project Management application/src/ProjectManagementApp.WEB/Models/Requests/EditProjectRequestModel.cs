@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace ProjectManagementApp.DAL.Models.Requests
+namespace ProjectManagementApp.WEB.Models.Requests
 {
     public class EditProjectRequestModel
     {

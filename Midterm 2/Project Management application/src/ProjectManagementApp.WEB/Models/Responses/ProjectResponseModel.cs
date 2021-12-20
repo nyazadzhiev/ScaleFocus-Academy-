@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ProjectManagementApp.DAL.Models.Responses
+namespace ProjectManagementApp.WEB.Models.Responses
 {
     public class ProjectResponseModel
     {

@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace ProjectManagementApp.DAL.Models.Requests
+namespace ProjectManagementApp.WEB.Models.Requests
 {
-    public class ProjectRequestModel
+    public class TeamRequestModel
     {
         [Required]
         [MinLength(5)]
         [MaxLength(20)]
-        public string Title { get; set; }
+        public string Name { get; set; }
     }
 }
