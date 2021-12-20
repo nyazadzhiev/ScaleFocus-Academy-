@@ -11,8 +11,8 @@ using Common;
 using ProjectManagementApp.BLL.Validations;
 using ProjectManagementApp.BLL.Exceptions;
 using System.Linq;
-using ProjectManagementApp.DAL.Models.Responses;
-using ProjectManagementApp.DAL.Models.Requests;
+using ProjectManagementApp.WEB.Models.Responses;
+using ProjectManagementApp.WEB.Models.Requests;
 using ProjectManagementApp.BLL.Contracts;
 
 namespace ProjectManagementApp.WEB.Controllers

@@ -6,10 +6,10 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using ProjectManagementApp.BLL.Services;
 using ProjectManagementApp.DAL;
-using ProjectManagementApp.DAL.Models.Requests;
+using ProjectManagementApp.WEB.Models.Requests;
 using ProjectManagementApp.DAL.Entities;
 using Common;
-using ProjectManagementApp.DAL.Models.Responses;
+using ProjectManagementApp.WEB.Models.Responses;
 using ProjectManagementApp.BLL.Validations;
 using ProjectManagementApp.BLL.Exceptions;
 using ProjectManagementApp.BLL.Contracts;
@@ -34,7 +34,7 @@ namespace ProjectManagementApp.WEB.Controllers
         }
 
         [Authorize]
-        [HttpGet("MyProjects")]
+        [HttpGet("own")]
         public async Task<ActionResult> GetMyProjects()
         {
             User currentUser = await userService.GetCurrentUserAsync(User);
@@ -158,7 +158,7 @@ namespace ProjectManagementApp.WEB.Controllers
         }
 
         [Authorize(Policy = "ProjectOwner")]
-        [HttpPost("{projectId}/Team/{teamId}")]
+        [HttpPost("{projectId}/Team/{teamId}/AddTeam")]
         public async Task<ActionResult> AddTeam(int projectId, int teamId)
         {
             User currentUser = await userService.GetCurrentUserAsync(User);
@@ -175,7 +175,7 @@ namespace ProjectManagementApp.WEB.Controllers
         }
 
         [Authorize(Policy = "ProjectOwner")]
-        [HttpDelete("{projectId}/Team/{teamId}")]
+        [HttpDelete("{projectId}/Team/{teamId}/RemoveTeam")]
         public async Task<ActionResult> RemoveTeam(int projectId, int teamId)
         {
             User currentUser = await userService.GetCurrentUserAsync(User);

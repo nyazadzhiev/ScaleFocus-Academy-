@@ -6,10 +6,10 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using ProjectManagementApp.BLL.Services;
 using ProjectManagementApp.DAL;
-using ProjectManagementApp.DAL.Models.Requests;
+using ProjectManagementApp.WEB.Models.Requests;
 using ProjectManagementApp.DAL.Entities;
 using Common;
-using ProjectManagementApp.DAL.Models.Responses;
+using ProjectManagementApp.WEB.Models.Responses;
 using ProjectManagementApp.BLL.Validations;
 using ProjectManagementApp.BLL.Exceptions;
 using ProjectManagementApp.BLL.Contracts;
@@ -35,7 +35,6 @@ namespace ProjectManagementApp.WEB.Controllers
         {
             User currentUser = await userService.GetCurrentUserAsync(User);
             validations.LoginCheck(currentUser);
-            //validations.CheckRole(currentUser);
 
             List<UserResponseModel> users = new List<UserResponseModel>();
 
@@ -59,7 +58,6 @@ namespace ProjectManagementApp.WEB.Controllers
         {
             User currentUser = await userService.GetCurrentUserAsync(User);
             validations.LoginCheck(currentUser);
-            //validations.CheckRole(currentUser);
 
             User userFromDB = await userService.GetUserById(id);
             validations.EnsureUserExist(userFromDB);
@@ -80,7 +78,6 @@ namespace ProjectManagementApp.WEB.Controllers
         {
             User currentUser = await userService.GetCurrentUserAsync(User);
             validations.LoginCheck(currentUser);
-            //validations.CheckRole(currentUser);
 
             bool isCreated = await userService.CreateUser(user.Username, user.Password, user.FirstName, user.LastName, user.Role);
 
