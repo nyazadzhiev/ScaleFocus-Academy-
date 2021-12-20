@@ -13,7 +13,7 @@ namespace ProjectManagementApp.WEB.Models.Requests
         public string Username { get; set; }
 
         [Required]
-        [MinLength(5)]
+        [MinLength(6)]
         [MaxLength(50)]
         public string Password { get; set; }
 
