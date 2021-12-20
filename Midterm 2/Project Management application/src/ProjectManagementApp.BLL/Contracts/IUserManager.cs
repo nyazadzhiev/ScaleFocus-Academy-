@@ -1,4 +1,5 @@
-﻿using ProjectManagementApp.DAL.Entities;
+﻿using Microsoft.AspNetCore.Identity;
+using ProjectManagementApp.DAL.Entities;
 using System;
 using System.Collections.Generic;
 using System.Security.Claims;
@@ -15,11 +16,11 @@ namespace ProjectManagementApp.BLL.Contracts
         Task<User> GetUserByUsernameAsync(string name);
         Task<User> GetUserByIdAsync(string id);
         Task<List<User>> GetAllAsync();
-        Task CreateUserAsync(User user, string password);
+        Task<IdentityResult> CreateUserAsync(User user, string password);
         Task<List<string>> GetUserRolesAsync(User user);
-        Task DeleteUserAsync(User user);
-        Task AddUserToRoleAsync(User user, string role);
-        Task UpdateUserAsync(User user, string newUsername, string newPassword, string newFirstName, string newLastName);
+        Task<IdentityResult> DeleteUserAsync(User user);
+        Task<IdentityResult> AddUserToRoleAsync(User user, string role);
+        Task<bool> UpdateUserAsync(User user, string newUsername, string newPassword, string newFirstName, string newLastName);
         Task<bool> ValidateUserCredentials(string userName, string password);
     }
 

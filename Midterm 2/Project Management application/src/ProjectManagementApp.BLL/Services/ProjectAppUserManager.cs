@@ -37,9 +37,9 @@ namespace ProjectManagementApp.BLL.Services
 
         }
 
-        public async Task CreateUserAsync(User user, string password)
+        public async Task<IdentityResult> CreateUserAsync(User user, string password)
         {
-            await CreateAsync(user, password);
+            return await CreateAsync(user, password);
         }
 
         public async Task<List<User>> GetAllAsync()
@@ -66,23 +66,25 @@ namespace ProjectManagementApp.BLL.Services
             return (await GetRolesAsync(user)).ToList();
         }
 
-        public async Task UpdateUserAsync(User user, string newUsername, string newPassword, string newFirstName, string newLastName)
+        public async Task<bool> UpdateUserAsync(User user, string newUsername, string newPassword, string newFirstName, string newLastName)
         {
             user.UserName = newUsername;
             user.FirstName = newFirstName;
             user.LastName = newLastName;
             await UpdatePasswordHash(user, newPassword, true);
             await UpdateUserAsync(user);
+
+            return true;
         }
 
-        public async Task DeleteUserAsync(User user)
+        public async Task<IdentityResult> DeleteUserAsync(User user)
         {
-            await DeleteAsync(user);
+            return await DeleteAsync(user);
         }
 
-        public async Task AddUserToRoleAsync(User user, string role)
+        public async Task<IdentityResult> AddUserToRoleAsync(User user, string role)
         {
-            await AddToRoleAsync(user, role);
+            return await AddToRoleAsync(user, role);
         }
 
         public async Task<bool> IsUserInRole(string userId, string roleId)
